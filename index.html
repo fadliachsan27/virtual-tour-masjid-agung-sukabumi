@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Masjid Agung Sukabumi - Virtual Tour 360°</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Pannellum (360° Viewer) -->
+  <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ======================================================
+     NAVIGASI
+====================================================== -->
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo">☽</div>
+    <div class="nav-title">
+      Masjid Agung Sukabumi
+      <span>Virtual Tour</span>
+    </div>
+  </div>
+
+  <div class="nav-links" id="main-nav">
+    <button class="nav-btn active" onclick="showPage('home')">Beranda</button>
+    <button class="nav-btn"        onclick="showPage('gallery-page')">Galeri</button>
+    <button class="nav-btn"        onclick="showPage('tour')">Virtual Tour</button>
+    <button class="nav-cta"        onclick="showPage('login')">Login Admin</button>
+  </div>
+</nav>
+
+
+<!-- ======================================================
+     HALAMAN: LOGIN
+====================================================== -->
+<div class="page" id="login">
+  <div class="login-card fade-in">
+
+    <div class="login-header">
+      <div class="login-logo">☽</div>
+      <h2 class="login-title">Selamat Datang</h2>
+      <p class="login-sub">Masuk ke portal Masjid Agung Sukabumi</p>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchLoginTab('user')">Pengunjung</button>
+      <button class="login-tab"        onclick="switchLoginTab('admin')">Admin</button>
+    </div>
+
+    <div class="login-error" id="login-error">Username atau password salah</div>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input type="text"     class="form-input" id="login-user" placeholder="Masukkan username">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" class="form-input" id="login-pass" placeholder="••••••••">
+    </div>
+
+    <button class="btn-primary" style="width:100%;margin-top:8px" onclick="doLogin()">Masuk</button>
+
+    <div class="login-hint" id="login-hint">
+      Demo: user = <strong>pengunjung / 12345</strong><br>
+      admin = <strong>admin / admin123</strong>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================================================
+     HALAMAN: BERANDA
+====================================================== -->
+<div class="page active" id="home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-pattern"></div>
+    <div class="hero-content fade-in">
+      <div class="hero-badge">Virtual Tour 360° Masjid Agung Sukabumi</div>
+      <h1 class="hero-title">
+        Jelajahi Keindahan
+        <span>Masjid Agung Sukabumi</span>
+      </h1>
+      <p class="hero-sub" id="hero-desc">
+        Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang memukau.
+        Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="showPage('tour')">Mulai Virtual Tour ▶</button>
+        <button class="btn-outline" onclick="scrollToInfo()">Profil Masjid</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-num"  id="stat-kapasitas">5.000</span>
+      <span class="stat-label">Kapasitas Jamaah</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num"  id="stat-berdiri">1965</span>
+      <span class="stat-label">Tahun Berdiri</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">4</span>
+      <span class="stat-label">Titik Virtual Tour</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">360°</span>
+      <span class="stat-label">Panorama Lengkap</span>
+    </div>
+  </div>
+
+  <!-- Titik Tour Spots -->
+  <section style="text-align:center">
+    <div class="section-label">Jelajahi Setiap Sudut</div>
+    <h2 class="section-title">Titik Virtual Tour</h2>
+    <p class="section-sub" style="margin:0 auto">
+      Pilih salah satu titik di bawah untuk memulai perjalanan virtual Anda.
+    </p>
+    <div class="spots-grid" id="spots-grid">
+      <!-- Diisi oleh JavaScript -->
+    </div>
+  </section>
+
+  <!-- Profil Masjid -->
+  <section id="info-section" style="background:var(--dark2)">
+    <div style="max-width:1000px;margin:0 auto">
+      <div class="section-label">Tentang Kami</div>
+      <h2 class="section-title">Profil Masjid</h2>
+      <div class="info-grid">
+        <div class="info-text">
+          <p id="profil-text" style="color:var(--text-muted);line-height:1.9;font-size:15px">
+            Masjid Agung Sukabumi berdiri megah sebagai pusat spiritual dan kebudayaan Islam di jantung kota.
+          </p>
+          <p id="profil-text2" style="color:var(--text-muted);line-height:1.9;font-size:15px;margin-top:16px">
+            Dengan arsitektur yang memadukan gaya Timur Tengah dan kearifan lokal.
+          </p>
+        </div>
+        <div class="info-items" id="info-items">
+          <!-- Diisi oleh JavaScript -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galeri Preview -->
+  <section style="padding-left:0;padding-right:0">
+    <div style="padding:0 2rem">
+      <div class="section-label">Galeri Foto</div>
+      <h2 class="section-title">Keindahan Masjid</h2>
+    </div>
+    <div class="gallery-scroll" id="gallery-scroll">
+      <!-- Diisi oleh JavaScript -->
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">Masjid Al-Nuur</div>
+    <p class="footer-sub" id="footer-alamat">Jl. Raya Masjid No. 1, Kota</p>
+    <div class="footer-bottom">
+      © 2025 Masjid Al-Nuur — Virtual Tour 360°. Semua hak dilindungi.
+    </div>
+  </footer>
+
+</div><!-- /home -->
+
+
+<!-- ======================================================
+     HALAMAN: GALERI
+====================================================== -->
+<div class="page" id="gallery-page">
+  <section style="text-align:center;min-height:100vh">
+    <div class="section-label">Dokumentasi</div>
+    <h2 class="section-title">Galeri Masjid</h2>
+    <p class="section-sub" style="margin:0 auto">
+      Koleksi foto keindahan arsitektur dan kegiatan Masjid Al-Nuur
+    </p>
+    <div class="gallery-page-grid" id="gallery-page-grid">
+      <!-- Diisi oleh JavaScript -->
+    </div>
+  </section>
+</div>
+
+
+<!-- ======================================================
+     HALAMAN: VIRTUAL TOUR 360°
+====================================================== -->
+<div class="page" id="tour">
+
+  <div class="tour-header">
+    <div>
+      <div class="tour-title">Virtual Tour 360°</div>
+      <div class="tour-subtitle">Gunakan mouse atau sentuh layar untuk menjelajah</div>
+    </div>
+    <button class="btn-outline" style="font-size:13px;padding:8px 16px" onclick="showPage('home')">
+      ← Kembali
+    </button>
+  </div>
+
+  <div class="tour-layout">
+
+    <!-- Sidebar pilih lokasi -->
+    <div class="tour-sidebar">
+      <div class="sidebar-section-title">Pilih Lokasi</div>
+      <div id="tour-spot-list">
+        <!-- Diisi oleh JavaScript -->
+      </div>
+    </div>
+
+    <!-- Viewer panorama -->
+    <div class="tour-main">
+      <div class="tour-loading" id="tour-loading">
+        <div class="tour-loading-spinner"></div>
+        <div class="tour-loading-text">Memuat panorama 360°...</div>
+      </div>
+      <div id="pannellum-container" style="height:calc(100vh - 128px)"></div>
+
+      <!-- Info panel bawah -->
+      <div class="tour-info-panel" id="tour-info-panel">
+        <div class="tip-name" id="tip-name">Ruang Utama</div>
+        <div class="tip-desc" id="tip-desc">Klik dan seret untuk melihat sekeliling</div>
+        <div class="tip-nav">
+          <button class="tip-nav-btn" onclick="prevSpot()">← Sebelumnya</button>
+          <button class="tip-nav-btn" onclick="nextSpot()">Berikutnya →</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- /tour -->
+
+
+<!-- ======================================================
+     HALAMAN: ADMIN PANEL
+====================================================== -->
+<div class="page" id="admin">
+  <div class="admin-layout">
+
+    <!-- Sidebar Admin -->
+    <div class="admin-sidebar">
+      <div class="admin-brand">
+        <div class="admin-brand-title">Panel Admin</div>
+        <div class="admin-brand-sub" id="admin-username-display">admin</div>
+      </div>
+
+      <button class="admin-menu-item active" onclick="switchAdmin('dashboard')">
+        <span class="admin-menu-icon">📊</span>Dashboard
+      </button>
+      <button class="admin-menu-item" onclick="switchAdmin('info')">
+        <span class="admin-menu-icon">🕌</span>Info Masjid
+      </button>
+      <button class="admin-menu-item" onclick="switchAdmin('spots')">
+        <span class="admin-menu-icon">📍</span>Titik Virtual Tour
+      </button>
+      <button class="admin-menu-item" onclick="switchAdmin('gallery')">
+        <span class="admin-menu-icon">🖼️</span>Kelola Galeri
+      </button>
+
+      <div style="flex:1"></div>
+
+      <button class="admin-menu-item" onclick="doLogout()" style="color:#f87171">
+        <span class="admin-menu-icon">🚪</span>Logout
+      </button>
+    </div>
+
+    <!-- Konten Admin -->
+    <div class="admin-content" id="admin-content">
+      <!-- Diisi oleh JavaScript -->
+    </div>
+
+  </div>
+</div><!-- /admin -->
+
+
+<!-- Script Utama -->
+<script src="main.js"></script>
+
+</body>
+</html>
