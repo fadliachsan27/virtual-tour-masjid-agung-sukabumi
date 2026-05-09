@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Masjid Agung Sukabumi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #c9a84c;
+      --bg: #0e0e0e;
+      --surface: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.1);
+      --text: rgba(255,255,255,0.85);
+      --muted: rgba(255,255,255,0.4);
+    }
+    body { background: var(--bg); color: var(--text); font-family: 'Lato', sans-serif; min-height: 100vh; display: flex; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px; min-height: 100vh; background: rgba(0,0,0,0.4);
+      border-right: 1px solid var(--border); flex-shrink: 0;
+      display: flex; flex-direction: column; padding: 28px 0;
+    }
+    .sidebar-brand {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-brand-title {
+      font-family: 'Playfair Display', serif; color: var(--gold); font-size: 15px;
+    }
+    .sidebar-brand-sub { font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 2px; }
+    .sidebar-nav a {
+      display: flex; align-items: center; gap: 10px; padding: 11px 20px;
+      color: var(--muted); text-decoration: none; font-size: 14px; transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar-nav a:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .sidebar-nav a.active { color: var(--gold); border-left-color: var(--gold); background: rgba(201,168,76,0.07); }
+    .sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); }
+    .sidebar-bottom a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .sidebar-bottom a:hover { color: #ff6b6b; }
+
+    /* Main */
+    .main { flex: 1; padding: 36px 40px; overflow-y: auto; }
+    .page-header { margin-bottom: 32px; }
+    .page-title { font-family: 'Playfair Display', serif; font-size: 26px; color: #fff; }
+    .page-sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    /* Card */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px 28px; margin-bottom: 24px;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif; font-size: 17px; color: var(--gold);
+      margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Preview */
+    .preview-box {
+      width: 100%; height: 240px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border); background: #111; position: relative; margin-bottom: 16px;
+    }
+    .preview-box .preview-img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .preview-label {
+      position: absolute; bottom: 8px; left: 8px;
+      background: rgba(0,0,0,0.7); color: var(--gold);
+      font-size: 11px; padding: 4px 10px; border-radius: 10px; letter-spacing: 1px;
+    }
+
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed var(--border); border-radius: 12px;
+      padding: 24px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255,255,255,0.02);
+    }
+    .upload-area:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+    .upload-area.drag-over { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+    .upload-icon { font-size: 28px; margin-bottom: 8px; }
+    .upload-text { color: var(--muted); font-size: 13px; }
+    .upload-text strong { color: var(--gold); }
+    input[type="file"] { display: none; }
+
+    /* Buttons */
+    .btn-save {
+      padding: 11px 24px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      color: #fff; font-size: 14px; cursor: pointer; font-family: 'Lato', sans-serif;
+      font-weight: 700; transition: opacity 0.2s; margin-top: 12px;
+    }
+    .btn-save:hover { opacity: 0.9; }
+    .btn-reset {
+      padding: 11px 20px; border-radius: 10px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-size: 14px; cursor: pointer; margin-top: 12px; margin-left: 10px;
+      font-family: 'Lato', sans-serif;
+    }
+    .btn-reset:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+
+    /* Location tabs */
+    .location-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .loc-tab {
+      padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted); cursor: pointer; font-size: 13px;
+      font-family: 'Lato', sans-serif; transition: all 0.2s;
+    }
+    .loc-tab:hover { border-color: var(--gold); color: var(--gold); }
+    .loc-tab.active { background: rgba(201,168,76,0.15); border-color: var(--gold); color: var(--gold); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 999;
+      background: #1a1a1a; border: 1px solid var(--gold); border-radius: 10px;
+      padding: 14px 20px; color: var(--gold); font-size: 14px;
+      transform: translateY(80px); opacity: 0; transition: all 0.3s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px 20px;
+    }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gold); }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* Settings form */
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; padding: 11px 14px; border-radius: 8px;
+      background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      color: #fff; font-size: 14px; font-family: 'Lato', sans-serif; outline: none;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-title">Admin Panel</div>
+    <div class="sidebar-brand-sub">MASJID AGUNG SUKABUMI</div>
+  </div>
+  <div class="sidebar-nav">
+    <a href="#dashboard" class="active" onclick="showPage('dashboard', this)">📊 Dashboard</a>
+    <a href="#hero" onclick="showPage('hero', this)">🖼 Background Hero</a>
+    <a href="#panorama" onclick="showPage('panorama', this)">🔄 Foto Panorama</a>
+    <a href="#settings" onclick="showPage('settings', this)">⚙ Pengaturan</a>
+  </div>
+  <div class="sidebar-bottom">
+    <a href="../index.html" style="display:block; margin-bottom:8px; color:rgba(255,255,255,0.4)">← Lihat Website</a>
+    <a href="#" onclick="doLogout()">🚪 Logout</a>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard">
+    <div class="page-header">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Selamat datang di panel admin Masjid Agung Sukabumi</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Lokasi Virtual Tour</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statPanos">1</div>
+        <div class="stat-label">Foto Panorama Aktif</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">360°</div>
+        <div class="stat-label">Format Panorama</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🚀 Quick Actions</div>
+      <button class="btn-save" onclick="showPage('hero', document.querySelector('[onclick*=hero]'))">Ganti Background Hero</button>
+      <button class="btn-save" style="margin-left:10px" onclick="showPage('panorama', document.querySelector('[onclick*=panorama]'))">Upload Foto Panorama</button>
+    </div>
+  </div>
+
+  <!-- HERO BACKGROUND -->
+  <div id="page-hero" style="display:none">
+    <div class="page-header">
+      <div class="page-title">🖼 Background Hero</div>
+      <div class="page-sub">Ganti foto 360° yang tampil di halaman depan website</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Preview Background Saat Ini</div>
+      <div class="preview-box">
+        <img id="heroPreviewImg" class="preview-img" src="../images/hero-360.png" alt="Hero"/>
+        <div class="preview-label">HERO PANORAMA</div>
+      </div>
+      <div class="upload-area" id="heroUploadArea" onclick="document.getElementById('heroFileInput').click()">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop foto 360° di sini</div>
+        <div class="upload-text" style="margin-top:4px; font-size:11px;">Format: JPG, PNG, WEBP • Disarankan foto equirectangular 360°</div>
+      </div>
+      <input type="file" id="heroFileInput" accept="image/*"/>
+      <br/>
+      <button class="btn-save" onclick="saveHeroBg()">💾 Simpan Background</button>
+      <button class="btn-reset" onclick="resetHeroBg()">↩ Reset Default</button>
+    </div>
+  </div>
+
+  <!-- PANORAMA LOCATIONS -->
+  <div id="page-panorama" style="display:none">
+    <div class="page-header">
+      <div class="page-title">🔄 Foto Panorama Virtual Tour</div>
+      <div class="page-sub">Upload foto 360° untuk setiap lokasi virtual tour</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Pilih Lokasi</div>
+      <div class="location-tabs">
+        <button class="loc-tab active" onclick="selectPanoLoc(0, this)">🕌 Ruang Utama</button>
+        <button class="loc-tab" onclick="selectPanoLoc(1, this)">🏛️ Aula & Selasar</button>
+        <button class="loc-tab" onclick="selectPanoLoc(2, this)">🌿 Halaman & Taman</button>
+        <button class="loc-tab" onclick="selectPanoLoc(3, this)">🔔 Menara & Kubah</button>
+      </div>
+
+      <div id="panoPreviewBox" class="preview-box" style="height:280px; margin-bottom:16px;">
+        <!-- pannellum will init here -->
+      </div>
+
+      <div class="upload-area" id="panoUploadArea" onclick="document.getElementById('panoFileInput').click()">
+        <div class="upload-icon">🌐</div>
+        <div class="upload-text"><strong>Upload foto equirectangular 360°</strong> untuk lokasi ini</div>
+        <div class="upload-text" style="margin-top:4px; font-size:11px;">Rasio ideal 2:1 (mis. 4096×2048px) • JPG, PNG</div>
+      </div>
+      <input type="file" id="panoFileInput" accept="image/*"/>
+      <br/>
+      <button class="btn-save" onclick="savePano()">💾 Simpan Foto Lokasi Ini</button>
+      <button class="btn-reset" onclick="resetPano()">↩ Reset Default</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="page-settings" style="display:none">
+    <div class="page-header">
+      <div class="page-title">⚙ Pengaturan</div>
+      <div class="page-sub">Konfigurasi akun dan sistem</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ganti Kredensial Admin</div>
+      <div class="form-group">
+        <label>Username Baru</label>
+        <input type="text" id="newUser" placeholder="Masukkan username baru"/>
+      </div>
+      <div class="form-group">
+        <label>Password Baru</label>
+        <input type="password" id="newPass" placeholder="Masukkan password baru"/>
+      </div>
+      <div class="form-group">
+        <label>Konfirmasi Password</label>
+        <input type="password" id="confPass" placeholder="Ulangi password baru"/>
+      </div>
+      <button class="btn-save" onclick="saveCredentials()">💾 Simpan Kredensial</button>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast">✅ Berhasil disimpan!</div>
+
+<script>
+// Auth guard
+if (localStorage.getItem('adminLoggedIn') !== '1') {
+  window.location.href = 'login.html';
+}
+function doLogout() {
+  localStorage.removeItem('adminLoggedIn');
+  window.location.href = 'login.html';
+}
+
+// Page navigation
+function showPage(name, el) {
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + name).style.display = 'block';
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (name === 'panorama') { if (db) initPanoPreview(); }
+  return false;
+}
+
+// Toast
+function showToast(msg, dur) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), dur || 3000);
+}
+
+// ================================================
+// IndexedDB — dipakai untuk HERO dan PANORAMA
+// ================================================
+let db = null;
+
+function openDB() {
+  return new Promise((res, rej) => {
+    // Hapus database lama yang mungkin bermasalah, buka versi baru
+    const req = indexedDB.open('virtualTourDB', 2);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('panoramas')) {
+        d.createObjectStore('panoramas');
+      }
+    };
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = e => rej(e.target.error);
+  });
+}
+
+function dbPut(key, blob) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction('panoramas', 'readwrite');
+    tx.objectStore('panoramas').put(blob, key);
+    tx.oncomplete = () => res(true);
+    tx.onerror = e => rej(e.target.error);
+  });
+}
+function dbGet(key) {
+  return new Promise(res => {
+    const tx = db.transaction('panoramas', 'readonly');
+    const req = tx.objectStore('panoramas').get(key);
+    req.onsuccess = () => res(req.result || null);
+    req.onerror = () => res(null);
+  });
+}
+function dbDelete(key) {
+  return new Promise(res => {
+    const tx = db.transaction('panoramas', 'readwrite');
+    tx.objectStore('panoramas').delete(key);
+    tx.oncomplete = res; tx.onerror = res;
+  });
+}
+
+// ================================================
+// Kompres gambar otomatis pakai Canvas
+// maxW: lebar max output (px), quality: 0–1 JPEG quality
+// ================================================
+function compressImage(file, maxW, quality) {
+  return new Promise((res) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const ratio = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width * ratio);
+      const h = Math.round(img.height * ratio);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(blob => res(blob), 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); res(file); };
+    img.src = url;
+  });
+}
+
+// ================================================
+// HERO BACKGROUND — simpan di IndexedDB juga
+// ================================================
+let heroPendingBlob = null;
+let heroPreviewURL = null;
+
+async function loadHeroPreview() {
+  const blob = await dbGet('hero_bg');
+  if (blob) {
+    heroPreviewURL = URL.createObjectURL(blob);
+    document.getElementById('heroPreviewImg').src = heroPreviewURL;
+  }
+}
+
+async function handleHeroFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  showToast('⏳ Memproses foto hero...', 15000);
+  // Kompres: max 4096px lebar, quality 0.85
+  const compressed = await compressImage(file, 4096, 0.85);
+  if (heroPreviewURL) URL.revokeObjectURL(heroPreviewURL);
+  heroPreviewURL = URL.createObjectURL(compressed);
+  heroPendingBlob = compressed;
+  document.getElementById('heroPreviewImg').src = heroPreviewURL;
+  const sizeMB = (compressed.size / 1024 / 1024).toFixed(1);
+  showToast('📷 Foto dipilih (' + sizeMB + ' MB) — klik Simpan');
+}
+
+document.getElementById('heroFileInput').addEventListener('change', e => handleHeroFile(e.target.files[0]));
+const heroArea = document.getElementById('heroUploadArea');
+heroArea.addEventListener('dragover', e => { e.preventDefault(); heroArea.classList.add('drag-over'); });
+heroArea.addEventListener('dragleave', () => heroArea.classList.remove('drag-over'));
+heroArea.addEventListener('drop', e => { e.preventDefault(); heroArea.classList.remove('drag-over'); handleHeroFile(e.dataTransfer.files[0]); });
+
+async function saveHeroBg() {
+  if (!heroPendingBlob) { showToast('⚠ Pilih foto dulu!'); return; }
+  if (!db) { showToast('⚠ Database belum siap'); return; }
+  showToast('⏳ Menyimpan...', 10000);
+  try {
+    await dbPut('hero_bg', heroPendingBlob);
+    showToast('✅ Background hero berhasil disimpan!');
+  } catch(e) { showToast('⚠ Gagal: ' + e.message); }
+}
+
+async function resetHeroBg() {
+  await dbDelete('hero_bg');
+  heroPendingBlob = null;
+  if (heroPreviewURL) { URL.revokeObjectURL(heroPreviewURL); heroPreviewURL = null; }
+  document.getElementById('heroPreviewImg').src = '../images/hero-360.png';
+  document.getElementById('heroFileInput').value = '';
+  showToast('↩ Background direset ke default');
+}
+
+// ================================================
+// PANORAMA LOCATIONS
+// ================================================
+const panoLocations = [
+  { name: 'Ruang Utama (Mihrab)', key: 'pano_0' },
+  { name: 'Aula & Selasar',       key: 'pano_1' },
+  { name: 'Halaman & Taman',      key: 'pano_2' },
+  { name: 'Menara & Kubah',       key: 'pano_3' },
+];
+let currentPanoLoc = 0;
+let panoPendingBlobs = {};  // index → compressed Blob siap simpan
+let panoObjectURLs = {};    // index → object URL untuk viewer
+let panoViewer = null;
+
+async function loadAllPanoFromDB() {
+  for (let i = 0; i < panoLocations.length; i++) {
+    const blob = await dbGet(panoLocations[i].key);
+    if (blob) {
+      if (panoObjectURLs[i]) URL.revokeObjectURL(panoObjectURLs[i]);
+      panoObjectURLs[i] = URL.createObjectURL(blob);
+    }
+  }
+  const count = Object.keys(panoObjectURLs).length;
+  document.getElementById('statPanos').textContent = count || 1;
+}
+
+function initPanoPreview() {
+  const src = panoObjectURLs[currentPanoLoc] || '../images/hero-360.png';
+  const box = document.getElementById('panoPreviewBox');
+  box.innerHTML = '';
+  if (panoViewer) { try { panoViewer.destroy(); } catch(e) {} panoViewer = null; }
+  panoViewer = pannellum.viewer('panoPreviewBox', {
+    type: 'equirectangular',
+    panorama: src,
+    autoLoad: true,
+    autoRotate: -2,
+    showControls: true,
+    hfov: 100,
+  });
+}
+
+function selectPanoLoc(idx, el) {
+  currentPanoLoc = idx;
+  document.querySelectorAll('.loc-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  initPanoPreview();
+}
+
+async function handlePanoFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  showToast('⏳ Memproses foto 360°... harap tunggu', 30000);
+  // Kompres: max 6000px (cukup untuk 360°), quality 0.88
+  const compressed = await compressImage(file, 6000, 0.88);
+  panoPendingBlobs[currentPanoLoc] = compressed;
+  if (panoObjectURLs[currentPanoLoc]) URL.revokeObjectURL(panoObjectURLs[currentPanoLoc]);
+  panoObjectURLs[currentPanoLoc] = URL.createObjectURL(compressed);
+  initPanoPreview();
+  const sizeMB = (compressed.size / 1024 / 1024).toFixed(1);
+  showToast('📸 Foto dipilih (' + sizeMB + ' MB) — klik Simpan');
+}
+
+document.getElementById('panoFileInput').addEventListener('change', e => handlePanoFile(e.target.files[0]));
+const panoArea = document.getElementById('panoUploadArea');
+panoArea.addEventListener('dragover', e => { e.preventDefault(); panoArea.classList.add('drag-over'); });
+panoArea.addEventListener('dragleave', () => panoArea.classList.remove('drag-over'));
+panoArea.addEventListener('drop', e => { e.preventDefault(); panoArea.classList.remove('drag-over'); handlePanoFile(e.dataTransfer.files[0]); });
+
+async function savePano() {
+  const blob = panoPendingBlobs[currentPanoLoc];
+  if (!blob) { showToast('⚠ Belum ada foto yang diupload!'); return; }
+  if (!db) { showToast('⚠ Database belum siap'); return; }
+  showToast('⏳ Menyimpan foto...', 15000);
+  try {
+    await dbPut(panoLocations[currentPanoLoc].key, blob);
+    showToast('✅ Foto "' + panoLocations[currentPanoLoc].name + '" disimpan!');
+    document.getElementById('statPanos').textContent = Object.keys(panoObjectURLs).length;
+  } catch(e) { showToast('⚠ Gagal: ' + e.message); }
+}
+
+async function resetPano() {
+  if (!db) return;
+  await dbDelete(panoLocations[currentPanoLoc].key);
+  delete panoPendingBlobs[currentPanoLoc];
+  if (panoObjectURLs[currentPanoLoc]) { URL.revokeObjectURL(panoObjectURLs[currentPanoLoc]); delete panoObjectURLs[currentPanoLoc]; }
+  document.getElementById('panoFileInput').value = '';
+  initPanoPreview();
+  showToast('↩ Foto "' + panoLocations[currentPanoLoc].name + '" direset');
+}
+
+// ===== SETTINGS =====
+function saveCredentials() {
+  const u = document.getElementById('newUser').value.trim();
+  const p = document.getElementById('newPass').value;
+  const c = document.getElementById('confPass').value;
+  if (!u || !p) { showToast('⚠ Username dan password wajib diisi!'); return; }
+  if (p !== c) { showToast('⚠ Password tidak cocok!'); return; }
+  localStorage.setItem('admin_user', u);
+  localStorage.setItem('admin_pass', p);
+  showToast('✅ Kredensial berhasil diperbarui!');
+}
+
+// ===== INIT =====
+openDB().then(d => {
+  db = d;
+  loadHeroPreview();
+  loadAllPanoFromDB();
+}).catch(e => {
+  showToast('⚠ Gagal buka database: ' + e.message);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galeri - Masjid Agung Sukabumi</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    .galeri-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+    .galeri-item {
+      aspect-ratio: 4/3; border-radius: 12px; overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+    }
+    .galeri-item img { width:100%; height:100%; object-fit:cover; transition: transform 0.4s; }
+    .galeri-item:hover img { transform: scale(1.06); }
+    body { padding-top: var(--navbar-h); }
+    .section { padding-top: 60px; }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
+      <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
+      <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
+    </svg>
+    <div><div class="nav-title">Masjid Agung Sukabumi</div><div class="nav-subtitle">VIRTUAL TOUR</div></div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Beranda</a>
+    <a href="galeri.html" class="nav-link active">Galeri</a>
+    <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
+    <a href="admin/login.html" class="btn-admin">Login Admin</a>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">GALERI FOTO</div>
+      <h2 class="section-title">Keindahan Masjid Agung Sukabumi</h2>
+    </div>
+    <div class="galeri-grid" id="galeriGrid">
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 1"/></div>
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 2"/></div>
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 3"/></div>
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 4"/></div>
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 5"/></div>
+      <div class="galeri-item"><img src="images/hero-360.png" alt="Foto 6"/></div>
+    </div>
+  </div>
+</section>
+<footer class="footer"><p>© 2025 Masjid Agung Sukabumi Virtual Tour</p></footer>
+<script>
+if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+window.addEventListener('scroll', () => {
+  document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+</script>
+</body>
+</html>

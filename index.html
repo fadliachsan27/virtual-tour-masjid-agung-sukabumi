@@ -1,293 +1,268 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Masjid Agung Sukabumi - Virtual Tour 360°</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Pannellum (360° Viewer) -->
-  <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Masjid Agung Sukabumi - Virtual Tour</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <!-- Pannellum 360 viewer -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
-
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ======================================================
-     NAVIGASI
-====================================================== -->
-<nav>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
   <div class="nav-brand">
-    <div class="nav-logo">☽</div>
-    <div class="nav-title">
-      Masjid Agung Sukabumi
-      <span>Virtual Tour</span>
+    <div class="nav-logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
+        <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
+        <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
+        <circle cx="18" cy="5" r="2" fill="#c9a84c"/>
+      </svg>
+    </div>
+    <div>
+      <div class="nav-title">Masjid Agung Sukabumi</div>
+      <div class="nav-subtitle">VIRTUAL TOUR</div>
     </div>
   </div>
 
-  <div class="nav-links" id="main-nav">
-    <button class="nav-btn active" onclick="showPage('home')">Beranda</button>
-    <button class="nav-btn"        onclick="showPage('gallery-page')">Galeri</button>
-    <button class="nav-btn"        onclick="showPage('tour')">Virtual Tour</button>
-    <button class="nav-cta"        onclick="showPage('login')">Login Admin</button>
+  <div class="nav-prayer-card">
+  
+  <div class="prayer-grid">
+    <div class="prayer-item">
+      <div class="p-label">IMSAK</div>
+      <div id="imsakTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">SUBUH</div>
+      <div id="subuhTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">TERBIT</div>
+      <div id="terbitTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">DZUHUR</div>
+      <div id="dzuhurTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">ASHAR</div>
+      <div id="asharTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">MAGHRIB</div>
+      <div id="maghribTime" class="p-time">--:--</div>
+    </div>
+    <div class="prayer-item">
+      <div class="p-label">ISYA</div>
+      <div id="isyaTime" class="p-time">--:--</div>
+    </div>
   </div>
+  </div>
+</div>
+  
+<div class="nav-links">
+  <div class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Beranda</a>
+    <a href="galeri.html" class="nav-link">Galeri</a>
+    <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
+    <!-- <a href="admin/login.html" class="btn-admin-mobile">Login Admin</a> -->
+  </div>
+
+  <button class="btn-theme" id="themeToggle" title="Ganti Tema">
+    <span class="icon-light">🌙</span>
+    <span class="icon-dark">☀️</span>
+  </button>
+
+  <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
+    </svg>
+  </a>
+</div>
 </nav>
 
-
-<!-- ======================================================
-     HALAMAN: LOGIN
-====================================================== -->
-<div class="page" id="login">
-  <div class="login-card fade-in">
-
-    <div class="login-header">
-      <div class="login-logo">☽</div>
-      <h2 class="login-title">Selamat Datang</h2>
-      <p class="login-sub">Masuk ke portal Masjid Agung Sukabumi</p>
-    </div>
-
-    <div class="login-tabs">
-      <button class="login-tab active" onclick="switchLoginTab('user')">Pengunjung</button>
-      <button class="login-tab"        onclick="switchLoginTab('admin')">Admin</button>
-    </div>
-
-    <div class="login-error" id="login-error">Username atau password salah</div>
-
-    <div class="form-group">
-      <label class="form-label">Username</label>
-      <input type="text"     class="form-input" id="login-user" placeholder="Masukkan username">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Password</label>
-      <input type="password" class="form-input" id="login-pass" placeholder="••••••••">
-    </div>
-
-    <button class="btn-primary" style="width:100%;margin-top:8px" onclick="doLogin()">Masuk</button>
-
-    <div class="login-hint" id="login-hint">
-      Demo: user = <strong>pengunjung / 12345</strong><br>
-      admin = <strong>admin / admin123</strong>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- ======================================================
-     HALAMAN: BERANDA
-====================================================== -->
-<div class="page active" id="home">
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-pattern"></div>
-    <div class="hero-content fade-in">
-      <div class="hero-badge">Virtual Tour 360° Masjid Agung Sukabumi</div>
-      <h1 class="hero-title">
-        Jelajahi Keindahan
-        <span>Masjid Agung Sukabumi</span>
-      </h1>
-      <p class="hero-sub" id="hero-desc">
-        Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang memukau.
-        Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
-      </p>
-      <div class="hero-buttons">
-        <button class="btn-primary" onclick="showPage('tour')">Mulai Virtual Tour ▶</button>
-        <button class="btn-outline" onclick="scrollToInfo()">Profil Masjid</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Stats Bar -->
-  <div class="stats-bar">
-    <div class="stat">
-      <span class="stat-num"  id="stat-kapasitas">5.000</span>
-      <span class="stat-label">Kapasitas Jamaah</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num"  id="stat-berdiri">1965</span>
-      <span class="stat-label">Tahun Berdiri</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num">4</span>
-      <span class="stat-label">Titik Virtual Tour</span>
-    </div>
-    <div class="stat">
-      <span class="stat-num">360°</span>
-      <span class="stat-label">Panorama Lengkap</span>
-    </div>
-  </div>
-
-  <!-- Titik Tour Spots -->
-  <section style="text-align:center">
-    <div class="section-label">Jelajahi Setiap Sudut</div>
-    <h2 class="section-title">Titik Virtual Tour</h2>
-    <p class="section-sub" style="margin:0 auto">
-      Pilih salah satu titik di bawah untuk memulai perjalanan virtual Anda.
+<!-- HERO SECTION with 360 panorama background -->
+<section class="hero" id="heroSection">
+  <div id="hero-panorama"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG SUKABUMI</div>
+    <h1 class="hero-title">
+      Jelajahi Keindahan<br/>
+      <span class="hero-title-gold">Masjid Agung Sukabumi</span>
+    </h1>
+    <p class="hero-desc">
+      Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
+      memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di
+      seluruh dunia.
     </p>
-    <div class="spots-grid" id="spots-grid">
-      <!-- Diisi oleh JavaScript -->
+    <div class="hero-actions">
+      <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour ▶</a>
+      <a href="#profil" class="btn-secondary">Profil Masjid</a>
     </div>
-  </section>
-
-  <!-- Profil Masjid -->
-  <section id="info-section" style="background:var(--dark2)">
-    <div style="max-width:1000px;margin:0 auto">
-      <div class="section-label">Tentang Kami</div>
-      <h2 class="section-title">Profil Masjid</h2>
-      <div class="info-grid">
-        <div class="info-text">
-          <p id="profil-text" style="color:var(--text-muted);line-height:1.9;font-size:15px">
-            Masjid Agung Sukabumi berdiri megah sebagai pusat spiritual dan kebudayaan Islam di jantung kota.
-          </p>
-          <p id="profil-text2" style="color:var(--text-muted);line-height:1.9;font-size:15px;margin-top:16px">
-            Dengan arsitektur yang memadukan gaya Timur Tengah dan kearifan lokal.
-          </p>
-        </div>
-        <div class="info-items" id="info-items">
-          <!-- Diisi oleh JavaScript -->
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Galeri Preview -->
-  <section style="padding-left:0;padding-right:0">
-    <div style="padding:0 2rem">
-      <div class="section-label">Galeri Foto</div>
-      <h2 class="section-title">Keindahan Masjid</h2>
-    </div>
-    <div class="gallery-scroll" id="gallery-scroll">
-      <!-- Diisi oleh JavaScript -->
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-logo">Masjid Al-Nuur</div>
-    <p class="footer-sub" id="footer-alamat">Jl. Raya Masjid No. 1, Kota</p>
-    <div class="footer-bottom">
-      © 2025 Masjid Al-Nuur — Virtual Tour 360°. Semua hak dilindungi.
-    </div>
-  </footer>
-
-</div><!-- /home -->
-
-
-<!-- ======================================================
-     HALAMAN: GALERI
-====================================================== -->
-<div class="page" id="gallery-page">
-  <section style="text-align:center;min-height:100vh">
-    <div class="section-label">Dokumentasi</div>
-    <h2 class="section-title">Galeri Masjid</h2>
-    <p class="section-sub" style="margin:0 auto">
-      Koleksi foto keindahan arsitektur dan kegiatan Masjid Al-Nuur
-    </p>
-    <div class="gallery-page-grid" id="gallery-page-grid">
-      <!-- Diisi oleh JavaScript -->
-    </div>
-  </section>
-</div>
-
-
-<!-- ======================================================
-     HALAMAN: VIRTUAL TOUR 360°
-====================================================== -->
-<div class="page" id="tour">
-
-  <div class="tour-header">
-    <div>
-      <div class="tour-title">Virtual Tour 360°</div>
-      <div class="tour-subtitle">Gunakan mouse atau sentuh layar untuk menjelajah</div>
-    </div>
-    <button class="btn-outline" style="font-size:13px;padding:8px 16px" onclick="showPage('home')">
-      ← Kembali
-    </button>
   </div>
+  <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
+</section>
 
-  <div class="tour-layout">
-
-    <!-- Sidebar pilih lokasi -->
-    <div class="tour-sidebar">
-      <div class="sidebar-section-title">Pilih Lokasi</div>
-      <div id="tour-spot-list">
-        <!-- Diisi oleh JavaScript -->
+<!-- PROFIL SECTION -->
+<section class="section" id="profil">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">PROFIL MASJID</div>
+      <h2 class="section-title">Tentang Masjid Agung Sukabumi</h2>
+    </div>
+    <div class="profil-grid">
+      <div class="profil-card">
+        <div class="profil-icon">🕌</div>
+        <h3>Ruang Utama</h3>
+        <p>Pusat ibadah dengan mihrab megah dan kubah utama yang indah</p>
+      </div>
+      <div class="profil-card">
+        <div class="profil-icon">🏛️</div>
+        <h3>Aula & Selasar</h3>
+        <p>Area multifungsi untuk berbagai kegiatan keagamaan dan sosial</p>
+      </div>
+      <div class="profil-card">
+        <div class="profil-icon">🌿</div>
+        <h3>Halaman & Taman</h3>
+        <p>Area luar masjid yang asri dan nyaman untuk beristirahat</p>
+      </div>
+      <div class="profil-card">
+        <div class="profil-icon">🕰️</div>
+        <h3>Menara & Kubah</h3>
+        <p>Landmark masjid yang menjulang tinggi sebagai simbol keagungan</p>
       </div>
     </div>
-
-    <!-- Viewer panorama -->
-    <div class="tour-main">
-      <div class="tour-loading" id="tour-loading">
-        <div class="tour-loading-spinner"></div>
-        <div class="tour-loading-text">Memuat panorama 360°...</div>
-      </div>
-      <div id="pannellum-container" style="height:calc(100vh - 128px)"></div>
-
-      <!-- Info panel bawah -->
-      <div class="tour-info-panel" id="tour-info-panel">
-        <div class="tip-name" id="tip-name">Ruang Utama</div>
-        <div class="tip-desc" id="tip-desc">Klik dan seret untuk melihat sekeliling</div>
-        <div class="tip-nav">
-          <button class="tip-nav-btn" onclick="prevSpot()">← Sebelumnya</button>
-          <button class="tip-nav-btn" onclick="nextSpot()">Berikutnya →</button>
-        </div>
-      </div>
+    <div class="cta-center">
+      <a href="virtual-tour.html" class="btn-primary">Mulai Eksplorasi Virtual Tour →</a>
     </div>
-
   </div>
-</div><!-- /tour -->
+</section>
+
+<footer class="footer">
+  <p>© 2025 Masjid Agung Sukabumi Virtual Tour</p>
+</footer>
+
+<script>
+function startHero(src) {
+  pannellum.viewer('hero-panorama', {
+    type: 'equirectangular',
+    panorama: src,
+    autoLoad: true,
+    autoRotate: -2,
+    showControls: false,
+    compass: false,
+    mouseZoom: false,
+    hfov: 100,
+    pitch: 0,
+    yaw: 0,
+  });
+}
+
+// Baca hero dari IndexedDB, fallback ke localStorage lama, lalu default
+(function() {
+  const r = indexedDB.open('virtualTourDB', 2);
+  r.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('panoramas')) e.target.result.createObjectStore('panoramas'); };
+  r.onsuccess = e => {
+    const db = e.target.result;
+    const tx = db.transaction('panoramas','readonly');
+    const req = tx.objectStore('panoramas').get('hero_bg');
+    req.onsuccess = () => {
+      if (req.result) startHero(URL.createObjectURL(req.result));
+      else startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
+    };
+    req.onerror = () => startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
+  };
+  r.onerror = () => startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
+})();
+
+// Theme toggle
+document.getElementById('themeToggle').addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+});
+if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+});
+// Script untuk Hamburger Menu
+const hamburger = document.getElementById('hamburgerMenu');
+const navMenu = document.getElementById('navMenu');
+
+hamburger.addEventListener('click', () => {
+  navMenu.classList.toggle('active');
+  
+  // Animasi hamburger menjadi X
+  const spans = hamburger.querySelectorAll('span');
+  if (navMenu.classList.contains('active')) {
+    spans[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
+    spans[1].style.opacity = '0';
+    spans[2].style.transform = 'rotate(-45deg) translate(5px, -6px)';
+  } else {
+    spans[0].style.transform = 'none';
+    spans[1].style.opacity = '1';
+    spans[2].style.transform = 'none';
+  }
+});
+
+// Tutup menu jika klik di luar area menu
+document.addEventListener('click', (e) => {
+  if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+    navMenu.classList.remove('active');
+    const spans = hamburger.querySelectorAll('span');
+    spans[0].style.transform = 'none';
+    spans[1].style.opacity = '1';
+    spans[2].style.transform = 'none';
+  }
+});
 
 
-<!-- ======================================================
-     HALAMAN: ADMIN PANEL
-====================================================== -->
-<div class="page" id="admin">
-  <div class="admin-layout">
+// 1. Fungsi Jam Realtime
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('realtimeClock').textContent = `${h}:${m}:${s}`;
+}
 
-    <!-- Sidebar Admin -->
-    <div class="admin-sidebar">
-      <div class="admin-brand">
-        <div class="admin-brand-title">Panel Admin</div>
-        <div class="admin-brand-sub" id="admin-username-display">admin</div>
-      </div>
+// 2. Fungsi Ambil Data API (Kota Sukabumi)
+async function getPrayerTimes() {
+    try {
+        const cityId = '1224'; // ID Kota Sukabumi
+        const date = new Date();
+        const y = date.getFullYear();
+        const m = date.getMonth() + 1;
+        const d = date.getDate();
 
-      <button class="admin-menu-item active" onclick="switchAdmin('dashboard')">
-        <span class="admin-menu-icon">📊</span>Dashboard
-      </button>
-      <button class="admin-menu-item" onclick="switchAdmin('info')">
-        <span class="admin-menu-icon">🕌</span>Info Masjid
-      </button>
-      <button class="admin-menu-item" onclick="switchAdmin('spots')">
-        <span class="admin-menu-icon">📍</span>Titik Virtual Tour
-      </button>
-      <button class="admin-menu-item" onclick="switchAdmin('gallery')">
-        <span class="admin-menu-icon">🖼️</span>Kelola Galeri
-      </button>
+        const response = await fetch(`https://api.myqz.com/v1/sholat/jadwal/${cityId}/${y}/${m}/${d}`);
+        const result = await response.json();
+        const data = result.data.jadwal;
 
-      <div style="flex:1"></div>
+        document.getElementById('imsakTime').textContent = data.imsak;
+        document.getElementById('subuhTime').textContent = data.subuh;
+        document.getElementById('terbitTime').textContent = data.terbit;
+        document.getElementById('dzuhurTime').textContent = data.dzuhur;
+        document.getElementById('asharTime').textContent = data.ashar;
+        document.getElementById('maghribTime').textContent = data.maghrib;
+        document.getElementById('isyaTime').textContent = data.isya;
+        document.getElementById('currentDate').textContent = data.tanggal;
+    } catch (e) {
+        console.error("Gagal memuat jadwal", e);
+    }
+}
 
-      <button class="admin-menu-item" onclick="doLogout()" style="color:#f87171">
-        <span class="admin-menu-icon">🚪</span>Logout
-      </button>
-    </div>
-
-    <!-- Konten Admin -->
-    <div class="admin-content" id="admin-content">
-      <!-- Diisi oleh JavaScript -->
-    </div>
-
-  </div>
-</div><!-- /admin -->
-
-
-<!-- Script Utama -->
-<script src="main.js"></script>
-
+// Jalankan fungsi
+setInterval(updateClock, 1000);
+updateClock();
+getPrayerTimes();
+</script>
 </body>
 </html>

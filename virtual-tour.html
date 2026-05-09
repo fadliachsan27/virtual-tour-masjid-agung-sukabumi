@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Virtual Tour 360° - Masjid Agung Sukabumi</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+  <style>
+    /* Full screen viewer overrides */
+    body { margin: 0; overflow: hidden; background: #0a0a0a; }
+
+    .vt-wrapper {
+      position: fixed; inset: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top bar */
+    .vt-topbar {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 100%);
+      pointer-events: none;
+    }
+    .vt-topbar > * { pointer-events: auto; }
+
+    .vt-brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+    .vt-brand-text { font-family: 'Playfair Display', serif; font-size: 16px; }
+    .vt-brand-sub { font-family: 'Lato', sans-serif; font-size: 10px; letter-spacing: 3px; opacity: 0.7; }
+
+    .vt-back {
+      display: flex; align-items: center; gap: 6px;
+      color: #fff; text-decoration: none;
+      font-family: 'Lato', sans-serif; font-size: 13px;
+      background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 7px 14px; border-radius: 20px;
+      transition: background 0.2s;
+    }
+    .vt-back:hover { background: rgba(255,255,255,0.25); }
+
+    /* 360 viewer - FULL SCREEN */
+    #panorama-viewer {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+    }
+    #panorama-viewer .pnlm-container { width: 100% !important; height: 100% !important; }
+
+    /* Side panel - location picker */
+    .vt-sidebar {
+      position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      z-index: 100; width: 240px;
+      background: rgba(255,255,255,0.08); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-left: none;
+      border-radius: 0 12px 12px 0;
+      padding: 16px 12px;
+      transition: transform 0.3s;
+    }
+    .vt-sidebar.collapsed { transform: translateY(-50%) translateX(-100%); }
+
+    .vt-sidebar-label {
+      font-family: 'Lato', sans-serif; font-size: 10px; letter-spacing: 3px;
+      color: #c9a84c; text-transform: uppercase; margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .vt-location-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 10px 12px; margin-bottom: 6px;
+      background: transparent; border: none; border-radius: 8px;
+      cursor: pointer; text-align: left; transition: background 0.2s;
+      color: rgba(255,255,255,0.85);
+    }
+    .vt-location-btn:hover { background: rgba(201,168,76,0.15); }
+    .vt-location-btn.active {
+      background: rgba(201,168,76,0.2);
+      border: 1px solid rgba(201,168,76,0.4);
+    }
+    .vt-location-icon { font-size: 20px; }
+    .vt-location-name {
+      font-family: 'Playfair Display', serif; font-size: 13px;
+      display: block;
+    }
+    .vt-location-sub {
+      font-family: 'Lato', sans-serif; font-size: 10px;
+      color: rgba(255,255,255,0.5); display: block; margin-top: 1px;
+    }
+
+    /* Toggle sidebar button */
+    .vt-sidebar-toggle {
+      position: absolute; right: -36px; top: 50%; transform: translateY(-50%);
+      width: 36px; height: 36px; border-radius: 0 6px 6px 0;
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.15); border-left: none;
+      color: #fff; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Info overlay at bottom */
+    .vt-info {
+      position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+      z-index: 100; min-width: 340px; max-width: 500px;
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 16px; padding: 20px 24px;
+      color: #fff; text-align: center;
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .vt-info.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
+
+    .vt-info h3 {
+      font-family: 'Playfair Display', serif; font-size: 20px;
+      color: #c9a84c; margin: 0 0 8px;
+    }
+    .vt-info p {
+      font-family: 'Lato', sans-serif; font-size: 13px;
+      color: rgba(255,255,255,0.8); margin: 0 0 14px; line-height: 1.6;
+    }
+    .vt-info-nav { display: flex; gap: 10px; justify-content: center; }
+    .vt-info-nav button {
+      padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(201,168,76,0.5);
+      background: transparent; color: #c9a84c;
+      font-family: 'Lato', sans-serif; font-size: 13px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .vt-info-nav button:hover { background: rgba(201,168,76,0.2); }
+    .vt-info-nav .btn-close {
+      border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.6);
+    }
+
+    /* Bottom controls */
+    .vt-controls {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      z-index: 100; display: flex; gap: 10px;
+    }
+    .vt-ctrl-btn {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .vt-ctrl-btn:hover { background: rgba(201,168,76,0.3); }
+
+    /* Loading screen */
+    .vt-loading {
+      position: fixed; inset: 0; z-index: 999;
+      background: #0a0a0a; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; transition: opacity 0.5s;
+    }
+    .vt-loading.done { opacity: 0; pointer-events: none; }
+    .vt-loading-logo {
+      font-family: 'Playfair Display', serif; color: #c9a84c; font-size: 22px;
+    }
+    .vt-loading-bar {
+      width: 200px; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;
+    }
+    .vt-loading-fill {
+      height: 100%; background: #c9a84c; border-radius: 2px;
+      animation: loadfill 1.5s ease forwards;
+    }
+    @keyframes loadfill { from { width: 0% } to { width: 100% } }
+    .vt-loading-text {
+      font-family: 'Lato', sans-serif; color: rgba(255,255,255,0.4); font-size: 12px; letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div class="vt-loading" id="vtLoading">
+  <div class="vt-loading-logo">Masjid Agung Sukabumi</div>
+  <div class="vt-loading-bar"><div class="vt-loading-fill"></div></div>
+  <div class="vt-loading-text">MEMUAT VIRTUAL TOUR 360°...</div>
+</div>
+
+<div class="vt-wrapper">
+  <!-- Full screen panorama -->
+  <div id="panorama-viewer"></div>
+
+  <!-- Top bar -->
+  <div class="vt-topbar">
+    <a href="index.html" class="vt-brand">
+      <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
+        <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
+        <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
+      </svg>
+      <div>
+        <div class="vt-brand-text">Masjid Agung Sukabumi</div>
+        <div class="vt-brand-sub">VIRTUAL TOUR</div>
+      </div>
+    </a>
+    <a href="index.html" class="vt-back">← Kembali</a>
+  </div>
+
+  <!-- Sidebar locations -->
+  <div class="vt-sidebar" id="vtSidebar">
+    <button class="vt-sidebar-toggle" id="sidebarToggle">☰</button>
+    <div class="vt-sidebar-label">PILIH LOKASI</div>
+    <button class="vt-location-btn active" data-idx="0" onclick="changeLocation(0)">
+      <span class="vt-location-icon">🕌</span>
+      <span>
+        <span class="vt-location-name">Ruang Utama (Mihrab)</span>
+        <span class="vt-location-sub">Area Shalat Utama</span>
+      </span>
+    </button>
+    <button class="vt-location-btn" data-idx="1" onclick="changeLocation(1)">
+      <span class="vt-location-icon">🏛️</span>
+      <span>
+        <span class="vt-location-name">Aula & Selasar</span>
+        <span class="vt-location-sub">Area Multifungsi</span>
+      </span>
+    </button>
+    <button class="vt-location-btn" data-idx="2" onclick="changeLocation(2)">
+      <span class="vt-location-icon">🌿</span>
+      <span>
+        <span class="vt-location-name">Halaman & Taman</span>
+        <span class="vt-location-sub">Area Luar Masjid</span>
+      </span>
+    </button>
+    <button class="vt-location-btn" data-idx="3" onclick="changeLocation(3)">
+      <span class="vt-location-icon">🔔</span>
+      <span>
+        <span class="vt-location-name">Menara & Kubah</span>
+        <span class="vt-location-sub">Landmark Masjid</span>
+      </span>
+    </button>
+  </div>
+
+  <!-- Info popup -->
+  <div class="vt-info" id="vtInfo">
+    <h3 id="infoTitle">Ruang Utama (Mihrab)</h3>
+    <p id="infoDesc">Pusat ibadah dengan mihrab megah dan kubah utama yang indah. Area ini dapat menampung ribuan jamaah.</p>
+    <div class="vt-info-nav">
+      <button onclick="prevLocation()">← Sebelumnya</button>
+      <button onclick="nextLocation()">Berikutnya →</button>
+      <button class="btn-close" onclick="document.getElementById('vtInfo').classList.add('hidden')">✕</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="vt-controls">
+    <button class="vt-ctrl-btn" onclick="toggleAutoRotate()" title="Auto Rotate" id="autoRotateBtn">↻</button>
+    <button class="vt-ctrl-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+    <button class="vt-ctrl-btn" onclick="document.getElementById('vtInfo').classList.toggle('hidden')" title="Info">ℹ</button>
+  </div>
+</div>
+
+<script>
+// Lokasi yang disimpan, image diisi setelah DB siap
+const locationsMeta = [
+  { name: 'Ruang Utama (Mihrab)', desc: 'Pusat ibadah dengan mihrab megah dan kubah utama yang indah. Area ini dapat menampung ribuan jamaah.', key: 'pano_0', yaw: 0 },
+  { name: 'Aula & Selasar',       desc: 'Area multifungsi yang digunakan untuk kegiatan pengajian, pertemuan, dan acara keagamaan lainnya.',    key: 'pano_1', yaw: 90 },
+  { name: 'Halaman & Taman',      desc: 'Area luar masjid yang asri dengan taman indah, tempat wudhu, dan area parkir yang luas.',               key: 'pano_2', yaw: 180 },
+  { name: 'Menara & Kubah',       desc: 'Menara megah yang menjulang tinggi dan kubah indah, menjadi landmark kebanggaan Kota Sukabumi.',         key: 'pano_3', yaw: 270 },
+];
+
+let locationImages = ['images/hero-360.png','images/hero-360.png','images/hero-360.png','images/hero-360.png'];
+let currentIdx = 0;
+let viewer = null;
+let autoRotating = true;
+
+// ── Ambil semua foto dari IndexedDB, lalu baru init viewer ──
+function openDB() {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('virtualTourDB', 2);
+    r.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('panoramas')) e.target.result.createObjectStore('panoramas'); };
+    r.onsuccess = e => res(e.target.result);
+    r.onerror   = () => res(null); // fallback: tetap lanjut tanpa DB
+  });
+}
+
+async function loadImages() {
+  const db = await openDB();
+  if (db) {
+    await Promise.all(locationsMeta.map((loc, i) => new Promise(res => {
+      try {
+        const tx = db.transaction('panoramas','readonly');
+        const req = tx.objectStore('panoramas').get(loc.key);
+        req.onsuccess = () => { if (req.result) locationImages[i] = URL.createObjectURL(req.result); res(); };
+        req.onerror  = () => res();
+      } catch(e) { res(); }
+    })));
+  }
+}
+
+function initViewer(idx) {
+  if (viewer) { try { viewer.destroy(); } catch(e){} viewer = null; }
+  viewer = pannellum.viewer('panorama-viewer', {
+    type        : 'equirectangular',
+    panorama    : locationImages[idx],
+    autoLoad    : true,
+    autoRotate  : autoRotating ? -2 : 0,
+    showControls: true,
+    compass     : false,
+    hfov        : 100,
+    yaw         : locationsMeta[idx].yaw,
+    pitch       : 0,
+    showFullscreenCtrl: false,
+    showZoomCtrl: true,
+  });
+}
+
+function changeLocation(idx) {
+  currentIdx = idx;
+  document.querySelectorAll('.vt-location-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
+  document.getElementById('infoTitle').textContent = locationsMeta[idx].name;
+  document.getElementById('infoDesc').textContent  = locationsMeta[idx].desc;
+  document.getElementById('vtInfo').classList.remove('hidden');
+  initViewer(idx);
+}
+
+function nextLocation() { changeLocation((currentIdx+1) % locationsMeta.length); }
+function prevLocation() { changeLocation((currentIdx-1+locationsMeta.length) % locationsMeta.length); }
+
+function toggleAutoRotate() {
+  autoRotating = !autoRotating;
+  document.getElementById('autoRotateBtn').style.color = autoRotating ? '#c9a84c' : '#fff';
+  if (viewer) viewer.setAutoRotate(autoRotating ? -2 : 0);
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+document.getElementById('sidebarToggle').addEventListener('click', () => {
+  document.getElementById('vtSidebar').classList.toggle('collapsed');
+});
+
+// ── INIT: load foto dulu, baru tampilkan viewer, baru hide loading ──
+loadImages().then(() => {
+  initViewer(0);
+  setTimeout(() => { document.getElementById('vtLoading').classList.add('done'); }, 1200);
+});
+</script>
+</body>
+</html>
