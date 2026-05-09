@@ -407,3 +407,10 @@ body.dark .btn-theme .icon-dark { display: block; }
     display: none;
   }
 }
+
+.no-photo-message {
+    color: #ff0000;
+    font-size: 1.2rem;
+    border: 2px dashed #ccc;
+    margin: 20px;
+}

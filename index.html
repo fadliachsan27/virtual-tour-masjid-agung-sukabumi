@@ -6,9 +6,75 @@
   <title>Masjid Agung Sukabumi - Virtual Tour</title>
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
-  <!-- Pannellum 360 viewer -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
+  <style>
+    /* ===== TENTANG MASJID ===== */
+    .tentang-section { padding: 80px 0; background: var(--bg); }
+    .tentang-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+    .tentang-text .section-badge { display: inline-block; font-size: 11px; letter-spacing: 3px; color: var(--gold); border: 1px solid var(--gold); padding: 5px 14px; border-radius: 20px; margin-bottom: 18px; }
+    .tentang-text h2 { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--text); line-height: 1.3; margin-bottom: 20px; }
+    .tentang-text p { color: var(--text-muted); font-size: 15px; line-height: 1.9; margin-bottom: 14px; }
+    .tentang-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; }
+    .tentang-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .tentang-stat-num { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold); }
+    .tentang-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .tentang-features { display: flex; flex-direction: column; gap: 14px; }
+    .tentang-feature { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; display: flex; align-items: flex-start; gap: 16px; transition: border-color 0.2s; }
+    .tentang-feature:hover { border-color: var(--gold); }
+    .tentang-feature-icon { font-size: 26px; flex-shrink: 0; }
+    .tentang-feature-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); margin-bottom: 5px; }
+    .tentang-feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ===== PROFIL PENGURUS SLIDER ===== */
+    .pengurus-section { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    body.dark .pengurus-section { background: rgba(255,255,255,0.02); }
+    .pengurus-slider-wrap { position: relative; margin-top: 40px; }
+    .pengurus-slider { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .pengurus-slider::-webkit-scrollbar { height: 4px; }
+    .pengurus-slider::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+    .pengurus-slider::-webkit-scrollbar-track { background: var(--border); border-radius: 2px; }
+    .pengurus-card { flex: 0 0 220px; scroll-snap-align: start; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; padding: 28px 20px 22px; text-align: center; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; }
+    body.dark .pengurus-card { background: rgba(255,255,255,0.04); }
+    .pengurus-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(201,168,76,0.12); }
+    .pengurus-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); margin: 0 auto 14px; display: block; background: var(--border); }
+    .pengurus-avatar-placeholder { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--border); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: var(--surface); }
+    .pengurus-jabatan { font-size: 10px; letter-spacing: 2px; color: var(--gold); background: rgba(201,168,76,0.12); border-radius: 20px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; }
+    .pengurus-nama { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+    .pengurus-periode { font-size: 12px; color: var(--text-muted); }
+    .slider-nav { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+    .slider-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .slider-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .pengurus-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); width: 100%; }
+    .pengurus-empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+    /* ===== IMAM & MUADZIN ===== */
+    .imam-section { padding: 80px 0; background: var(--bg); }
+    .imam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; }
+    .imam-group { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px 26px; }
+    .imam-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .imam-group-icon { font-size: 22px; }
+    .imam-group-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); }
+    .imam-list { display: flex; flex-direction: column; gap: 12px; }
+    .imam-item { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; transition: border-color 0.2s; }
+    body.dark .imam-item { background: rgba(255,255,255,0.03); }
+    .imam-item:hover { border-color: rgba(201,168,76,0.4); }
+    .imam-hari-badge { flex-shrink: 0; min-width: 76px; font-size: 11px; font-weight: 700; color: var(--gold); background: rgba(201,168,76,0.12); border-radius: 8px; padding: 5px 8px; text-align: center; letter-spacing: 0.5px; }
+    .imam-nama-col { flex: 1; }
+    .imam-nama { font-size: 14px; color: var(--text); font-weight: 600; }
+    .imam-keterangan { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .imam-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
+    .imam-empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    @media (max-width: 900px) {
+      .tentang-inner { grid-template-columns: 1fr; gap: 36px; }
+      .imam-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .tentang-stats { grid-template-columns: 1fr 1fr; }
+      .pengurus-card { flex: 0 0 180px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -28,65 +94,37 @@
       <div class="nav-subtitle">VIRTUAL TOUR</div>
     </div>
   </div>
-
   <div class="nav-prayer-card">
-  
-  <div class="prayer-grid">
-    <div class="prayer-item">
-      <div class="p-label">IMSAK</div>
-      <div id="imsakTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">SUBUH</div>
-      <div id="subuhTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">TERBIT</div>
-      <div id="terbitTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">DZUHUR</div>
-      <div id="dzuhurTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">ASHAR</div>
-      <div id="asharTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">MAGHRIB</div>
-      <div id="maghribTime" class="p-time">--:--</div>
-    </div>
-    <div class="prayer-item">
-      <div class="p-label">ISYA</div>
-      <div id="isyaTime" class="p-time">--:--</div>
+    <div class="prayer-grid">
+      <div class="prayer-item"><div class="p-label">IMSAK</div><div id="imsakTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">SUBUH</div><div id="subuhTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">TERBIT</div><div id="terbitTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">DZUHUR</div><div id="dzuhurTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">ASHAR</div><div id="asharTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">MAGHRIB</div><div id="maghribTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">ISYA</div><div id="isyaTime" class="p-time">--:--</div></div>
     </div>
   </div>
+  <div class="nav-links">
+    <div class="nav-menu" id="navMenu">
+      <a href="index.html" class="nav-link active">Beranda</a>
+      <a href="galeri.html" class="nav-link">Galeri</a>
+      <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
+    </div>
+    <button class="btn-theme" id="themeToggle" title="Ganti Tema">
+      <span class="icon-light">🌙</span>
+      <span class="icon-dark">☀️</span>
+    </button>
+    <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </a>
   </div>
-</div>
-  
-<div class="nav-links">
-  <div class="nav-menu" id="navMenu">
-    <a href="index.html" class="nav-link active">Beranda</a>
-    <a href="galeri.html" class="nav-link">Galeri</a>
-    <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
-    <!-- <a href="admin/login.html" class="btn-admin-mobile">Login Admin</a> -->
-  </div>
-
-  <button class="btn-theme" id="themeToggle" title="Ganti Tema">
-    <span class="icon-light">🌙</span>
-    <span class="icon-dark">☀️</span>
-  </button>
-
-  <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-      <circle cx="12" cy="7" r="4"></circle>
-    </svg>
-  </a>
-</div>
 </nav>
 
-<!-- HERO SECTION with 360 panorama background -->
+<!-- HERO SECTION -->
 <section class="hero" id="heroSection">
   <div id="hero-panorama"></div>
   <div class="hero-overlay"></div>
@@ -98,15 +136,133 @@
     </h1>
     <p class="hero-desc">
       Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
-      memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di
-      seluruh dunia.
+      memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
     </p>
     <div class="hero-actions">
       <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour ▶</a>
-      <a href="#profil" class="btn-secondary">Profil Masjid</a>
+      <a href="#tentang" class="btn-secondary">Tentang Masjid</a>
     </div>
   </div>
   <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
+</section>
+
+<!-- ===== TENTANG MASJID ===== -->
+<section class="tentang-section" id="tentang">
+  <div class="container">
+    <div class="tentang-inner">
+      <div class="tentang-text">
+        <div class="section-badge">TENTANG MASJID</div>
+        <h2 id="tentangJudul">Tentang Masjid Agung Sukabumi</h2>
+        <div id="tentangDeskripsi">
+          <p>Masjid Agung Sukabumi adalah masjid kebanggaan masyarakat Kota Sukabumi, Jawa Barat. Masjid ini merupakan pusat kegiatan keagamaan, sosial, dan budaya Islam di Kota Sukabumi, berdiri megah di jantung kota sebagai simbol keimanan dan peradaban Islam.</p>
+          <p>Dibangun dengan arsitektur yang memadukan nilai-nilai Islam dan kearifan budaya lokal, Masjid Agung Sukabumi menjadi tempat ibadah yang nyaman bagi ribuan jamaah setiap harinya, terutama saat shalat Jumat dan hari-hari besar Islam.</p>
+          <p>Masjid ini terus berkembang dalam pelayanan kepada umat, dengan berbagai program pendidikan Islam, sosial kemasyarakatan, dan pemberdayaan ekonomi umat yang dikelola secara profesional oleh Badan Kemakmuran Masjid (BKM).</p>
+        </div>
+        <div class="tentang-stats">
+          <div class="tentang-stat">
+            <div class="tentang-stat-num" id="statKapasitas">5.000+</div>
+            <div class="tentang-stat-label">Kapasitas Jamaah</div>
+          </div>
+          <div class="tentang-stat">
+            <div class="tentang-stat-num" id="statBerdiri">1960</div>
+            <div class="tentang-stat-label">Tahun Berdiri</div>
+          </div>
+          <div class="tentang-stat">
+            <div class="tentang-stat-num" id="statLuas">12.000 m²</div>
+            <div class="tentang-stat-label">Luas Area</div>
+          </div>
+          <div class="tentang-stat">
+            <div class="tentang-stat-num" id="statMenara">2</div>
+            <div class="tentang-stat-label">Jumlah Menara</div>
+          </div>
+        </div>
+      </div>
+      <div class="tentang-features" id="tentangFitur">
+        <div class="tentang-feature">
+          <div class="tentang-feature-icon">🕌</div>
+          <div>
+            <div class="tentang-feature-title">Ruang Utama Shalat</div>
+            <div class="tentang-feature-desc">Pusat ibadah dengan mihrab megah, mimbar berukir indah, dan kubah utama yang menakjubkan, mampu menampung ribuan jamaah secara bersamaan.</div>
+          </div>
+        </div>
+        <div class="tentang-feature">
+          <div class="tentang-feature-icon">🏛️</div>
+          <div>
+            <div class="tentang-feature-title">Aula & Selasar Multifungsi</div>
+            <div class="tentang-feature-desc">Ruang serbaguna yang digunakan untuk kajian ilmu, pengajian rutin, peringatan hari besar Islam, serta berbagai kegiatan sosial kemasyarakatan.</div>
+          </div>
+        </div>
+        <div class="tentang-feature">
+          <div class="tentang-feature-icon">📚</div>
+          <div>
+            <div class="tentang-feature-title">Perpustakaan Islam</div>
+            <div class="tentang-feature-desc">Koleksi kitab dan buku Islam yang lengkap tersedia untuk menunjang pendidikan agama masyarakat dan generasi muda Muslim.</div>
+          </div>
+        </div>
+        <div class="tentang-feature">
+          <div class="tentang-feature-icon">🌿</div>
+          <div>
+            <div class="tentang-feature-title">Halaman & Taman Asri</div>
+            <div class="tentang-feature-desc">Area luar masjid yang rindang dan asri, menjadi tempat istirahat yang nyaman bagi jamaah sebelum dan sesudah ibadah.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROFIL PENGURUS ===== -->
+<section class="pengurus-section" id="pengurus">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">KEPENGURUSAN</div>
+      <h2 class="section-title">Profil Pengurus Masjid</h2>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Badan Kemakmuran Masjid (BKM) Masjid Agung Sukabumi</p>
+    </div>
+    <div class="pengurus-slider-wrap">
+      <div class="pengurus-slider" id="pengurusSlider">
+        <div class="pengurus-empty">
+          <div class="pengurus-empty-icon">👥</div>
+          <div>Data pengurus belum ditambahkan. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
+        </div>
+      </div>
+      <div class="slider-nav">
+        <button class="slider-btn" onclick="slideLeft()">&#8592;</button>
+        <button class="slider-btn" onclick="slideRight()">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== IMAM & MUADZIN HARIAN ===== -->
+<section class="imam-section" id="imam-muadzin">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">JADWAL HARIAN</div>
+      <h2 class="section-title">Imam & Muadzin Harian</h2>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Jadwal petugas imam dan muadzin shalat berjamaah Masjid Agung Sukabumi</p>
+    </div>
+    <div class="imam-grid">
+      <div class="imam-group">
+        <div class="imam-group-header">
+          <div class="imam-group-icon">🎙️</div>
+          <div class="imam-group-title">Imam Harian</div>
+        </div>
+        <div class="imam-list" id="imamList">
+          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data imam. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+        </div>
+      </div>
+      <div class="imam-group">
+        <div class="imam-group-header">
+          <div class="imam-group-icon">📢</div>
+          <div class="imam-group-title">Muadzin Harian</div>
+        </div>
+        <div class="imam-list" id="muadzinList">
+          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data muadzin. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- PROFIL SECTION -->
@@ -114,29 +270,13 @@
   <div class="container">
     <div class="section-header">
       <div class="section-badge">PROFIL MASJID</div>
-      <h2 class="section-title">Tentang Masjid Agung Sukabumi</h2>
+      <h2 class="section-title">Fasilitas Masjid</h2>
     </div>
     <div class="profil-grid">
-      <div class="profil-card">
-        <div class="profil-icon">🕌</div>
-        <h3>Ruang Utama</h3>
-        <p>Pusat ibadah dengan mihrab megah dan kubah utama yang indah</p>
-      </div>
-      <div class="profil-card">
-        <div class="profil-icon">🏛️</div>
-        <h3>Aula & Selasar</h3>
-        <p>Area multifungsi untuk berbagai kegiatan keagamaan dan sosial</p>
-      </div>
-      <div class="profil-card">
-        <div class="profil-icon">🌿</div>
-        <h3>Halaman & Taman</h3>
-        <p>Area luar masjid yang asri dan nyaman untuk beristirahat</p>
-      </div>
-      <div class="profil-card">
-        <div class="profil-icon">🕰️</div>
-        <h3>Menara & Kubah</h3>
-        <p>Landmark masjid yang menjulang tinggi sebagai simbol keagungan</p>
-      </div>
+      <div class="profil-card"><div class="profil-icon">🕌</div><h3>Ruang Utama</h3><p>Pusat ibadah dengan mihrab megah dan kubah utama yang indah</p></div>
+      <div class="profil-card"><div class="profil-icon">🏛️</div><h3>Aula & Selasar</h3><p>Area multifungsi untuk berbagai kegiatan keagamaan dan sosial</p></div>
+      <div class="profil-card"><div class="profil-icon">🌿</div><h3>Halaman & Taman</h3><p>Area luar masjid yang asri dan nyaman untuk beristirahat</p></div>
+      <div class="profil-card"><div class="profil-icon">🕰️</div><h3>Menara & Kubah</h3><p>Landmark masjid yang menjulang tinggi sebagai simbol keagungan</p></div>
     </div>
     <div class="cta-center">
       <a href="virtual-tour.html" class="btn-primary">Mulai Eksplorasi Virtual Tour →</a>
@@ -149,119 +289,161 @@
 </footer>
 
 <script>
-function startHero(src) {
-  pannellum.viewer('hero-panorama', {
-    type: 'equirectangular',
-    panorama: src,
-    autoLoad: true,
-    autoRotate: -2,
-    showControls: false,
-    compass: false,
-    mouseZoom: false,
-    hfov: 100,
-    pitch: 0,
-    yaw: 0,
+// ===== IndexedDB =====
+let db = null;
+const DB_VERSION = 4;
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('virtualTourDB', DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      ['panoramas','galeri','pengurus','imam_muadzin','masjid_info'].forEach(s => {
+        if (!d.objectStoreNames.contains(s)) d.createObjectStore(s);
+      });
+    };
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = e => rej(e.target.error);
+  });
+}
+function dbGet(store, key) {
+  return new Promise(res => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).get(key);
+      req.onsuccess = () => res(req.result || null);
+      req.onerror = () => res(null);
+    } catch(e) { res(null); }
+  });
+}
+function dbGetAllKeys(store) {
+  return new Promise(res => {
+    try {
+      const tx = db.transaction(store, 'readonly');
+      const req = tx.objectStore(store).getAllKeys();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => res([]);
+    } catch(e) { res([]); }
   });
 }
 
-// Baca hero dari IndexedDB, fallback ke localStorage lama, lalu default
-(function() {
-  const r = indexedDB.open('virtualTourDB', 2);
-  r.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('panoramas')) e.target.result.createObjectStore('panoramas'); };
-  r.onsuccess = e => {
-    const db = e.target.result;
-    const tx = db.transaction('panoramas','readonly');
-    const req = tx.objectStore('panoramas').get('hero_bg');
-    req.onsuccess = () => {
-      if (req.result) startHero(URL.createObjectURL(req.result));
-      else startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
-    };
-    req.onerror = () => startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
-  };
-  r.onerror = () => startHero(localStorage.getItem('heroPanorama') || 'images/hero-360.png');
-})();
+// ===== Hero =====
+function startHero(src) {
+  pannellum.viewer('hero-panorama', {
+    type: 'equirectangular', panorama: src, autoLoad: true,
+    autoRotate: -2, showControls: false, compass: false,
+    mouseZoom: false, hfov: 100, pitch: 0, yaw: 0,
+  });
+}
 
-// Theme toggle
+// ===== Informasi Masjid =====
+async function loadMasjidInfo() {
+  const info = await dbGet('masjid_info', 'info');
+  if (info) {
+    if (info.judul) document.getElementById('tentangJudul').textContent = info.judul;
+    if (info.deskripsi) {
+      document.getElementById('tentangDeskripsi').innerHTML = info.deskripsi.split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+    }
+    if (info.kapasitas) document.getElementById('statKapasitas').textContent = info.kapasitas;
+    if (info.berdiri) document.getElementById('statBerdiri').textContent = info.berdiri;
+    if (info.luas) document.getElementById('statLuas').textContent = info.luas;
+    if (info.menara) document.getElementById('statMenara').textContent = info.menara;
+  }
+  const fiturData = await dbGet('masjid_info', 'fitur');
+  if (fiturData && fiturData.length > 0) {
+    document.getElementById('tentangFitur').innerHTML = fiturData.map(f => `
+      <div class="tentang-feature">
+        <div class="tentang-feature-icon">${f.icon||'🕌'}</div>
+        <div>
+          <div class="tentang-feature-title">${f.judul}</div>
+          <div class="tentang-feature-desc">${f.deskripsi}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+// ===== Pengurus =====
+async function loadPengurus() {
+  const keys = await dbGetAllKeys('pengurus');
+  const sorted = keys.filter(k=>String(k).startsWith('pengurus_')).sort();
+  const slider = document.getElementById('pengurusSlider');
+  if (sorted.length === 0) return;
+  slider.innerHTML = '';
+  for (const key of sorted) {
+    const item = await dbGet('pengurus', key);
+    if (!item) continue;
+    const card = document.createElement('div');
+    card.className = 'pengurus-card';
+    let avatarHtml = item.fotoBlob
+      ? `<img class="pengurus-avatar" src="${URL.createObjectURL(item.fotoBlob)}" alt="${item.nama}"/>`
+      : `<div class="pengurus-avatar-placeholder">👤</div>`;
+    card.innerHTML = `${avatarHtml}
+      <div class="pengurus-jabatan">${item.jabatan||'Pengurus'}</div>
+      <div class="pengurus-nama">${item.nama||'-'}</div>
+      <div class="pengurus-periode">${item.periode||''}</div>`;
+    slider.appendChild(card);
+  }
+}
+function slideLeft() { document.getElementById('pengurusSlider').scrollBy({left:-240,behavior:'smooth'}); }
+function slideRight() { document.getElementById('pengurusSlider').scrollBy({left:240,behavior:'smooth'}); }
+
+// ===== Imam & Muadzin =====
+async function loadImamMuadzin() {
+  const data = await dbGet('imam_muadzin', 'jadwal');
+  if (!data) return;
+  const renderList = (items, elId) => {
+    if (!items || items.length === 0) return;
+    document.getElementById(elId).innerHTML = items.map(item => `
+      <div class="imam-item">
+        <div class="imam-hari-badge">${item.hari}</div>
+        <div class="imam-nama-col">
+          <div class="imam-nama">${item.nama}</div>
+          ${item.keterangan?`<div class="imam-keterangan">${item.keterangan}</div>`:''}
+        </div>
+      </div>`).join('');
+  };
+  renderList(data.imam, 'imamList');
+  renderList(data.muadzin, 'muadzinList');
+}
+
+// ===== Theme =====
 document.getElementById('themeToggle').addEventListener('click', () => {
   document.body.classList.toggle('dark');
   localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
 });
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
-
-// Navbar scroll effect
 window.addEventListener('scroll', () => {
   document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
 });
-// Script untuk Hamburger Menu
-const hamburger = document.getElementById('hamburgerMenu');
-const navMenu = document.getElementById('navMenu');
 
-hamburger.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-  
-  // Animasi hamburger menjadi X
-  const spans = hamburger.querySelectorAll('span');
-  if (navMenu.classList.contains('active')) {
-    spans[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
-    spans[1].style.opacity = '0';
-    spans[2].style.transform = 'rotate(-45deg) translate(5px, -6px)';
-  } else {
-    spans[0].style.transform = 'none';
-    spans[1].style.opacity = '1';
-    spans[2].style.transform = 'none';
-  }
-});
-
-// Tutup menu jika klik di luar area menu
-document.addEventListener('click', (e) => {
-  if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
-    navMenu.classList.remove('active');
-    const spans = hamburger.querySelectorAll('span');
-    spans[0].style.transform = 'none';
-    spans[1].style.opacity = '1';
-    spans[2].style.transform = 'none';
-  }
-});
-
-
-// 1. Fungsi Jam Realtime
-function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('realtimeClock').textContent = `${h}:${m}:${s}`;
-}
-
-// 2. Fungsi Ambil Data API (Kota Sukabumi)
+// ===== Prayer Times =====
 async function getPrayerTimes() {
-    try {
-        const cityId = '1224'; // ID Kota Sukabumi
-        const date = new Date();
-        const y = date.getFullYear();
-        const m = date.getMonth() + 1;
-        const d = date.getDate();
-
-        const response = await fetch(`https://api.myqz.com/v1/sholat/jadwal/${cityId}/${y}/${m}/${d}`);
-        const result = await response.json();
-        const data = result.data.jadwal;
-
-        document.getElementById('imsakTime').textContent = data.imsak;
-        document.getElementById('subuhTime').textContent = data.subuh;
-        document.getElementById('terbitTime').textContent = data.terbit;
-        document.getElementById('dzuhurTime').textContent = data.dzuhur;
-        document.getElementById('asharTime').textContent = data.ashar;
-        document.getElementById('maghribTime').textContent = data.maghrib;
-        document.getElementById('isyaTime').textContent = data.isya;
-        document.getElementById('currentDate').textContent = data.tanggal;
-    } catch (e) {
-        console.error("Gagal memuat jadwal", e);
-    }
+  try {
+    const cityId = '1224';
+    const date = new Date();
+    const response = await fetch(`https://api.myqz.com/v1/sholat/jadwal/${cityId}/${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`);
+    const result = await response.json();
+    const data = result.data.jadwal;
+    document.getElementById('imsakTime').textContent = data.imsak;
+    document.getElementById('subuhTime').textContent = data.subuh;
+    document.getElementById('terbitTime').textContent = data.terbit;
+    document.getElementById('dzuhurTime').textContent = data.dzuhur;
+    document.getElementById('asharTime').textContent = data.ashar;
+    document.getElementById('maghribTime').textContent = data.maghrib;
+    document.getElementById('isyaTime').textContent = data.isya;
+  } catch(e) { console.error("Gagal memuat jadwal", e); }
 }
 
-// Jalankan fungsi
-setInterval(updateClock, 1000);
-updateClock();
+// ===== INIT =====
+openDB().then(async d => {
+  db = d;
+  // Load hero panorama
+  const blob = await dbGet('panoramas','hero_bg');
+  startHero(blob ? URL.createObjectURL(blob) : (localStorage.getItem('heroPanorama')||'images/hero-360.png'));
+  await loadMasjidInfo();
+  await loadPengurus();
+  await loadImamMuadzin();
+}).catch(() => startHero('images/hero-360.png'));
+
 getPrayerTimes();
 </script>
 </body>
