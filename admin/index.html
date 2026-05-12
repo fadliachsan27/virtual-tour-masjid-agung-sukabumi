@@ -192,7 +192,7 @@
   </div>
   <div class="sidebar-bottom">
     <a href="../index.html">← Lihat Website</a>
-    <a href="../galeri.html">🖼 Lihat Galeri</a>
+    <!-- <a href="../galeri.html">🖼 Lihat Galeri</a> -->
     <a href="#" onclick="doLogout()">🚪 Logout</a>
   </div>
 </nav>
@@ -477,6 +477,18 @@
       <div class="page-sub">Konfigurasi akun dan sistem</div>
     </div>
     <div class="card">
+      <div class="card-title">☁️ Supabase (galeri untuk semua pengunjung)</div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
+        Tanpa koneksi ini, foto galeri hanya tersimpan di browser Anda (IndexedDB), sehingga halaman <strong>galeri.html</strong> pengunjung tidak menampilkan unggahan admin.
+        Salin <strong>Project URL</strong> dari Supabase Dashboard → Settings → API (bentuknya <code style="color:var(--gold)">https://…supabase.co</code> saja, <strong>jangan</strong> tambahkan <code style="color:var(--gold)">/rest/v1/</code>).
+        Jalankan skrip SQL <code style="color:var(--gold)">supabase/schema.sql</code> di SQL Editor bila belum.
+      </p>
+      <div class="form-group"><label>Supabase URL</label><input type="text" id="sbUrl" placeholder="https://xxxx.supabase.co (tanpa /rest/v1/)" autocomplete="off"/></div>
+      <div class="form-group"><label>Anon (public) key</label><input type="password" id="sbKey" placeholder="eyJhbGciOiJIUzI1NiIs..." autocomplete="off"/></div>
+      <button class="btn-save" onclick="saveSupabaseSettings()">💾 Simpan koneksi Supabase</button>
+      <button class="btn-reset" onclick="clearSupabaseSettings()">↩ Hapus kredensial dari browser ini</button>
+    </div>
+    <div class="card">
       <div class="card-title">Ganti Kredensial Admin</div>
       <div class="form-group"><label>Username Baru</label><input type="text" id="newUser" placeholder="Masukkan username baru"/></div>
       <div class="form-group"><label>Password Baru</label><input type="password" id="newPass" placeholder="Masukkan password baru"/></div>
@@ -517,6 +529,10 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="../js/supabase-galeri.js"></script>
+<script src="../js/supabase-app-data.js"></script>
 <script>
 if(localStorage.getItem('adminLoggedIn')!=='1') window.location.href='login.html';
 function doLogout(){localStorage.removeItem('adminLoggedIn');window.location.href='login.html';}
@@ -528,7 +544,8 @@ function showPage(name,el){
   document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
   if(el) el.classList.add('active');
   if(name==='panorama'&&db) initPanoPreview();
-  if(name==='galeri') renderGaleriGrid();
+  if(name==='galeri') loadGaleriFromDB().then(()=>renderGaleriGrid());
+  if(name==='settings') loadSupabaseSettings();
   if(name==='pengurus') renderPengurusGrid();
   if(name==='imam') renderImamMuadzinTables();
   if(name==='info') loadInfoForm();
@@ -612,36 +629,78 @@ function compressImage(file,maxW,quality){
   });
 }
 
+function useRemoteGaleri(){
+  return typeof vtSupabaseConfigured==='function' && vtSupabaseConfigured() && typeof vtGetSupabase==='function' && vtGetSupabase();
+}
+
 // ===== DASHBOARD STATS =====
 async function updateDashboardStats(){
-  const galeriKeys=await dbGetAllKeys('galeri');
-  document.getElementById('statGaleri').textContent=galeriKeys.filter(k=>String(k).startsWith('galeri_')).length;
-  const pengurusKeys=await dbGetAllKeys('pengurus');
-  document.getElementById('statPengurus').textContent=pengurusKeys.filter(k=>String(k).startsWith('pengurus_')).length;
-  const jadwal=await dbGet('imam_muadzin','jadwal');
-  document.getElementById('statImam').textContent=(jadwal&&jadwal.imam)?jadwal.imam.length:0;
-  document.getElementById('statMuadzin').textContent=(jadwal&&jadwal.muadzin)?jadwal.muadzin.length:0;
+  let galN=0;
+  if(useRemoteGaleri()){
+    try{ galN=await vtGaleriRemote.countRows(); }catch(e){ galN=0; }
+  }else{
+    const galeriKeys=await dbGetAllKeys('galeri');
+    galN=galeriKeys.filter(k=>String(k).startsWith('galeri_')).length;
+  }
+  document.getElementById('statGaleri').textContent=galN;
+  if(useRemoteGaleri()&&typeof vtRemote!=='undefined'&&vtRemote.active()){
+    try{ document.getElementById('statPengurus').textContent=await vtRemote.countPengurus(); }catch(e){ document.getElementById('statPengurus').textContent='0'; }
+    try{ document.getElementById('statImam').textContent=await vtRemote.countImam(); }catch(e){ document.getElementById('statImam').textContent='0'; }
+    try{ document.getElementById('statMuadzin').textContent=await vtRemote.countMuadzin(); }catch(e){ document.getElementById('statMuadzin').textContent='0'; }
+  }else{
+    const pengurusKeys=await dbGetAllKeys('pengurus');
+    document.getElementById('statPengurus').textContent=pengurusKeys.filter(k=>String(k).startsWith('pengurus_')).length;
+    const jadwal=await dbGet('imam_muadzin','jadwal');
+    document.getElementById('statImam').textContent=(jadwal&&jadwal.imam)?jadwal.imam.length:0;
+    document.getElementById('statMuadzin').textContent=(jadwal&&jadwal.muadzin)?jadwal.muadzin.length:0;
+  }
 }
 
 // ===== INFORMASI MASJID =====
 let fiturRows=[];
 async function loadInfoForm(){
-  const info=await dbGet('masjid_info','info');
-  if(info){
-    document.getElementById('infoJudul').value=info.judul||'';
-    document.getElementById('infoDeskripsi').value=info.deskripsi||'';
-    document.getElementById('infoKapasitas').value=info.kapasitas||'';
-    document.getElementById('infoBerdiri').value=info.berdiri||'';
-    document.getElementById('infoLuas').value=info.luas||'';
-    document.getElementById('infoMenara').value=info.menara||'';
-  }
-  const fiturData=await dbGet('masjid_info','fitur');
-  fiturRows=fiturData||[
+  const defaults=[
     {icon:'🕌',judul:'Ruang Utama Shalat',deskripsi:'Pusat ibadah dengan mihrab megah dan kubah utama yang menakjubkan.'},
     {icon:'🏛️',judul:'Aula & Selasar Multifungsi',deskripsi:'Ruang serbaguna untuk kajian, pengajian, dan kegiatan sosial.'},
     {icon:'📚',judul:'Perpustakaan Islam',deskripsi:'Koleksi kitab dan buku Islam untuk pendidikan agama.'},
     {icon:'🌿',judul:'Halaman & Taman Asri',deskripsi:'Area luar masjid yang rindang dan nyaman.'},
   ];
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      const {info,fiturRows:fr}=await vtRemote.loadMasjidAndFitur();
+      if(info){
+        document.getElementById('infoJudul').value=info.judul||'';
+        document.getElementById('infoDeskripsi').value=info.deskripsi||'';
+        document.getElementById('infoKapasitas').value=info.kapasitas||'';
+        document.getElementById('infoBerdiri').value=info.berdiri||'';
+        document.getElementById('infoLuas').value=info.luas||'';
+        document.getElementById('infoMenara').value=info.menara||'';
+      }else{
+        document.getElementById('infoJudul').value='';
+        document.getElementById('infoDeskripsi').value='';
+        document.getElementById('infoKapasitas').value='';
+        document.getElementById('infoBerdiri').value='';
+        document.getElementById('infoLuas').value='';
+        document.getElementById('infoMenara').value='';
+      }
+      fiturRows=(fr&&fr.length)?fr:defaults.slice();
+    }catch(err){
+      showToast('⚠ Info masjid: '+err.message);
+      fiturRows=defaults.slice();
+    }
+  }else{
+    const info=await dbGet('masjid_info','info');
+    if(info){
+      document.getElementById('infoJudul').value=info.judul||'';
+      document.getElementById('infoDeskripsi').value=info.deskripsi||'';
+      document.getElementById('infoKapasitas').value=info.kapasitas||'';
+      document.getElementById('infoBerdiri').value=info.berdiri||'';
+      document.getElementById('infoLuas').value=info.luas||'';
+      document.getElementById('infoMenara').value=info.menara||'';
+    }
+    const fiturData=await dbGet('masjid_info','fitur');
+    fiturRows=fiturData||defaults;
+  }
   renderFiturRows();
 }
 function renderFiturRows(){
@@ -680,8 +739,15 @@ async function saveInfoMasjid(){
     luas:document.getElementById('infoLuas').value,
     menara:document.getElementById('infoMenara').value,
   };
-  await dbPut('masjid_info','info',info);
-  await dbPut('masjid_info','fitur',fiturRows);
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      const fiturClean=fiturRows.map(f=>({icon:f.icon,judul:f.judul,deskripsi:f.deskripsi}));
+      await vtRemote.saveMasjidAndFitur(info,fiturClean);
+    }catch(err){ showToast('⚠ '+err.message); return; }
+  }else{
+    await dbPut('masjid_info','info',info);
+    await dbPut('masjid_info','fitur',fiturRows);
+  }
   showToast('✅ Informasi masjid berhasil disimpan!');
 }
 
@@ -692,11 +758,20 @@ let pengurusPendingBlob=null;
 
 async function loadPengurus(){
   pengurusItems=[];
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      const rows=await vtRemote.loadPengurusRows();
+      rows.forEach(r=>{
+        pengurusItems.push({key:r.id,source:'remote',nama:r.nama,jabatan:r.jabatan,periode:r.periode||'',foto_url:r.foto_url||null,fotoBlob:null});
+      });
+    }catch(e){ console.error(e); }
+    return;
+  }
   const keys=await dbGetAllKeys('pengurus');
   const sorted=keys.filter(k=>String(k).startsWith('pengurus_')).sort();
   for(const key of sorted){
     const item=await dbGet('pengurus',key);
-    if(item) pengurusItems.push({key,...item});
+    if(item) pengurusItems.push({key,...item,source:'local'});
   }
 }
 
@@ -708,22 +783,40 @@ async function renderPengurusGrid(){
     return;
   }
   grid.innerHTML='';
-  for(const item of pengurusItems){
+  pengurusItems.forEach((item,idx)=>{
     const card=document.createElement('div');
     card.className='pengurus-admin-card';
     let avatarHtml=item.fotoBlob
-      ?`<img class="pengurus-admin-avatar" src="${URL.createObjectURL(item.fotoBlob)}" alt="${item.nama}"/>`
+      ?`<img class="pengurus-admin-avatar" src="${URL.createObjectURL(item.fotoBlob)}" alt="${(item.nama||'').replace(/"/g,'&quot;')}"/>`
+      :item.foto_url
+      ?`<img class="pengurus-admin-avatar" src="${item.foto_url}" alt="${(item.nama||'').replace(/"/g,'&quot;')}"/>`
       :`<div class="pengurus-admin-placeholder">👤</div>`;
     card.innerHTML=`${avatarHtml}
       <div class="pengurus-admin-jabatan">${item.jabatan||'Pengurus'}</div>
       <div class="pengurus-admin-nama">${item.nama||'-'}</div>
       <div style="font-size:11px;color:var(--muted)">${item.periode||''}</div>
       <div class="pengurus-admin-actions">
-        <button class="btn-sm" onclick="editPengurus('${item.key}')">✏️ Edit</button>
-        <button class="btn-danger" onclick="deletePengurus('${item.key}')">🗑</button>
+        <button class="btn-sm" onclick="editPengurusByIdx(${idx})">✏️ Edit</button>
+        <button class="btn-danger" onclick="deletePengurusByIdx(${idx})">🗑</button>
       </div>`;
     grid.appendChild(card);
+  });
+}
+
+function editPengurusByIdx(idx){ openPengurusModal(pengurusItems[idx].key); }
+
+async function deletePengurusByIdx(idx){
+  const item=pengurusItems[idx];
+  if(!confirm('Hapus pengurus ini?')) return;
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{ await vtRemote.deletePengurus(item.key,item.foto_url); }
+    catch(err){ showToast('⚠ '+err.message); return; }
+  }else{
+    await dbDelete('pengurus',item.key);
   }
+  await renderPengurusGrid();
+  updateDashboardStats();
+  showToast('🗑 Pengurus dihapus');
 }
 
 function openPengurusModal(key){
@@ -738,7 +831,7 @@ function openPengurusModal(key){
   document.getElementById('pengurusAvatarPreview').style.backgroundImage='';
 
   if(key){
-    const item=pengurusItems.find(p=>p.key===key);
+    const item=pengurusItems.find(p=>String(p.key)===String(key));
     if(item){
       document.getElementById('pengurusNama').value=item.nama||'';
       document.getElementById('pengurusJabatan').value=item.jabatan||'';
@@ -747,6 +840,9 @@ function openPengurusModal(key){
         const url=URL.createObjectURL(item.fotoBlob);
         document.getElementById('pengurusAvatarPreview').innerHTML=`<img src="${url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
         pengurusPendingBlob=item.fotoBlob;
+      }else if(item.foto_url){
+        document.getElementById('pengurusAvatarPreview').innerHTML=`<img src="${item.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+        pengurusPendingBlob=null;
       }
     }
   }
@@ -769,24 +865,33 @@ async function savePengurus(){
   const periode=document.getElementById('pengurusPeriode').value.trim();
   if(!nama||!jabatan){showToast('⚠ Nama dan Jabatan wajib diisi!');return;}
 
-  const key=editPengurusKey||('pengurus_'+Date.now());
-  let existingBlob=null;
-  if(editPengurusKey){
-    const existing=await dbGet('pengurus',editPengurusKey);
-    if(existing) existingBlob=existing.fotoBlob||null;
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      if(editPengurusKey){
+        const existing=pengurusItems.find(p=>String(p.key)===String(editPengurusKey));
+        await vtRemote.updatePengurus(Number(editPengurusKey),{
+          nama,jabatan,periode,
+          fotoBlob:pengurusPendingBlob,
+          oldFotoUrl:existing?existing.foto_url:null
+        });
+      }else{
+        await vtRemote.insertPengurus({nama,jabatan,periode,fotoBlob:pengurusPendingBlob});
+      }
+    }catch(err){ showToast('⚠ '+err.message); return; }
+  }else{
+    const key=editPengurusKey||('pengurus_'+Date.now());
+    let existingBlob=null;
+    if(editPengurusKey){
+      const existing=await dbGet('pengurus',editPengurusKey);
+      if(existing) existingBlob=existing.fotoBlob||null;
+    }
+    const data={nama,jabatan,periode,fotoBlob:pengurusPendingBlob||existingBlob};
+    await dbPut('pengurus',key,data);
   }
-  const data={nama,jabatan,periode,fotoBlob:pengurusPendingBlob||existingBlob};
-  await dbPut('pengurus',key,data);
   closePengurusModal();
   await renderPengurusGrid();
+  updateDashboardStats();
   showToast('✅ Pengurus berhasil disimpan!');
-}
-
-async function deletePengurus(key){
-  if(!confirm('Hapus pengurus ini?')) return;
-  await dbDelete('pengurus',key);
-  await renderPengurusGrid();
-  showToast('🗑 Pengurus dihapus');
 }
 
 // ===== IMAM & MUADZIN =====
@@ -794,6 +899,16 @@ let imamData=[];
 let muadzinData=[];
 
 async function loadImamMuadzinData(){
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      imamData=await vtRemote.loadImamRows();
+      muadzinData=await vtRemote.loadMuadzinRows();
+    }catch(e){
+      imamData=[]; muadzinData=[];
+      console.error(e);
+    }
+    return;
+  }
   const jadwal=await dbGet('imam_muadzin','jadwal');
   imamData=(jadwal&&jadwal.imam)||[];
   muadzinData=(jadwal&&jadwal.muadzin)||[];
@@ -854,7 +969,13 @@ function addMuadzinRow(){
 function deleteImamRow(i){ imamData.splice(i,1); renderImamTable(); }
 function deleteMuadzinRow(i){ muadzinData.splice(i,1); renderMuadzinTable(); }
 async function saveImamMuadzin(){
-  await dbPut('imam_muadzin','jadwal',{imam:imamData,muadzin:muadzinData});
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      await vtRemote.saveJadwal(imamData,muadzinData);
+    }catch(err){ showToast('⚠ '+err.message); return; }
+  }else{
+    await dbPut('imam_muadzin','jadwal',{imam:imamData,muadzin:muadzinData});
+  }
   showToast('✅ Jadwal imam & muadzin berhasil disimpan!');
   updateDashboardStats();
 }
@@ -863,16 +984,31 @@ async function saveImamMuadzin(){
 let galeriItems=[];
 let galeriReplaceIdx=-1;
 async function loadGaleriFromDB(){
+  for(const it of galeriItems){
+    if(typeof it.id==='string'&&it.url&&String(it.url).startsWith('blob:')) URL.revokeObjectURL(it.url);
+  }
   galeriItems=[];
-  const keys=await dbGetAllKeys('galeri');
-  const sorted=keys.filter(k=>String(k).startsWith('galeri_')).sort((a,b)=>{
-    const na=parseInt(String(a).split('_')[1])||0;
-    const nb=parseInt(String(b).split('_')[1])||0;
-    return na-nb;
-  });
-  for(const key of sorted){
-    const blob=await dbGet('galeri',key);
-    if(blob) galeriItems.push({id:key,url:URL.createObjectURL(blob)});
+  if(useRemoteGaleri()){
+    try{
+      const rows=await vtGaleriRemote.fetchRows();
+      if(rows&&rows.length){
+        rows.forEach(r=>galeriItems.push({id:r.id,url:r.url,source:'remote'}));
+      }
+    }catch(err){
+      console.error(err);
+      showToast('⚠ Galeri Supabase: '+(err.message||String(err)));
+    }
+  }else{
+    const keys=await dbGetAllKeys('galeri');
+    const sorted=keys.filter(k=>String(k).startsWith('galeri_')).sort((a,b)=>{
+      const na=parseInt(String(a).split('_')[1])||0;
+      const nb=parseInt(String(b).split('_')[1])||0;
+      return na-nb;
+    });
+    for(const key of sorted){
+      const blob=await dbGet('galeri',key);
+      if(blob) galeriItems.push({id:key,url:URL.createObjectURL(blob),source:'local'});
+    }
   }
   document.getElementById('galeriCount').textContent=galeriItems.length+' foto';
 }
@@ -901,19 +1037,32 @@ async function addGaleriFiles(files){
   document.getElementById('galeriProgress').style.display='block';
   document.getElementById('galeriProgressFill').style.width='0%';
   showToast('Memproses '+arr.length+' foto...',30000);
+  let done=0;
   for(let i=0;i<arr.length;i++){
     const file=arr[i];
     if(!file.type.startsWith('image/')) continue;
     const compressed=await compressImage(file,2400,0.82);
-    const newId='galeri_'+Date.now()+'_'+i;
-    await dbPut('galeri',newId,compressed);
-    galeriItems.push({id:newId,url:URL.createObjectURL(compressed)});
+    if(useRemoteGaleri()){
+      try{
+        const row=await vtGaleriRemote.uploadBlob(compressed);
+        galeriItems.push({id:row.id,url:row.url,source:'remote'});
+      }catch(err){
+        showToast('⚠ Upload gagal: '+(err.message||String(err)));
+        break;
+      }
+    }else{
+      const newId='galeri_'+Date.now()+'_'+i;
+      await dbPut('galeri',newId,compressed);
+      galeriItems.push({id:newId,url:URL.createObjectURL(compressed),source:'local'});
+    }
+    done++;
     document.getElementById('galeriProgressFill').style.width=Math.round(((i+1)/arr.length)*100)+'%';
   }
   document.getElementById('galeriProgress').style.display='none';
   document.getElementById('galeriCount').textContent=galeriItems.length+' foto';
   renderGaleriGrid();
-  showToast('✅ '+arr.length+' foto berhasil ditambahkan!');
+  updateDashboardStats();
+  showToast('✅ '+done+' foto berhasil diproses');
   document.getElementById('galeriAddInput').value='';
   document.getElementById('galeriBulkInput').value='';
 }
@@ -923,31 +1072,60 @@ async function replaceGaleriFile(file){
   showToast('⏳ Memproses...', 15000);
   const compressed=await compressImage(file,2400,0.82);
   const item=galeriItems[galeriReplaceIdx];
-  await dbDelete('galeri',item.id);
-  const newId='galeri_'+Date.now()+'_r';
-  await dbPut('galeri',newId,compressed);
-  URL.revokeObjectURL(item.url);
-  galeriItems[galeriReplaceIdx]={id:newId,url:URL.createObjectURL(compressed)};
+  if(useRemoteGaleri()){
+    try{
+      const row=await vtGaleriRemote.replaceBlob(item.id,item.url,compressed);
+      galeriItems[galeriReplaceIdx]={id:row.id,url:row.url,source:'remote'};
+    }catch(err){
+      showToast('⚠ Gagal: '+(err.message||String(err)));
+      galeriReplaceIdx=-1;
+      return;
+    }
+  }else{
+    await dbDelete('galeri',item.id);
+    const newId='galeri_'+Date.now()+'_r';
+    await dbPut('galeri',newId,compressed);
+    URL.revokeObjectURL(item.url);
+    galeriItems[galeriReplaceIdx]={id:newId,url:URL.createObjectURL(compressed),source:'local'};
+  }
   renderGaleriGrid();
   showToast('✅ Foto #'+(galeriReplaceIdx+1)+' berhasil diganti!');
   galeriReplaceIdx=-1;
 }
 async function deleteGaleriItem(idx){
   const item=galeriItems[idx];
-  await dbDelete('galeri',item.id);
-  URL.revokeObjectURL(item.url);
+  if(useRemoteGaleri()){
+    try{ await vtGaleriRemote.deleteById(item.id,item.url); }
+    catch(err){ showToast('⚠ '+err.message); return; }
+  }else{
+    await dbDelete('galeri',item.id);
+    if(item.url&&String(item.url).startsWith('blob:')) URL.revokeObjectURL(item.url);
+  }
   galeriItems.splice(idx,1);
   document.getElementById('galeriCount').textContent=galeriItems.length+' foto';
   renderGaleriGrid();
+  updateDashboardStats();
   showToast('🗑 Foto #'+(idx+1)+' dihapus');
 }
 async function confirmClearGaleri(){
   if(!confirm('Hapus SEMUA foto dari galeri?')) return;
-  for(const item of galeriItems) URL.revokeObjectURL(item.url);
-  await dbClear('galeri');
+  if(useRemoteGaleri()){
+    try{
+      await vtGaleriRemote.deleteAll();
+    }catch(err){
+      showToast('⚠ '+err.message);
+      return;
+    }
+  }else{
+    for(const item of galeriItems){
+      if(item.url&&String(item.url).startsWith('blob:')) URL.revokeObjectURL(item.url);
+    }
+    await dbClear('galeri');
+  }
   galeriItems=[];
   document.getElementById('galeriCount').textContent='0 foto';
   renderGaleriGrid();
+  updateDashboardStats();
   showToast('🗑 Semua foto galeri dihapus');
 }
 const dz=document.getElementById('galeriDropZone');
@@ -958,6 +1136,14 @@ dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag-over
 // ===== HERO =====
 let heroPendingBlob=null,heroPreviewURL=null;
 async function loadHeroPreview(){
+  if(useRemoteGaleri()&&typeof vtRemote!=='undefined'&&vtRemote.active()){
+    try{
+      const u=await vtRemote.getHeroUrl();
+      if(u){ document.getElementById('heroPreviewImg').src=u; return; }
+    }catch(e){ console.warn(e); }
+    document.getElementById('heroPreviewImg').src='../images/hero-360.png';
+    return;
+  }
   const blob=await dbGet('panoramas','hero_bg');
   if(blob){heroPreviewURL=URL.createObjectURL(blob);document.getElementById('heroPreviewImg').src=heroPreviewURL;}
 }
@@ -977,10 +1163,32 @@ ha.addEventListener('dragleave',()=>ha.classList.remove('drag-over'));
 ha.addEventListener('drop',e=>{e.preventDefault();ha.classList.remove('drag-over');handleHeroFile(e.dataTransfer.files[0]);});
 async function saveHeroBg(){
   if(!heroPendingBlob){showToast('⚠ Pilih foto dulu!');return;}
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      await vtRemote.saveHeroBlob(heroPendingBlob);
+      heroPendingBlob=null;
+      if(heroPreviewURL&&String(heroPreviewURL).startsWith('blob:')){URL.revokeObjectURL(heroPreviewURL);heroPreviewURL=null;}
+      await loadHeroPreview();
+      document.getElementById('heroFileInput').value='';
+      showToast('✅ Background hero disimpan ke Supabase!');
+    }catch(err){ showToast('⚠ '+err.message); }
+    return;
+  }
   await dbPut('panoramas','hero_bg',heroPendingBlob);
   showToast('✅ Background hero disimpan!');
 }
 async function resetHeroBg(){
+  if(useRemoteGaleri()&&vtRemote.active()){
+    try{
+      await vtRemote.clearHeroUrl();
+      heroPendingBlob=null;
+      if(heroPreviewURL&&String(heroPreviewURL).startsWith('blob:')){URL.revokeObjectURL(heroPreviewURL);heroPreviewURL=null;}
+      document.getElementById('heroPreviewImg').src='../images/hero-360.png';
+      document.getElementById('heroFileInput').value='';
+      showToast('↩ Background direset');
+    }catch(err){ showToast('⚠ '+err.message); }
+    return;
+  }
   await dbDelete('panoramas','hero_bg');
   heroPendingBlob=null;
   if(heroPreviewURL){URL.revokeObjectURL(heroPreviewURL);heroPreviewURL=null;}
@@ -994,11 +1202,28 @@ const panoLocations=[
   {name:'Ruang Utama (Mihrab)',key:'pano_0'},{name:'Aula & Selasar',key:'pano_1'},
   {name:'Halaman & Taman',key:'pano_2'},{name:'Menara & Kubah',key:'pano_3'}
 ];
+let panoSpotIds=[null,null,null,null];
+let vtTourSpotsCache=[];
 let currentPanoLoc=0,panoPendingBlobs={},panoObjectURLs={},panoViewer=null;
 async function loadAllPanoFromDB(){
+  if(useRemoteGaleri()&&typeof vtRemote!=='undefined'&&vtRemote.active()){
+    try{
+      const spots=await vtRemote.loadTourSpotsOrdered();
+      vtTourSpotsCache=spots||[];
+      for(let i=0;i<panoLocations.length;i++){
+        const prev=panoObjectURLs[i];
+        if(prev&&String(prev).startsWith('blob:')) URL.revokeObjectURL(prev);
+        const s=spots[i];
+        panoSpotIds[i]=s?s.id:null;
+        if(s&&s.foto_url) panoObjectURLs[i]=s.foto_url;
+        else delete panoObjectURLs[i];
+      }
+    }catch(e){ console.error(e); }
+    return;
+  }
   for(let i=0;i<panoLocations.length;i++){
     const blob=await dbGet('panoramas',panoLocations[i].key);
-    if(blob){if(panoObjectURLs[i]) URL.revokeObjectURL(panoObjectURLs[i]);panoObjectURLs[i]=URL.createObjectURL(blob);}
+    if(blob){if(panoObjectURLs[i]&&String(panoObjectURLs[i]).startsWith('blob:')) URL.revokeObjectURL(panoObjectURLs[i]);panoObjectURLs[i]=URL.createObjectURL(blob);}
   }
 }
 function initPanoPreview(){
@@ -1017,7 +1242,8 @@ async function handlePanoFile(file){
   showToast('⏳ Memproses foto 360°...',30000);
   const c=await compressImage(file,6000,0.88);
   panoPendingBlobs[currentPanoLoc]=c;
-  if(panoObjectURLs[currentPanoLoc]) URL.revokeObjectURL(panoObjectURLs[currentPanoLoc]);
+  const prev=panoObjectURLs[currentPanoLoc];
+  if(prev&&String(prev).startsWith('blob:')) URL.revokeObjectURL(prev);
   panoObjectURLs[currentPanoLoc]=URL.createObjectURL(c);
   initPanoPreview();
   showToast('📸 Foto dipilih — klik Simpan');
@@ -1030,15 +1256,72 @@ pa.addEventListener('drop',e=>{e.preventDefault();pa.classList.remove('drag-over
 async function savePano(){
   const blob=panoPendingBlobs[currentPanoLoc];
   if(!blob){showToast('⚠ Belum ada foto!');return;}
+  if(useRemoteGaleri()&&vtRemote.active()){
+    const sid=panoSpotIds[currentPanoLoc];
+    if(!sid){ showToast('⚠ Baris tour_spot tidak ada untuk tab ini. Jalankan supabase/schema.sql.'); return; }
+    try{
+      const url=await vtRemote.updateTourSpotFoto(sid,blob);
+      panoObjectURLs[currentPanoLoc]=url;
+      delete panoPendingBlobs[currentPanoLoc];
+      showToast('✅ Foto "'+panoLocations[currentPanoLoc].name+'" disimpan ke Supabase!');
+    }catch(err){ showToast('⚠ '+err.message); }
+    return;
+  }
   await dbPut('panoramas',panoLocations[currentPanoLoc].key,blob);
   showToast('✅ Foto "'+panoLocations[currentPanoLoc].name+'" disimpan!');
 }
 async function resetPano(){
+  if(useRemoteGaleri()&&vtRemote.active()){
+    const sid=panoSpotIds[currentPanoLoc];
+    if(!sid){ showToast('⚠ Tidak ada data lokasi di Supabase.'); return; }
+    try{
+      await vtRemote.clearTourSpotFoto(sid);
+      delete panoPendingBlobs[currentPanoLoc];
+      const prev=panoObjectURLs[currentPanoLoc];
+      if(prev&&String(prev).startsWith('blob:')) URL.revokeObjectURL(prev);
+      delete panoObjectURLs[currentPanoLoc];
+      document.getElementById('panoFileInput').value='';initPanoPreview();
+      showToast('↩ Foto "'+panoLocations[currentPanoLoc].name+'" direset');
+    }catch(err){ showToast('⚠ '+err.message); }
+    return;
+  }
   await dbDelete('panoramas',panoLocations[currentPanoLoc].key);
   delete panoPendingBlobs[currentPanoLoc];
-  if(panoObjectURLs[currentPanoLoc]){URL.revokeObjectURL(panoObjectURLs[currentPanoLoc]);delete panoObjectURLs[currentPanoLoc];}
+  if(panoObjectURLs[currentPanoLoc]&&String(panoObjectURLs[currentPanoLoc]).startsWith('blob:')){URL.revokeObjectURL(panoObjectURLs[currentPanoLoc]);delete panoObjectURLs[currentPanoLoc];}
   document.getElementById('panoFileInput').value='';initPanoPreview();
   showToast('↩ Foto "'+panoLocations[currentPanoLoc].name+'" direset');
+}
+
+// ===== SETTINGS / SUPABASE =====
+function loadSupabaseSettings(){
+  const u=document.getElementById('sbUrl');
+  const k=document.getElementById('sbKey');
+  if(!u||!k) return;
+  const stored=localStorage.getItem('vt_supabase_url')||'';
+  u.value=typeof vtNormalizeSupabaseUrl==='function'?vtNormalizeSupabaseUrl(stored):stored;
+  k.value=localStorage.getItem('vt_supabase_anon_key')||'';
+}
+function saveSupabaseSettings(){
+  const raw=document.getElementById('sbUrl').value.trim();
+  const url=typeof vtNormalizeSupabaseUrl==='function'?vtNormalizeSupabaseUrl(raw):raw;
+  const key=document.getElementById('sbKey').value.trim();
+  if(!url||!key){ showToast('⚠ URL dan anon key wajib diisi'); return; }
+  localStorage.setItem('vt_supabase_url',url);
+  localStorage.setItem('vt_supabase_anon_key',key);
+  document.getElementById('sbUrl').value=url;
+  if(typeof vtResetSupabaseClient==='function') vtResetSupabaseClient();
+  showToast('✅ Supabase disimpan. Unggahan galeri tersimpan di server.');
+  loadGaleriFromDB().then(()=>{ renderGaleriGrid(); updateDashboardStats(); });
+  loadAllPanoFromDB();
+  loadHeroPreview();
+}
+function clearSupabaseSettings(){
+  localStorage.removeItem('vt_supabase_url');
+  localStorage.removeItem('vt_supabase_anon_key');
+  if(typeof vtResetSupabaseClient==='function') vtResetSupabaseClient();
+  loadSupabaseSettings();
+  showToast('↩ Koneksi Supabase dihapus dari browser ini');
+  loadGaleriFromDB().then(()=>{ renderGaleriGrid(); updateDashboardStats(); });
 }
 
 // ===== SETTINGS =====

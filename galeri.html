@@ -152,6 +152,9 @@
 
 <footer class="footer"><p>© 2025 Masjid Agung Sukabumi Virtual Tour</p></footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-galeri.js"></script>
 <script>
 // Theme
 if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
@@ -166,11 +169,12 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 // ===== IndexedDB =====
 function openDB() {
   return new Promise((res, rej) => {
-    const req = indexedDB.open('virtualTourDB', 3);
+    const req = indexedDB.open('virtualTourDB', 4);
     req.onupgradeneeded = e => {
       const d = e.target.result;
-      if (!d.objectStoreNames.contains('panoramas')) d.createObjectStore('panoramas');
-      if (!d.objectStoreNames.contains('galeri')) d.createObjectStore('galeri');
+      ['panoramas','galeri','pengurus','imam_muadzin','masjid_info'].forEach(s => {
+        if (!d.objectStoreNames.contains(s)) d.createObjectStore(s);
+      });
     };
     req.onsuccess = e => res(e.target.result);
     req.onerror = e => rej(e.target.error);
@@ -195,9 +199,32 @@ function dbGet(db, store, key) {
 let galeriURLs = [];
 let lightboxIdx = 0;
 
+function useRemoteGaleriPublic() {
+  return typeof vtSupabaseConfigured === 'function' && vtSupabaseConfigured() &&
+    typeof vtGetSupabase === 'function' && vtGetSupabase();
+}
+
 async function loadAndRenderGaleri() {
   const grid = document.getElementById('galeriGrid');
   try {
+    if (useRemoteGaleriPublic()) {
+      const rows = await vtGaleriRemote.fetchRows();
+      if (rows && rows.length > 0) {
+        grid.innerHTML = '';
+        galeriURLs = rows.map(function (r) { return r.url; });
+        for (let idx = 0; idx < rows.length; idx++) {
+          const item = document.createElement('div');
+          item.className = 'galeri-item';
+          item.onclick = function () { openLightbox(idx); };
+          item.innerHTML =
+            '<img src="' + rows[idx].url + '" alt="Foto ' + (idx + 1) + '" loading="lazy"/>' +
+            '<div class="galeri-item-num">' + (idx + 1) + ' / ' + rows.length + '</div>';
+          grid.appendChild(item);
+        }
+        return;
+      }
+    }
+
     const db = await openDB();
     const keys = await dbGetAllKeys(db, 'galeri');
     const sorted = keys.filter(k => String(k).startsWith('galeri_')).sort((a, b) => {
@@ -207,7 +234,6 @@ async function loadAndRenderGaleri() {
     });
 
     if (sorted.length === 0) {
-      // Tampilkan foto default jika galeri kosong
       renderDefault(grid);
       return;
     }

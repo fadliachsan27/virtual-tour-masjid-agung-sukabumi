@@ -97,12 +97,12 @@
   <div class="nav-prayer-card">
     <div class="prayer-grid">
       <div class="prayer-item"><div class="p-label">IMSAK</div><div id="imsakTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">SUBUH</div><div id="subuhTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">TERBIT</div><div id="terbitTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">DZUHUR</div><div id="dzuhurTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">ASHAR</div><div id="asharTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">MAGHRIB</div><div id="maghribTime" class="p-time">--:--</div></div>
-      <div class="prayer-item"><div class="p-label">ISYA</div><div id="isyaTime" class="p-time">--:--</div></div>
+      <div class="prayer-item"><div class="p-label">SUBUH</div><div id="subuhTime" class="p-time">04:33</div></div>
+      <div class="prayer-item"><div class="p-label">TERBIT</div><div id="terbitTime" class="p-time">05:54</div></div>
+      <div class="prayer-item"><div class="p-label">DZUHUR</div><div id="dzuhurTime" class="p-time">11:49</div></div>
+      <div class="prayer-item"><div class="p-label">ASHAR</div><div id="asharTime" class="p-time">15:10</div></div>
+      <div class="prayer-item"><div class="p-label">MAGHRIB</div><div id="maghribTime" class="p-time">17:43</div></div>
+      <div class="prayer-item"><div class="p-label">ISYA</div><div id="isyaTime" class="p-time">18:56</div></div>
     </div>
   </div>
   <div class="nav-links">
@@ -288,6 +288,9 @@
   <p>© 2025 Masjid Agung Sukabumi Virtual Tour</p>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-app-data.js"></script>
 <script>
 // ===== IndexedDB =====
 let db = null;
@@ -335,8 +338,39 @@ function startHero(src) {
   });
 }
 
+function useSupabasePublic() {
+  return typeof vtSupabaseConfigured === 'function' && vtSupabaseConfigured() &&
+    typeof vtGetSupabase === 'function' && vtGetSupabase();
+}
+
 // ===== Informasi Masjid =====
 async function loadMasjidInfo() {
+  if (useSupabasePublic()) {
+    try {
+      const { info, fiturRows } = await vtRemote.loadMasjidAndFitur();
+      if (info) {
+        if (info.judul) document.getElementById('tentangJudul').textContent = info.judul;
+        if (info.deskripsi) {
+          document.getElementById('tentangDeskripsi').innerHTML = info.deskripsi.split('\n\n').filter(Boolean).map(p => `<p>${p}</p>`).join('');
+        }
+        if (info.kapasitas) document.getElementById('statKapasitas').textContent = info.kapasitas;
+        if (info.berdiri) document.getElementById('statBerdiri').textContent = info.berdiri;
+        if (info.luas) document.getElementById('statLuas').textContent = info.luas;
+        if (info.menara) document.getElementById('statMenara').textContent = info.menara;
+      }
+      if (fiturRows && fiturRows.length > 0) {
+        document.getElementById('tentangFitur').innerHTML = fiturRows.map(f => `
+      <div class="tentang-feature">
+        <div class="tentang-feature-icon">${f.icon||'🕌'}</div>
+        <div>
+          <div class="tentang-feature-title">${f.judul}</div>
+          <div class="tentang-feature-desc">${f.deskripsi}</div>
+        </div>
+      </div>`).join('');
+      }
+    } catch (e) { console.error(e); }
+    return;
+  }
   const info = await dbGet('masjid_info', 'info');
   if (info) {
     if (info.judul) document.getElementById('tentangJudul').textContent = info.judul;
@@ -363,6 +397,27 @@ async function loadMasjidInfo() {
 
 // ===== Pengurus =====
 async function loadPengurus() {
+  if (useSupabasePublic()) {
+    try {
+      const rows = await vtRemote.loadPengurusRows();
+      const slider = document.getElementById('pengurusSlider');
+      if (!rows || rows.length === 0) return;
+      slider.innerHTML = '';
+      rows.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'pengurus-card';
+        const avatarHtml = item.foto_url
+          ? `<img class="pengurus-avatar" src="${item.foto_url}" alt=""/>`
+          : `<div class="pengurus-avatar-placeholder">👤</div>`;
+        card.innerHTML = `${avatarHtml}
+      <div class="pengurus-jabatan">${item.jabatan||'Pengurus'}</div>
+      <div class="pengurus-nama">${item.nama||'-'}</div>
+      <div class="pengurus-periode">${item.periode||''}</div>`;
+        slider.appendChild(card);
+      });
+    } catch (e) { console.error(e); }
+    return;
+  }
   const keys = await dbGetAllKeys('pengurus');
   const sorted = keys.filter(k=>String(k).startsWith('pengurus_')).sort();
   const slider = document.getElementById('pengurusSlider');
@@ -388,7 +443,16 @@ function slideRight() { document.getElementById('pengurusSlider').scrollBy({left
 
 // ===== Imam & Muadzin =====
 async function loadImamMuadzin() {
-  const data = await dbGet('imam_muadzin', 'jadwal');
+  let data = null;
+  if (useSupabasePublic()) {
+    try {
+      const imam = await vtRemote.loadImamRows();
+      const muadzin = await vtRemote.loadMuadzinRows();
+      data = { imam, muadzin };
+    } catch (e) { console.error(e); return; }
+  } else {
+    data = await dbGet('imam_muadzin', 'jadwal');
+  }
   if (!data) return;
   const renderList = (items, elId) => {
     if (!items || items.length === 0) return;
@@ -436,9 +500,21 @@ async function getPrayerTimes() {
 // ===== INIT =====
 openDB().then(async d => {
   db = d;
-  // Load hero panorama
-  const blob = await dbGet('panoramas','hero_bg');
-  startHero(blob ? URL.createObjectURL(blob) : (localStorage.getItem('heroPanorama')||'images/hero-360.png'));
+  let heroSrc = 'images/hero-360.png';
+  if (useSupabasePublic()) {
+    try {
+      const u = await vtRemote.getHeroUrl();
+      if (u) heroSrc = u;
+    } catch (e) { console.warn(e); }
+  } else {
+    const blob = await dbGet('panoramas','hero_bg');
+    if (blob) heroSrc = URL.createObjectURL(blob);
+    else {
+      const ls = localStorage.getItem('heroPanorama');
+      if (ls) heroSrc = ls;
+    }
+  }
+  startHero(heroSrc);
   await loadMasjidInfo();
   await loadPengurus();
   await loadImamMuadzin();

@@ -204,34 +204,7 @@
   <div class="vt-sidebar" id="vtSidebar">
     <button class="vt-sidebar-toggle" id="sidebarToggle">☰</button>
     <div class="vt-sidebar-label">PILIH LOKASI</div>
-    <button class="vt-location-btn active" data-idx="0" onclick="changeLocation(0)">
-      <span class="vt-location-icon">🕌</span>
-      <span>
-        <span class="vt-location-name">Ruang Utama (Mihrab)</span>
-        <span class="vt-location-sub">Area Shalat Utama</span>
-      </span>
-    </button>
-    <button class="vt-location-btn" data-idx="1" onclick="changeLocation(1)">
-      <span class="vt-location-icon">🏛️</span>
-      <span>
-        <span class="vt-location-name">Aula & Selasar</span>
-        <span class="vt-location-sub">Area Multifungsi</span>
-      </span>
-    </button>
-    <button class="vt-location-btn" data-idx="2" onclick="changeLocation(2)">
-      <span class="vt-location-icon">🌿</span>
-      <span>
-        <span class="vt-location-name">Halaman & Taman</span>
-        <span class="vt-location-sub">Area Luar Masjid</span>
-      </span>
-    </button>
-    <button class="vt-location-btn" data-idx="3" onclick="changeLocation(3)">
-      <span class="vt-location-icon">🔔</span>
-      <span>
-        <span class="vt-location-name">Menara & Kubah</span>
-        <span class="vt-location-sub">Landmark Masjid</span>
-      </span>
-    </button>
+    <div id="vtSpotList"></div>
   </div>
 
   <!-- Info popup -->
@@ -253,34 +226,87 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<script src="js/supabase-app-data.js"></script>
 <script>
-// Lokasi yang disimpan, image diisi setelah DB siap
-const locationsMeta = [
-  { name: 'Ruang Utama (Mihrab)', desc: 'Pusat ibadah dengan mihrab megah dan kubah utama yang indah. Area ini dapat menampung ribuan jamaah.', key: 'pano_0', yaw: 0 },
-  { name: 'Aula & Selasar',       desc: 'Area multifungsi yang digunakan untuk kegiatan pengajian, pertemuan, dan acara keagamaan lainnya.',    key: 'pano_1', yaw: 90 },
-  { name: 'Halaman & Taman',      desc: 'Area luar masjid yang asri dengan taman indah, tempat wudhu, dan area parkir yang luas.',               key: 'pano_2', yaw: 180 },
-  { name: 'Menara & Kubah',       desc: 'Menara megah yang menjulang tinggi dan kubah indah, menjadi landmark kebanggaan Kota Sukabumi.',         key: 'pano_3', yaw: 270 },
+const DEFAULT_LOCATIONS = [
+  { name: 'Ruang Utama (Mihrab)', desc: 'Pusat ibadah dengan mihrab megah dan kubah utama yang indah. Area ini dapat menampung ribuan jamaah.', key: 'pano_0', yaw: 0, icon: '🕌', sub: 'Area Shalat Utama' },
+  { name: 'Aula & Selasar',       desc: 'Area multifungsi yang digunakan untuk kegiatan pengajian, pertemuan, dan acara keagamaan lainnya.',    key: 'pano_1', yaw: 90, icon: '🏛️', sub: 'Area Multifungsi' },
+  { name: 'Halaman & Taman',      desc: 'Area luar masjid yang asri dengan taman indah, tempat wudhu, dan area parkir yang luas.',               key: 'pano_2', yaw: 180, icon: '🌿', sub: 'Area Luar Masjid' },
+  { name: 'Menara & Kubah',       desc: 'Menara megah yang menjulang tinggi dan kubah indah, menjadi landmark kebanggaan Kota Sukabumi.',         key: 'pano_3', yaw: 270, icon: '🔔', sub: 'Landmark Masjid' },
 ];
 
-let locationImages = ['images/hero-360.png','images/hero-360.png','images/hero-360.png','images/hero-360.png'];
+let locationsMeta = [];
+let locationImages = [];
 let currentIdx = 0;
 let viewer = null;
 let autoRotating = true;
 
-// ── Ambil semua foto dari IndexedDB, lalu baru init viewer ──
+function vtEscape(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+function renderVtSidebar() {
+  const el = document.getElementById('vtSpotList');
+  if (!el) return;
+  el.innerHTML = locationsMeta.map((loc, i) => `
+    <button class="vt-location-btn ${i === currentIdx ? 'active' : ''}" type="button" data-idx="${i}" onclick="changeLocation(${i})">
+      <span class="vt-location-icon">${loc.icon || '📍'}</span>
+      <span>
+        <span class="vt-location-name">${vtEscape(loc.name)}</span>
+        <span class="vt-location-sub">${vtEscape(loc.sub || '')}</span>
+      </span>
+    </button>`).join('');
+}
+
 function openDB() {
   return new Promise((res, rej) => {
-    const r = indexedDB.open('virtualTourDB', 2);
-    r.onupgradeneeded = e => { if (!e.target.result.objectStoreNames.contains('panoramas')) e.target.result.createObjectStore('panoramas'); };
+    const r = indexedDB.open('virtualTourDB', 4);
+    r.onupgradeneeded = e => {
+      const d = e.target.result;
+      ['panoramas','galeri','pengurus','imam_muadzin','masjid_info'].forEach(s => {
+        if (!d.objectStoreNames.contains(s)) d.createObjectStore(s);
+      });
+    };
     r.onsuccess = e => res(e.target.result);
-    r.onerror   = () => res(null); // fallback: tetap lanjut tanpa DB
+    r.onerror = () => res(null);
   });
 }
 
+function useSupabasePublic() {
+  return typeof vtSupabaseConfigured === 'function' && vtSupabaseConfigured() &&
+    typeof vtGetSupabase === 'function' && vtGetSupabase();
+}
+
 async function loadImages() {
+  locationsMeta = DEFAULT_LOCATIONS.map(m => ({ ...m }));
+  locationImages = DEFAULT_LOCATIONS.map(() => 'images/hero-360.png');
+
+  if (useSupabasePublic()) {
+    try {
+      const spots = await vtRemote.loadTourSpotsOrdered();
+      if (spots && spots.length) {
+        locationsMeta = spots.map(s => ({
+          name: s.nama,
+          desc: s.deskripsi || '',
+          key: 'spot_' + s.id,
+          yaw: typeof s.yaw_awal === 'number' ? s.yaw_awal : 0,
+          icon: s.icon || '📍',
+          sub: s.sub_label || '',
+        }));
+        locationImages = spots.map(s => (s.foto_url && String(s.foto_url).trim()) ? s.foto_url : 'images/hero-360.png');
+        renderVtSidebar();
+        return;
+      }
+    } catch (e) { console.warn(e); }
+  }
+
   const db = await openDB();
   if (db) {
-    await Promise.all(locationsMeta.map((loc, i) => new Promise(res => {
+    await Promise.all(DEFAULT_LOCATIONS.map((loc, i) => new Promise(res => {
       try {
         const tx = db.transaction('panoramas','readonly');
         const req = tx.objectStore('panoramas').get(loc.key);
@@ -289,6 +315,7 @@ async function loadImages() {
       } catch(e) { res(); }
     })));
   }
+  renderVtSidebar();
 }
 
 function initViewer(idx) {
@@ -301,7 +328,7 @@ function initViewer(idx) {
     showControls: true,
     compass     : false,
     hfov        : 100,
-    yaw         : locationsMeta[idx].yaw,
+    yaw         : locationsMeta[idx] ? locationsMeta[idx].yaw : 0,
     pitch       : 0,
     showFullscreenCtrl: false,
     showZoomCtrl: true,
@@ -310,9 +337,12 @@ function initViewer(idx) {
 
 function changeLocation(idx) {
   currentIdx = idx;
-  document.querySelectorAll('.vt-location-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
-  document.getElementById('infoTitle').textContent = locationsMeta[idx].name;
-  document.getElementById('infoDesc').textContent  = locationsMeta[idx].desc;
+  document.querySelectorAll('.vt-location-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+  const meta = locationsMeta[idx];
+  if (meta) {
+    document.getElementById('infoTitle').textContent = meta.name;
+    document.getElementById('infoDesc').textContent  = meta.desc;
+  }
   document.getElementById('vtInfo').classList.remove('hidden');
   initViewer(idx);
 }
@@ -333,7 +363,6 @@ document.getElementById('sidebarToggle').addEventListener('click', () => {
   document.getElementById('vtSidebar').classList.toggle('collapsed');
 });
 
-// ── INIT: load foto dulu, baru tampilkan viewer, baru hide loading ──
 loadImages().then(() => {
   initViewer(0);
   setTimeout(() => { document.getElementById('vtLoading').classList.add('done'); }, 1200);
