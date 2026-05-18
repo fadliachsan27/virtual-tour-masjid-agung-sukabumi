@@ -939,18 +939,56 @@ ha.addEventListener('dragleave',()=>ha.classList.remove('drag-over'));
 ha.addEventListener('drop',e=>{e.preventDefault();ha.classList.remove('drag-over');handleHeroFile(e.dataTransfer.files[0]);});
 window.saveHeroBg=saveHeroBg; window.resetHeroBg=resetHeroBg;
 
-// ===== PANORAMA — Base64 di Firestore =====
+// ===== PANORAMA — Chunked Base64 di Firestore =====
+// Firestore max 1MB/doc, foto 360° bisa besar → pecah jadi chunk 700KB
+const CHUNK_SIZE = 700000; // 700KB per chunk (aman di bawah batas 1MB Firestore)
 const panoLocations=[
   {name:'Ruang Utama (Mihrab)',key:'pano_0'},{name:'Aula & Selasar',key:'pano_1'},
   {name:'Halaman & Taman',key:'pano_2'},{name:'Menara & Kubah',key:'pano_3'}
 ];
 let currentPanoLoc=0, panoPendingBase64={}, panoLoadedBase64={}, panoViewer=null;
 
+// Simpan base64 besar ke beberapa dokumen Firestore (chunks)
+async function savePanoChunked(key, base64){
+  const chunks = [];
+  for(let i=0; i<base64.length; i+=CHUNK_SIZE) chunks.push(base64.slice(i, i+CHUNK_SIZE));
+  // Simpan metadata + jumlah chunk
+  await setDoc(doc(db,'panorama',key), {chunks: chunks.length, updatedAt: Date.now()});
+  // Simpan setiap chunk sebagai sub-dokumen
+  const saves = chunks.map((chunk, i) =>
+    setDoc(doc(db,'panorama_chunks', key+'_'+i), {data: chunk, index: i})
+  );
+  await Promise.all(saves);
+}
+
+// Baca dan gabungkan semua chunk
+async function loadPanoChunked(key){
+  const meta = await getDoc(doc(db,'panorama',key));
+  if(!meta.exists()) return null;
+  const numChunks = meta.data().chunks;
+  if(!numChunks) return meta.data().base64||null; // fallback format lama
+  const chunkDocs = await Promise.all(
+    Array.from({length:numChunks},(_,i)=>getDoc(doc(db,'panorama_chunks',key+'_'+i)))
+  );
+  return chunkDocs.map(d=>d.exists()?d.data().data:'').join('');
+}
+
+// Hapus semua chunk + dokumen metadata
+async function deletePanoChunked(key){
+  const meta = await getDoc(doc(db,'panorama',key));
+  if(meta.exists()){
+    const numChunks = meta.data().chunks||0;
+    const dels = Array.from({length:numChunks},(_,i)=>deleteDoc(doc(db,'panorama_chunks',key+'_'+i)));
+    await Promise.all(dels);
+  }
+  await deleteDoc(doc(db,'panorama',key));
+}
+
 async function loadAllPanoFromDB(){
   for(let i=0;i<panoLocations.length;i++){
     try {
-      const snap=await getDoc(doc(db,'panorama',panoLocations[i].key));
-      if(snap.exists()&&snap.data().base64) panoLoadedBase64[i]=snap.data().base64;
+      const b64 = await loadPanoChunked(panoLocations[i].key);
+      if(b64) panoLoadedBase64[i]=b64;
     } catch(e){}
   }
 }
@@ -968,22 +1006,26 @@ function selectPanoLoc(idx,el){
 async function handlePanoFile(file){
   if(!file||!file.type.startsWith('image/')) return;
   showToast('⏳ Memproses foto 360°...', 30000);
-  panoPendingBase64[currentPanoLoc]=await compressToBase64(file,5000,0.88);
+  // Kompres lebih agresif agar tetap kecil: max 3000px, quality 0.75
+  panoPendingBase64[currentPanoLoc]=await compressToBase64(file,3000,0.75);
   initPanoPreview();
   showToast('📸 Foto dipilih — klik Simpan');
 }
 async function savePano(){
   const base64=panoPendingBase64[currentPanoLoc];
   if(!base64){ showToast('⚠ Belum ada foto!'); return; }
+  const key=panoLocations[currentPanoLoc].key;
+  showToast('⏳ Menyimpan foto panorama...', 60000);
   try {
-    await setDoc(doc(db,'panorama',panoLocations[currentPanoLoc].key), {base64});
+    await savePanoChunked(key, base64);
     panoLoadedBase64[currentPanoLoc]=base64;
     showToast('✅ Foto "'+panoLocations[currentPanoLoc].name+'" disimpan!');
   } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
 }
 async function resetPano(){
+  const key=panoLocations[currentPanoLoc].key;
   try {
-    await deleteDoc(doc(db,'panorama',panoLocations[currentPanoLoc].key));
+    await deletePanoChunked(key);
     delete panoPendingBase64[currentPanoLoc]; delete panoLoadedBase64[currentPanoLoc];
     document.getElementById('panoFileInput').value=''; initPanoPreview();
     showToast('↩ Foto "'+panoLocations[currentPanoLoc].name+'" direset');
