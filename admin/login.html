@@ -6,40 +6,21 @@
   <title>Login Admin - Masjid Agung Sukabumi</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: #0e0e0e;
-      font-family: 'Lato', sans-serif;
-    }
-    .login-card {
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px; padding: 48px 40px; width: 360px; text-align: center;
-    }
-    .login-logo {
-      font-family: 'Playfair Display', serif; font-size: 22px; color: #c9a84c;
-      margin-bottom: 6px;
-    }
-    .login-sub { font-size: 11px; letter-spacing: 3px; color: rgba(255,255,255,0.3); margin-bottom: 36px; }
-    .input-group { margin-bottom: 16px; text-align: left; }
-    .input-group label { font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 6px; }
-    .input-group input {
-      width: 100%; padding: 12px 16px; border-radius: 10px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
-      color: #fff; font-size: 14px; outline: none; font-family: 'Lato', sans-serif;
-      transition: border-color 0.2s;
-    }
-    .input-group input:focus { border-color: #c9a84c; }
-    .btn-login {
-      width: 100%; padding: 14px; border-radius: 10px; border: none;
-      background: linear-gradient(135deg, #c9a84c, #a07830);
-      color: #fff; font-size: 15px; font-family: 'Lato', sans-serif; font-weight: 700;
-      cursor: pointer; margin-top: 8px; transition: opacity 0.2s;
-    }
-    .btn-login:hover { opacity: 0.9; }
-    .login-err { color: #ff6b6b; font-size: 13px; margin-top: 12px; display: none; }
-    .login-back { display: block; margin-top: 20px; color: rgba(255,255,255,0.4); font-size: 13px; text-decoration: none; }
-    .login-back:hover { color: #c9a84c; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0e0e0e;font-family:'Lato',sans-serif}
+    .login-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:48px 40px;width:360px;text-align:center}
+    .login-logo{font-family:'Playfair Display',serif;font-size:22px;color:#c9a84c;margin-bottom:6px}
+    .login-sub{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.3);margin-bottom:36px}
+    .input-group{margin-bottom:16px;text-align:left}
+    .input-group label{font-size:12px;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px}
+    .input-group input{width:100%;padding:12px 16px;border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:14px;outline:none;font-family:'Lato',sans-serif;transition:border-color 0.2s}
+    .input-group input:focus{border-color:#c9a84c}
+    .btn-login{width:100%;padding:14px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a84c,#a07830);color:#fff;font-size:15px;font-family:'Lato',sans-serif;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity 0.2s}
+    .btn-login:hover{opacity:0.9}
+    .btn-login:disabled{opacity:0.6;cursor:not-allowed}
+    .login-err{color:#ff6b6b;font-size:13px;margin-top:12px;display:none}
+    .login-back{display:block;margin-top:20px;color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none}
+    .login-back:hover{color:#c9a84c}
   </style>
 </head>
 <body>
@@ -48,34 +29,73 @@
   <div class="login-sub">ADMIN PANEL</div>
   <div class="input-group">
     <label>Username</label>
-    <input type="text" id="username" placeholder="admin"/>
+    <input type="text" id="username" placeholder="admin" onkeypress="if(event.key==='Enter')doLogin()"/>
   </div>
   <div class="input-group">
     <label>Password</label>
     <input type="password" id="password" placeholder="••••••••" onkeypress="if(event.key==='Enter')doLogin()"/>
   </div>
-  <button class="btn-login" onclick="doLogin()">Masuk</button>
+  <button class="btn-login" id="btnLogin" onclick="doLogin()">Masuk</button>
   <div class="login-err" id="loginErr">Username atau password salah.</div>
   <a href="../index.html" class="login-back">← Kembali ke Beranda</a>
 </div>
-<script>
-function doLogin() {
-  const u = document.getElementById('username').value;
-  const p = document.getElementById('password').value;
-  // Default credentials (change in admin panel)
-  const savedUser = localStorage.getItem('admin_user') || 'admin';
-  const savedPass = localStorage.getItem('admin_pass') || 'admin123';
-  if (u === savedUser && p === savedPass) {
-    localStorage.setItem('adminLoggedIn', '1');
-    window.location.href = 'index.html';
-  } else {
-    document.getElementById('loginErr').style.display = 'block';
-  }
-}
-// Auto-redirect if already logged in
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ⚠ GANTI DENGAN CONFIG FIREBASE ANDA
+const firebaseConfig = {
+  apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
+  authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
+  projectId: "vt-masjid-agung-sukabumi",
+  storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
+  messagingSenderId: "633933684627",
+  appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
+  measurementId: "G-GG88GW221Z"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
 if (localStorage.getItem('adminLoggedIn') === '1') {
   window.location.href = 'index.html';
 }
+
+window.doLogin = async function() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+  const btn = document.getElementById('btnLogin');
+  const err = document.getElementById('loginErr');
+  err.style.display = 'none';
+  if (!u || !p) { err.textContent = 'Isi username dan password.'; err.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Memeriksa...';
+  try {
+    // Cek kredensial dari Firestore
+    const snap = await getDoc(doc(db, 'admin_settings', 'credentials'));
+    let validUser = 'admin', validPass = 'admin123';
+    if (snap.exists()) { validUser = snap.data().username || validUser; validPass = snap.data().password || validPass; }
+    if (u === validUser && p === validPass) {
+      localStorage.setItem('adminLoggedIn', '1');
+      window.location.href = 'index.html';
+    } else {
+      err.textContent = 'Username atau password salah.';
+      err.style.display = 'block';
+    }
+  } catch(e) {
+    // Fallback: cek dari localStorage jika Firestore gagal
+    const savedUser = localStorage.getItem('admin_user') || 'admin';
+    const savedPass = localStorage.getItem('admin_pass') || 'admin123';
+    if (u === savedUser && p === savedPass) {
+      localStorage.setItem('adminLoggedIn', '1');
+      window.location.href = 'index.html';
+    } else {
+      err.textContent = 'Gagal terhubung / username atau password salah.';
+      err.style.display = 'block';
+    }
+  }
+  btn.disabled = false; btn.textContent = 'Masuk';
+};
 </script>
 </body>
 </html>
