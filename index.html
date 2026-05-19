@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
   <style>
     /* ===== TENTANG MASJID ===== */
@@ -65,6 +66,308 @@
     .imam-keterangan { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .imam-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
     .imam-empty-icon { font-size: 28px; margin-bottom: 8px; }
+
+    /* FOOTER*/
+
+  :root{
+    /* LIGHT MODE */
+    --footer-bg: #ffffff;
+    --footer-text: #111111;
+    --footer-text-soft: rgba(0,0,0,.70);
+
+    --footer-border: rgba(0,0,0,.08);
+
+    --footer-social-bg: rgba(0,0,0,.05);
+    --footer-social-border: rgba(0,0,0,.08);
+    --footer-social-hover: rgba(0,0,0,.10);
+
+    --footer-glow: rgba(255,255,255,.20);
+  }
+
+  body.dark{
+    /* DARK MODE */
+    --footer-bg: #131313;
+    --footer-text: #ffffff;
+    --footer-text-soft: rgba(255,255,255,.75);
+
+    --footer-border: rgba(255,255,255,.08);
+
+    --footer-social-bg: rgba(255,255,255,.06);
+    --footer-social-border: rgba(255,255,255,.10);
+    --footer-social-hover: rgba(255,255,255,.12);
+
+    --footer-glow: rgba(255,255,255,.04);
+  }
+
+  /* ==========================
+      FOOTER
+  ========================== */
+
+  .footer{
+    position:relative;
+    width:100%;
+
+    background: var(--footer-bg);
+    color: var(--footer-text);
+
+    overflow:hidden;
+    margin-top:80px;
+
+    transition:
+      background .35s ease,
+      color .35s ease;
+  }
+
+  /* Glow */
+  .footer::before{
+    content:"";
+    position:absolute;
+
+    top:-120px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:450px;
+    height:220px;
+
+    background:radial-gradient(
+      circle,
+      var(--footer-glow),
+      transparent 70%
+    );
+
+    pointer-events:none;
+  }
+
+  /* ==========================
+      CONTAINER
+  ========================== */
+
+  .footer-container{
+    max-width:1200px;
+    margin:auto;
+
+    padding:65px 30px 45px;
+
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+
+    gap:50px;
+
+    align-items:start;
+
+    position:relative;
+    z-index:2;
+  }
+
+  /* ==========================
+      BRAND
+  ========================== */
+
+  .footer-brand{
+    text-align:center;
+  }
+
+  .footer-logo{
+    font-size:50px;
+    margin-bottom:14px;
+  }
+
+  .footer-brand h3{
+    font-family:'Playfair Display', serif;
+    font-size:40px;
+    font-weight:700;
+
+    color:var(--footer-text);
+
+    margin-bottom:16px;
+  }
+
+  .footer-brand p{
+    color:var(--footer-text-soft);
+
+    font-size:16px;
+    line-height:1.9;
+
+    max-width:560px;
+    margin:auto;
+  }
+
+  /* ==========================
+      SOCIAL
+  ========================== */
+
+  .footer-social{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    gap:16px;
+    margin-top:28px;
+  }
+
+  .footer-social a{
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:var(--footer-social-bg);
+    border:1px solid var(--footer-social-border);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    text-decoration:none;
+
+    color:var(--footer-text);
+
+    font-size:22px;
+
+    transition:all .3s ease;
+  }
+
+  .footer-social a:hover{
+    transform:translateY(-5px);
+    background:var(--footer-social-hover);
+  }
+
+  /* ==========================
+      LINKS
+  ========================== */
+
+  .footer-links{
+    text-align:center;
+  }
+
+  .footer-links h4{
+    font-size:24px;
+    margin-bottom:24px;
+
+    color:var(--footer-text);
+  }
+
+  .footer-links a{
+    display:block;
+
+    color:var(--footer-text-soft);
+
+    text-decoration:none;
+
+    margin-bottom:16px;
+
+    transition:.3s ease;
+
+    font-size:16px;
+  }
+
+  .footer-links a:hover{
+    color:var(--footer-text);
+  }
+
+  /* ==========================
+      CONTACT
+  ========================== */
+
+  .footer-contact{
+    text-align:center;
+  }
+
+  .footer-contact h4{
+    font-size:24px;
+    margin-bottom:24px;
+
+    color:var(--footer-text);
+  }
+
+  .footer-contact p{
+    color:var(--footer-text-soft);
+
+    font-size:15px;
+    margin-bottom:14px;
+
+    line-height:1.8;
+  }
+
+  #footerClock{
+    color:var(--footer-text);
+    font-weight:600;
+  }
+
+  /* ==========================
+      BOTTOM
+  ========================== */
+
+  .footer-bottom{
+    border-top:1px solid var(--footer-border);
+
+    text-align:center;
+
+    padding:22px;
+
+    position:relative;
+    z-index:2;
+  }
+
+  .footer-bottom p{
+    color:var(--footer-text-soft);
+
+    font-size:14px;
+    margin:0;
+  }
+
+  /* ==========================
+      RESPONSIVE
+  ========================== */
+
+  @media(max-width:900px){
+
+    .footer-container{
+      grid-template-columns:1fr;
+      gap:45px;
+      text-align:center;
+    }
+
+    .footer-brand h3{
+      font-size:34px;
+    }
+
+    .footer-brand p{
+      font-size:15px;
+    }
+  }
+
+  @media(max-width:500px){
+
+    .footer-container{
+      padding:50px 20px 35px;
+    }
+
+    .footer-logo{
+      font-size:42px;
+    }
+
+    .footer-brand h3{
+      font-size:28px;
+    }
+
+    .footer-brand p{
+      font-size:14px;
+    }
+
+    .footer-social a{
+      width:44px;
+      height:44px;
+      font-size:18px;
+    }
+
+    .footer-links h4,
+    .footer-contact h4{
+      font-size:22px;
+    }
+  }
 
     @media (max-width: 900px) {
       .tentang-inner { grid-template-columns: 1fr; gap: 36px; }
@@ -268,10 +571,82 @@
 <!-- PROFIL SECTION -->
 <section class="section" id="profil">
   <div class="container">
+  </div>
+</section>
 
-<footer class="footer">
-  <p>© 2025 Masjid Agung Sukabumi Virtual Tour</p>
-</footer>
+</div>
+</section>
+
+<!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-container">
+
+      <!-- Brand -->
+      <div class="footer-brand">
+        <div class="footer-logo">🕌</div>
+
+        <h3>Masjid Agung Sukabumi</h3>
+
+        <p>
+          Virtual Tour 360° untuk menjelajahi
+          keindahan, sejarah, dan aktivitas
+          Masjid Agung Sukabumi dari mana saja.
+        </p>
+
+        <!-- Social -->
+        <div class="footer-social">
+          <a href="https://instagram.com/"
+            target="_blank"
+            title="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+
+          <a href="https://youtube.com/"
+            target="_blank"
+            title="YouTube">
+            <i class="fab fa-youtube"></i>
+          </a>
+
+          <a href="https://maps.google.com/"
+            target="_blank"
+            title="Lokasi">
+            <i class="fas fa-location-dot"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Navigasi -->
+      <div class="footer-links">
+        <h4>Navigasi</h4>
+
+        <a href="index.html">Beranda</a>
+        <a href="galeri.html">Galeri</a>
+        <a href="virtual-tour.html">Virtual Tour</a>
+        <a href="#tentang">Tentang Masjid</a>
+      </div>
+
+      <!-- Informasi -->
+      <div class="footer-contact">
+        <h4>Informasi</h4>
+
+        <p>📍 Kota Sukabumi, Jawa Barat</p>
+        <p>🕌 Masjid Agung Sukabumi</p>
+        <p>📧 info@masjidagungsukabumi.id</p>
+        <p>+62 871261217217</p>
+        <p>🕒 <span id="footerClock"></span></p>
+      </div>
+
+    </div>
+
+    <!-- Bottom -->
+    <div class="footer-bottom">
+      <p>
+        © 2025 Masjid Agung Sukabumi Virtual Tour
+        • All Rights Reserved
+      </p>
+    </div>
+
+  </footer>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -405,6 +780,24 @@ async function getPrayerTimes(){
     document.getElementById('isyaTime').textContent    = d.isya;
   } catch(e){ console.error('Prayer times:', e); }
 }
+
+function updateFooterClock() {
+  const clock = document.getElementById("footerClock");
+  if (!clock) return;
+
+  const now = new Date();
+
+  const time = now.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+
+  clock.textContent = time + " WIB";
+}
+
+setInterval(updateFooterClock, 1000);
+updateFooterClock();
 
 // ===== INIT =====
 (async()=>{
