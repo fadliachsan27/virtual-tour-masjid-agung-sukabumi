@@ -19,6 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
+const isAdminPage = !!document.getElementById('page-dashboard');
+const isPublicGalleryPage = !!document.getElementById('galeriGroups');
+
+if (isAdminPage) {
+
 // ===== AUTH CHECK =====
 if (localStorage.getItem('adminLoggedIn') !== '1') {
   window.location.href = 'login.html';
@@ -410,10 +415,34 @@ window.saveImamMuadzin = saveImamMuadzin;
 // GALERI — Base64 di Firestore
 // ============================================================
 let galeriItems = [], galeriReplaceId = null;
+let activeGaleriUploadKategori = 'luar';
+window.activeGaleriUploadKategori = 'luar';
+
+function kategoriLabelGaleri(kategori) {
+  return kategori === 'dalam' ? 'Foto bagian dalam' : 'Foto bagian luar';
+}
+
+function setActiveGaleriKategori(kategori) {
+  activeGaleriUploadKategori = kategori === 'dalam' ? 'dalam' : 'luar';
+  window.activeGaleriUploadKategori = activeGaleriUploadKategori;
+  document.getElementById('galeriKategoriAktifText').textContent = kategoriLabelGaleri(activeGaleriUploadKategori);
+}
+
+function triggerAddGaleri(kategori) {
+  setActiveGaleriKategori(kategori);
+  document.getElementById('galeriAddInput').click();
+}
+
+function triggerBulkGaleri(kategori) {
+  setActiveGaleriKategori(kategori);
+  document.getElementById('galeriBulkInput').click();
+}
 
 async function loadGaleri() {
-  const grid = document.getElementById('galeriAdminGrid');
-  grid.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">⏳ Memuat...</div>';
+  const gridLuar = document.getElementById('galeriAdminGridLuar');
+  const gridDalam = document.getElementById('galeriAdminGridDalam');
+  gridLuar.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">⏳ Memuat...</div>';
+  gridDalam.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">⏳ Memuat...</div>';
   try {
     const snap = await getDocs(query(collection(db, 'galeri'), orderBy('order', 'asc')));
     galeriItems = [];
@@ -423,53 +452,73 @@ async function loadGaleri() {
     updateDashboardStats();
   } catch (e) {
     showToast('⚠ Gagal memuat galeri: ' + e.message);
-    grid.innerHTML = '';
+    gridLuar.innerHTML = '';
+    gridDalam.innerHTML = '';
   }
 }
 
 function renderGaleriGrid() {
-  const grid = document.getElementById('galeriAdminGrid');
-  grid.innerHTML = '';
-  if (galeriItems.length === 0) {
-    grid.innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px;grid-column:1/-1">Belum ada foto. Tambahkan foto!</div>';
-    return;
+  const gridLuar = document.getElementById('galeriAdminGridLuar');
+  const gridDalam = document.getElementById('galeriAdminGridDalam');
+  gridLuar.innerHTML = '';
+  gridDalam.innerHTML = '';
+
+  const itemsLuar = galeriItems.filter(item => (item.kategori || 'luar') === 'luar');
+  const itemsDalam = galeriItems.filter(item => item.kategori === 'dalam');
+  document.getElementById('galeriCountLuar').textContent = itemsLuar.length + ' foto';
+  document.getElementById('galeriCountDalam').textContent = itemsDalam.length + ' foto';
+
+  function renderItems(items, grid, offset) {
+    if (items.length === 0) {
+      grid.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;grid-column:1/-1">Belum ada foto.</div>';
+      return;
+    }
+    items.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'galeri-admin-item';
+      div.innerHTML = `
+        <img src="${item.base64}" alt="Foto ${offset + idx + 1}" loading="lazy"/>
+        <div class="galeri-item-num">#${offset + idx + 1}</div>
+        <div class="galeri-item-overlay">
+          <div class="galeri-item-actions">
+            <button class="btn-item-replace" onclick="triggerReplace('${item.id}')">🔄 Ganti</button>
+            <button class="btn-item-delete"  onclick="deleteGaleriItem('${item.id}')">🗑</button>
+          </div>
+        </div>`;
+      grid.appendChild(div);
+    });
   }
-  galeriItems.forEach((item, idx) => {
-    const div = document.createElement('div');
-    div.className = 'galeri-admin-item';
-    div.innerHTML = `
-      <img src="${item.base64}" alt="Foto ${idx + 1}" loading="lazy"/>
-      <div class="galeri-item-num">#${idx + 1}</div>
-      <div class="galeri-item-overlay">
-        <div class="galeri-item-actions">
-          <button class="btn-item-replace" onclick="triggerReplace('${item.id}')">🔄 Ganti</button>
-          <button class="btn-item-delete"  onclick="deleteGaleriItem('${item.id}')">🗑</button>
-        </div>
-      </div>`;
-    grid.appendChild(div);
-  });
+
+  renderItems(itemsLuar, gridLuar, 0);
+  renderItems(itemsDalam, gridDalam, itemsLuar.length);
 }
 
-async function addGaleriFiles(files) {
+async function addGaleriFiles(files, kategori) {
   if (!files || files.length === 0) return;
   const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
   if (arr.length === 0) return;
+  const kategoriFinal = kategori === 'dalam' ? 'dalam' : 'luar';
 
   document.getElementById('galeriProgress').style.display = 'block';
   document.getElementById('galeriProgressFill').style.width = '0%';
-  showToast('⏳ Menyimpan ' + arr.length + ' foto ke Firestore...', 60000);
+  showToast('⏳ Menyimpan ' + arr.length + ' ' + kategoriLabelGaleri(kategoriFinal).toLowerCase() + ' ke Firestore...', 60000);
 
   for (let i = 0; i < arr.length; i++) {
     const base64 = await compressToBase64(arr[i], 1200, 0.78);
     if (!base64) continue;
-    await addDoc(collection(db, 'galeri'), { base64, order: Date.now() + i, createdAt: serverTimestamp() });
+    await addDoc(collection(db, 'galeri'), {
+      base64,
+      kategori: kategoriFinal,
+      order: Date.now() + i,
+      createdAt: serverTimestamp()
+    });
     document.getElementById('galeriProgressFill').style.width =
       Math.round(((i + 1) / arr.length) * 100) + '%';
   }
 
   document.getElementById('galeriProgress').style.display = 'none';
   await loadGaleri();
-  showToast('✅ ' + arr.length + ' foto berhasil disimpan!');
+  showToast('✅ ' + arr.length + ' ' + kategoriLabelGaleri(kategoriFinal).toLowerCase() + ' berhasil disimpan!');
   document.getElementById('galeriAddInput').value  = '';
   document.getElementById('galeriBulkInput').value = '';
 }
@@ -512,6 +561,8 @@ window.triggerReplace     = triggerReplace;
 window.deleteGaleriItem   = deleteGaleriItem;
 window.confirmClearGaleri = confirmClearGaleri;
 window.addGaleriFiles     = addGaleriFiles;
+window.triggerAddGaleri   = triggerAddGaleri;
+window.triggerBulkGaleri  = triggerBulkGaleri;
 
 document.getElementById('galeriReplaceInput')
   .addEventListener('change', e => replaceGaleriFile(e.target.files[0]));
@@ -522,7 +573,7 @@ dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dra
 dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
 dz.addEventListener('drop', e => {
   e.preventDefault(); dz.classList.remove('drag-over');
-  addGaleriFiles(e.dataTransfer.files);
+  addGaleriFiles(e.dataTransfer.files, activeGaleriUploadKategori);
 });
 
 
@@ -767,3 +818,122 @@ updateAdminClock();
   await loadHeroPreview();
   await updateDashboardStats();
 })();
+
+} else if (isPublicGalleryPage) {
+  // Theme
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.navbar');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
+  }
+
+  // ===== Galeri dari Firestore (Base64) =====
+  let galeriSrcs = [], lightboxIdx = 0;
+
+  async function loadAndRenderGaleriPublic() {
+    const groupsContainer = document.getElementById('galeriGroups');
+    if (!groupsContainer) return;
+    try {
+      const snap = await getDocs(query(collection(db, 'galeri'), orderBy('order', 'asc')));
+      if (snap.empty) { renderEmptyPublic(groupsContainer); return; }
+      groupsContainer.innerHTML = '';
+      galeriSrcs = [];
+      const fotoLuar = [], fotoDalam = [];
+      snap.forEach(d => {
+        const item = d.data();
+        if (!item.base64) return;
+        if (item.kategori === 'dalam') fotoDalam.push(item);
+        else fotoLuar.push(item);
+      });
+      if (fotoLuar.length === 0 && fotoDalam.length === 0) { renderEmptyPublic(groupsContainer); return; }
+
+      const totalFoto = fotoLuar.length + fotoDalam.length;
+      let startIndex = 0;
+      startIndex = renderGroupPublic(groupsContainer, 'Foto Bagian Luar', fotoLuar, startIndex, totalFoto);
+      renderGroupPublic(groupsContainer, 'Foto Bagian Dalam', fotoDalam, startIndex, totalFoto);
+    } catch (e) {
+      renderEmptyPublic(groupsContainer);
+      console.error(e);
+    }
+  }
+
+  function renderGroupPublic(container, title, items, startIndex, totalFoto) {
+    const group = document.createElement('div');
+    group.className = 'galeri-group';
+    group.innerHTML = `<h3 class="galeri-group-title">${title}</h3>`;
+    const grid = document.createElement('div');
+    grid.className = 'galeri-grid';
+    if (items.length === 0) {
+      grid.innerHTML = '<div class="galeri-empty" style="padding:30px 20px"><div class="galeri-empty-sub">Belum ada foto pada kategori ini.</div></div>';
+      group.appendChild(grid);
+      container.appendChild(group);
+      return startIndex;
+    }
+    items.forEach((item, localIndex) => {
+      galeriSrcs.push(item.base64);
+      const idx = galeriSrcs.length - 1;
+      const el = document.createElement('div');
+      el.className = 'galeri-item';
+      el.onclick = () => openLightboxPublic(idx);
+      el.innerHTML = `<img src="${item.base64}" alt="${title}" loading="lazy"/>
+      <div class="galeri-item-num">${startIndex + localIndex + 1} / ${totalFoto}</div>`;
+      grid.appendChild(el);
+    });
+    group.appendChild(grid);
+    container.appendChild(group);
+    return startIndex + items.length;
+  }
+
+  function renderEmptyPublic(container) {
+    container.innerHTML = '<div class="galeri-empty"><div class="galeri-empty-icon">🖼️</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
+  }
+
+  function openLightboxPublic(idx) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const counter = document.getElementById('lightboxCounter');
+    if (!lightbox || !lightboxImg || !counter) return;
+    lightboxIdx = idx;
+    lightboxImg.src = galeriSrcs[idx];
+    lightbox.classList.add('active');
+    counter.textContent = (idx + 1) + ' / ' + galeriSrcs.length;
+  }
+
+  window.closeLightbox = () => {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) lightbox.classList.remove('active');
+  };
+
+  window.lightboxNav = (dir) => {
+    const lightboxImg = document.getElementById('lightboxImg');
+    const counter = document.getElementById('lightboxCounter');
+    if (!lightboxImg || !counter || galeriSrcs.length === 0) return;
+    lightboxIdx = (lightboxIdx + dir + galeriSrcs.length) % galeriSrcs.length;
+    lightboxImg.src = galeriSrcs[lightboxIdx];
+    counter.textContent = (lightboxIdx + 1) + ' / ' + galeriSrcs.length;
+  };
+
+  document.addEventListener('keydown', e => {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox || !lightbox.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft')  window.lightboxNav(-1);
+    if (e.key === 'ArrowRight') window.lightboxNav(1);
+    if (e.key === 'Escape')     window.closeLightbox();
+  });
+
+  const lightbox = document.getElementById('lightbox');
+  if (lightbox) {
+    lightbox.addEventListener('click', e => {
+      if (e.target === e.currentTarget) window.closeLightbox();
+    });
+  }
+
+  loadAndRenderGaleriPublic();
+}
