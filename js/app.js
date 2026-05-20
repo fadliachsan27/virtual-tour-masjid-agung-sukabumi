@@ -19,6 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 
+const isAdminPage = !!document.getElementById('page-dashboard');
+const isPublicGalleryPage = !!document.getElementById('galeriGroups');
+
+if (isAdminPage) {
+
 // ===== AUTH CHECK =====
 if (localStorage.getItem('adminLoggedIn') !== '1') {
   window.location.href = 'login.html';
@@ -813,3 +818,122 @@ updateAdminClock();
   await loadHeroPreview();
   await updateDashboardStats();
 })();
+
+} else if (isPublicGalleryPage) {
+  // Theme
+  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('.navbar');
+    if (nav) nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    });
+  }
+
+  // ===== Galeri dari Firestore (Base64) =====
+  let galeriSrcs = [], lightboxIdx = 0;
+
+  async function loadAndRenderGaleriPublic() {
+    const groupsContainer = document.getElementById('galeriGroups');
+    if (!groupsContainer) return;
+    try {
+      const snap = await getDocs(query(collection(db, 'galeri'), orderBy('order', 'asc')));
+      if (snap.empty) { renderEmptyPublic(groupsContainer); return; }
+      groupsContainer.innerHTML = '';
+      galeriSrcs = [];
+      const fotoLuar = [], fotoDalam = [];
+      snap.forEach(d => {
+        const item = d.data();
+        if (!item.base64) return;
+        if (item.kategori === 'dalam') fotoDalam.push(item);
+        else fotoLuar.push(item);
+      });
+      if (fotoLuar.length === 0 && fotoDalam.length === 0) { renderEmptyPublic(groupsContainer); return; }
+
+      const totalFoto = fotoLuar.length + fotoDalam.length;
+      let startIndex = 0;
+      startIndex = renderGroupPublic(groupsContainer, 'Foto Bagian Luar', fotoLuar, startIndex, totalFoto);
+      renderGroupPublic(groupsContainer, 'Foto Bagian Dalam', fotoDalam, startIndex, totalFoto);
+    } catch (e) {
+      renderEmptyPublic(groupsContainer);
+      console.error(e);
+    }
+  }
+
+  function renderGroupPublic(container, title, items, startIndex, totalFoto) {
+    const group = document.createElement('div');
+    group.className = 'galeri-group';
+    group.innerHTML = `<h3 class="galeri-group-title">${title}</h3>`;
+    const grid = document.createElement('div');
+    grid.className = 'galeri-grid';
+    if (items.length === 0) {
+      grid.innerHTML = '<div class="galeri-empty" style="padding:30px 20px"><div class="galeri-empty-sub">Belum ada foto pada kategori ini.</div></div>';
+      group.appendChild(grid);
+      container.appendChild(group);
+      return startIndex;
+    }
+    items.forEach((item, localIndex) => {
+      galeriSrcs.push(item.base64);
+      const idx = galeriSrcs.length - 1;
+      const el = document.createElement('div');
+      el.className = 'galeri-item';
+      el.onclick = () => openLightboxPublic(idx);
+      el.innerHTML = `<img src="${item.base64}" alt="${title}" loading="lazy"/>
+      <div class="galeri-item-num">${startIndex + localIndex + 1} / ${totalFoto}</div>`;
+      grid.appendChild(el);
+    });
+    group.appendChild(grid);
+    container.appendChild(group);
+    return startIndex + items.length;
+  }
+
+  function renderEmptyPublic(container) {
+    container.innerHTML = '<div class="galeri-empty"><div class="galeri-empty-icon">🖼️</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
+  }
+
+  function openLightboxPublic(idx) {
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const counter = document.getElementById('lightboxCounter');
+    if (!lightbox || !lightboxImg || !counter) return;
+    lightboxIdx = idx;
+    lightboxImg.src = galeriSrcs[idx];
+    lightbox.classList.add('active');
+    counter.textContent = (idx + 1) + ' / ' + galeriSrcs.length;
+  }
+
+  window.closeLightbox = () => {
+    const lightbox = document.getElementById('lightbox');
+    if (lightbox) lightbox.classList.remove('active');
+  };
+
+  window.lightboxNav = (dir) => {
+    const lightboxImg = document.getElementById('lightboxImg');
+    const counter = document.getElementById('lightboxCounter');
+    if (!lightboxImg || !counter || galeriSrcs.length === 0) return;
+    lightboxIdx = (lightboxIdx + dir + galeriSrcs.length) % galeriSrcs.length;
+    lightboxImg.src = galeriSrcs[lightboxIdx];
+    counter.textContent = (lightboxIdx + 1) + ' / ' + galeriSrcs.length;
+  };
+
+  document.addEventListener('keydown', e => {
+    const lightbox = document.getElementById('lightbox');
+    if (!lightbox || !lightbox.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft')  window.lightboxNav(-1);
+    if (e.key === 'ArrowRight') window.lightboxNav(1);
+    if (e.key === 'Escape')     window.closeLightbox();
+  });
+
+  const lightbox = document.getElementById('lightbox');
+  if (lightbox) {
+    lightbox.addEventListener('click', e => {
+      if (e.target === e.currentTarget) window.closeLightbox();
+    });
+  }
+
+  loadAndRenderGaleriPublic();
+}
