@@ -576,7 +576,7 @@
     <div class="form-row">
       <div class="form-group">
         <label>Waktu</label>
-        <input type="text" id="eventTime" placeholder="08.00 - 10.00 WIB"/>
+        <input type="time" id="eventTime"/>
       </div>
       <div class="form-group">
         <label>Lokasi</label>
@@ -930,6 +930,11 @@ function formatEventDate(value){
   if(Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
 }
+function toTimeInputValue(value){
+  const match=String(value||'').match(/(\d{1,2})[:.](\d{2})/);
+  if(!match) return '';
+  return match[1].padStart(2,'0')+':'+match[2];
+}
 async function loadEvents(){
   const grid=document.getElementById('eventAdminGrid');
   if(!grid) return;
@@ -1016,7 +1021,7 @@ function openEventModal(id){
     if(item){
       document.getElementById('eventTitle').value=item.title||'';
       document.getElementById('eventDate').value=item.date||'';
-      document.getElementById('eventTime').value=item.time||'';
+      document.getElementById('eventTime').value=toTimeInputValue(item.time);
       document.getElementById('eventLocation').value=item.location||'';
       document.getElementById('eventDescription').value=item.description||'';
       eventPendingBase64=item.imageBase64||null;
