@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kegiatan - Masjid Agung Sukabumi</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    body { padding-top: var(--navbar-h); }
+    .section { padding-top: 60px; padding-bottom: 80px; }
+    .event-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .event-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; min-height: 100%; transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+    .event-card:hover { transform: translateY(-4px); border-color: rgba(201,168,76,0.4); box-shadow: 0 12px 30px rgba(201,168,76,0.12); }
+    .event-media { aspect-ratio: 4/3; background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(0,0,0,0.08)); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .event-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .event-placeholder { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 36px; }
+    .event-content { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+    .event-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .event-pill { display: inline-flex; color: var(--gold); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); border-radius: 20px; padding: 5px 10px; font-size: 11px; font-weight: 700; }
+    .event-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); line-height: 1.3; margin-bottom: 10px; }
+    .event-desc { color: var(--text-muted); font-size: 14px; line-height: 1.7; flex: 1; white-space: pre-line; }
+    .event-loading, .event-empty { grid-column: 1/-1; text-align: center; padding: 70px 20px; color: var(--text-muted); }
+    .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (max-width: 900px) { .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 560px) { .event-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-brand">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
+      <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
+      <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
+    </svg>
+    <div><div class="nav-title">Masjid Agung Sukabumi</div><div class="nav-subtitle">VIRTUAL TOUR</div></div>
+  </div>
+  <div class="nav-links">
+    <div class="nav-menu" id="navMenu">
+      <a href="index.html" class="nav-link">Beranda</a>
+      <a href="event.html" class="nav-link active">Kegiatan</a>
+      <a href="galeri.html" class="nav-link">Galeri</a>
+      <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
+    </div>
+    <button class="btn-theme" id="themeToggle" title="Ganti Tema">
+      <span class="icon-light">M</span><span class="icon-dark">S</span>
+    </button>
+    <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </a>
+  </div>
+</nav>
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-badge">EVENT & KEGIATAN</div>
+      <h2 class="section-title">Kegiatan Masjid Agung Sukabumi</h2>
+      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Agenda kajian, sosial, dan kegiatan umat terbaru</p>
+    </div>
+    <div class="event-grid" id="eventGrid">
+      <div class="event-loading">
+        <div class="loading-spinner"></div>
+        Memuat kegiatan...
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer"><p>(c) 2025 Masjid Agung Sukabumi Virtual Tour</p></footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
+  authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
+  projectId: "vt-masjid-agung-sukabumi",
+  storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
+  messagingSenderId: "633933684627",
+  appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
+  measurementId: "G-GG88GW221Z"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
+window.addEventListener('scroll',()=>{ document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY>60); });
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  document.body.classList.toggle('dark');
+  localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light');
+});
+
+function escapeHtml(value){
+  return String(value||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function formatEventDate(value){
+  if(!value) return 'Tanggal belum diatur';
+  const date = new Date(value + 'T00:00:00');
+  if(Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+}
+function renderEmpty(){
+  document.getElementById('eventGrid').innerHTML='<div class="event-empty"><div style="font-family:\'Playfair Display\',serif;font-size:22px;color:var(--text);margin-bottom:8px">Belum Ada Kegiatan</div><div>Kegiatan dapat ditambahkan melalui Admin Panel.</div></div>';
+}
+async function loadEvents(){
+  const grid=document.getElementById('eventGrid');
+  try {
+    const snap=await getDocs(query(collection(db,'events'), orderBy('date','desc')));
+    if(snap.empty){ renderEmpty(); return; }
+    grid.innerHTML='';
+    snap.forEach(d=>{
+      const item=d.data();
+      const card=document.createElement('article');
+      card.className='event-card';
+      const media=item.imageBase64
+        ? `<img src="${item.imageBase64}" alt="${escapeHtml(item.title||'Kegiatan masjid')}" loading="lazy"/>`
+        : `<div class="event-placeholder">EVENT</div>`;
+      card.innerHTML=`
+        <div class="event-media">${media}</div>
+        <div class="event-content">
+          <div class="event-meta">
+            <span class="event-pill">${formatEventDate(item.date)}</span>
+            ${item.time?`<span class="event-pill">${escapeHtml(item.time)}</span>`:''}
+          </div>
+          <h3 class="event-title">${escapeHtml(item.title||'Kegiatan Masjid')}</h3>
+          ${item.location?`<div class="event-pill" style="width:max-content;margin-bottom:12px">${escapeHtml(item.location)}</div>`:''}
+          <div class="event-desc">${escapeHtml(item.description||'')}</div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  } catch(e){
+    console.error(e);
+    renderEmpty();
+  }
+}
+loadEvents();
+</script>
+</body>
+</html>

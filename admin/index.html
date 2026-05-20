@@ -53,7 +53,7 @@
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
     /* STATS */
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+    .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:24px}
     .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
     .stat-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold)}
     .stat-label{color:var(--muted);font-size:12px;margin-top:4px}
@@ -83,6 +83,20 @@
     .btn-item-delete{padding:6px 10px;border-radius:7px;border:none;background:rgba(255,70,70,0.8);color:#fff;font-size:12px;cursor:pointer;font-weight:700}
     .galeri-item-num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:6px}
     .galeri-count{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:var(--gold);font-size:12px;padding:5px 12px;border-radius:20px}
+    /* EVENTS */
+    .event-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+    .event-admin-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.2s}
+    .event-admin-card:hover{border-color:rgba(201,168,76,0.4)}
+    .event-admin-media{height:150px;background:rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Playfair Display',serif;font-size:28px;overflow:hidden}
+    .event-admin-media img{width:100%;height:100%;object-fit:cover}
+    .event-admin-body{padding:16px}
+    .event-admin-date{display:inline-flex;color:var(--gold);background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;margin-bottom:10px}
+    .event-admin-title{font-family:'Playfair Display',serif;color:#fff;font-size:17px;margin-bottom:8px;line-height:1.35}
+    .event-admin-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+    .event-admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .event-highlight-admin{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:14px}
+    .event-highlight-admin-img{width:110px;height:82px;border-radius:10px;background:rgba(201,168,76,0.09);display:flex;align-items:center;justify-content:center;color:var(--gold);font-family:'Playfair Display',serif;overflow:hidden}
+    .event-highlight-admin-img img{width:100%;height:100%;object-fit:cover}
     /* PENGURUS */
     .pengurus-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:16px}
     .pengurus-admin-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:border-color 0.2s}
@@ -187,6 +201,7 @@
     <a href="#info" onclick="showPage('info',this)">🕌 Informasi Masjid</a>
     <a href="#pengurus" onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
     <a href="#imam" onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
+    <a href="#events" onclick="showPage('events',this)">Kegiatan</a>
     <a href="#galeri" onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
     <a href="#hero" onclick="showPage('hero',this)">🌄 Background Hero</a>
     <a href="#panorama" onclick="showPage('panorama',this)">🔄 Foto Panorama</a>
@@ -223,6 +238,16 @@
       <div class="stat-card">
         <div class="stat-num" id="statMuadzin">0</div>
         <div class="stat-label">Data Muadzin</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="statEvents">0</div>
+        <div class="stat-label">Kegiatan</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Kegiatan Terbaru</div>
+      <div id="dashboardLatestEvent">
+        <div style="color:var(--muted);font-size:13px">Memuat kegiatan terbaru...</div>
       </div>
     </div>
     <div class="card">
@@ -393,6 +418,23 @@
     </div>
   </div>
 
+  <!-- EVENTS -->
+  <div id="page-events" style="display:none">
+    <div class="page-header">
+      <div class="page-title">Kegiatan Masjid</div>
+      <div class="page-sub">Tambah, edit, dan hapus kegiatan yang tampil di halaman publik</div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div class="card-title" style="margin-bottom:0">Daftar Kegiatan</div>
+        <button class="btn-save" style="margin-top:0" onclick="openEventModal()">+ Tambah Kegiatan</button>
+      </div>
+      <div class="event-admin-grid" id="eventAdminGrid">
+        <div style="color:var(--muted);font-size:13px;padding:20px">Belum ada kegiatan.</div>
+      </div>
+    </div>
+  </div>
+
   <!-- GALERI -->
   <div id="page-galeri" style="display:none">
     <div class="page-header">
@@ -517,6 +559,52 @@
   </div>
 </div>
 
+<!-- MODAL TAMBAH/EDIT EVENT -->
+<div class="modal-overlay" id="eventModal">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-title" id="eventModalTitle">Tambah Kegiatan</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Judul Kegiatan *</label>
+        <input type="text" id="eventTitle" placeholder="Kajian Ahad Pagi"/>
+      </div>
+      <div class="form-group">
+        <label>Tanggal *</label>
+        <input type="date" id="eventDate"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Waktu</label>
+        <input type="text" id="eventTime" placeholder="08.00 - 10.00 WIB"/>
+      </div>
+      <div class="form-group">
+        <label>Lokasi</label>
+        <input type="text" id="eventLocation" placeholder="Ruang utama masjid"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Deskripsi</label>
+      <textarea id="eventDescription" placeholder="Tulis ringkasan kegiatan..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Foto Kegiatan</label>
+      <div class="preview-box" style="height:180px">
+        <img id="eventPreviewImg" class="preview-img" src="" alt="" style="display:none"/>
+        <div id="eventPreviewPlaceholder" style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted)">Belum ada foto</div>
+      </div>
+      <div class="upload-area" onclick="document.getElementById('eventImageInput').click()">
+        <div class="upload-text"><strong>Klik untuk upload foto</strong></div>
+      </div>
+      <input type="file" id="eventImageInput" accept="image/*"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-reset" style="margin:0" onclick="closeEventModal()">Batal</button>
+      <button class="btn-save" style="margin:0" onclick="saveEvent()">Simpan Kegiatan</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -553,6 +641,7 @@ function showPage(name, el){
   if(el) el.classList.add('active');
   if(name==='panorama') initPanoPreview();
   if(name==='galeri')   loadGaleri();
+  if(name==='events')   loadEvents();
   if(name==='pengurus') loadPengurus();
   if(name==='imam')     loadImamMuadzin();
   if(name==='info')     loadInfoForm();
@@ -560,6 +649,7 @@ function showPage(name, el){
   return false;
 }
 window.showPage = showPage;
+window.showTab = (name)=>showPage(name, document.querySelector(`.sidebar-nav a[href="#${name}"]`));
 
 function showToast(msg, dur){
   const t=document.getElementById('toast');
@@ -590,16 +680,19 @@ function compressToBase64(file, maxW, quality){
 // ===== DASHBOARD STATS =====
 async function updateDashboardStats(){
   try {
-    const [galeriSnap, pengurusSnap, jadwalSnap] = await Promise.all([
+    const [galeriSnap, pengurusSnap, jadwalSnap, eventsSnap] = await Promise.all([
       getDocs(collection(db,'galeri')),
       getDocs(collection(db,'pengurus')),
-      getDoc(doc(db,'imam_muadzin','jadwal'))
+      getDoc(doc(db,'imam_muadzin','jadwal')),
+      getDocs(collection(db,'events'))
     ]);
     document.getElementById('statGaleri').textContent = galeriSnap.size;
     document.getElementById('statPengurus').textContent = pengurusSnap.size;
     const jadwal = jadwalSnap.exists() ? jadwalSnap.data() : {};
     document.getElementById('statImam').textContent = (jadwal.imam||[]).length;
     document.getElementById('statMuadzin').textContent = (jadwal.muadzin||[]).length;
+    document.getElementById('statEvents').textContent = eventsSnap.size;
+    await loadDashboardLatestEvent();
   } catch(e){ console.error(e); }
 }
 
@@ -822,6 +915,155 @@ async function saveImamMuadzin(){
 window.addImamRow=addImamRow; window.addMuadzinRow=addMuadzinRow;
 window.deleteImamRow=deleteImamRow; window.deleteMuadzinRow=deleteMuadzinRow;
 window.saveImamMuadzin=saveImamMuadzin;
+
+// ===== EVENTS =====
+let eventItems = [];
+let editEventId = null;
+let eventPendingBase64 = null;
+
+function escapeHtml(value){
+  return String(value||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function formatEventDate(value){
+  if(!value) return 'Tanggal belum diatur';
+  const date = new Date(value + 'T00:00:00');
+  if(Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+}
+async function loadEvents(){
+  const grid=document.getElementById('eventAdminGrid');
+  if(!grid) return;
+  grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">Memuat...</div>';
+  try {
+    const snap = await getDocs(query(collection(db,'events'), orderBy('date','desc')));
+    eventItems=[];
+    snap.forEach(d=>eventItems.push({id:d.id,...d.data()}));
+    renderEventGrid();
+    updateDashboardStats();
+  } catch(e){ showToast('Gagal memuat kegiatan: '+e.message); grid.innerHTML=''; }
+}
+function renderEventGrid(){
+  const grid=document.getElementById('eventAdminGrid');
+  grid.innerHTML='';
+  if(eventItems.length===0){
+    grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:40px;grid-column:1/-1">Belum ada kegiatan. Tambahkan kegiatan baru.</div>';
+    return;
+  }
+  eventItems.forEach(item=>{
+    const card=document.createElement('div');
+    card.className='event-admin-card';
+    const media=item.imageBase64 ? `<img src="${item.imageBase64}" alt="${escapeHtml(item.title||'Kegiatan')}"/>` : 'EVENT';
+    const desc=(item.description||'').trim();
+    card.innerHTML=`
+      <div class="event-admin-media">${media}</div>
+      <div class="event-admin-body">
+        <div class="event-admin-date">${formatEventDate(item.date)}${item.time?' | '+escapeHtml(item.time):''}</div>
+        <div class="event-admin-title">${escapeHtml(item.title||'Kegiatan Masjid')}</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">${escapeHtml(item.location||'')}</div>
+        <div class="event-admin-desc">${escapeHtml(desc).slice(0,150)}${desc.length>150?'...':''}</div>
+        <div class="event-admin-actions">
+          <button class="btn-sm" onclick="editEvent('${item.id}')">Edit</button>
+          <button class="btn-danger" onclick="deleteEvent('${item.id}')">Hapus</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+async function loadDashboardLatestEvent(){
+  const box=document.getElementById('dashboardLatestEvent');
+  if(!box) return;
+  try {
+    const snap=await getDocs(query(collection(db,'events'), orderBy('date','desc')));
+    if(snap.empty){
+      box.innerHTML='<div style="color:var(--muted);font-size:13px">Belum ada kegiatan.</div>';
+      return;
+    }
+    const item=snap.docs[0].data();
+    const img=item.imageBase64 ? `<img src="${item.imageBase64}" alt="${escapeHtml(item.title||'Kegiatan')}"/>` : 'EVENT';
+    box.innerHTML=`
+      <div class="event-highlight-admin">
+        <div class="event-highlight-admin-img">${img}</div>
+        <div>
+          <div class="event-admin-date">${formatEventDate(item.date)}${item.time?' | '+escapeHtml(item.time):''}</div>
+          <div class="event-admin-title">${escapeHtml(item.title||'Kegiatan Masjid')}</div>
+          <div style="font-size:13px;color:var(--muted)">${escapeHtml(item.location||'')}</div>
+        </div>
+      </div>`;
+  } catch(e){ box.innerHTML='<div style="color:var(--muted);font-size:13px">Kegiatan belum dapat dimuat.</div>'; }
+}
+function setEventPreview(base64){
+  const img=document.getElementById('eventPreviewImg');
+  const ph=document.getElementById('eventPreviewPlaceholder');
+  if(base64){
+    img.src=base64; img.style.display='block'; ph.style.display='none';
+  } else {
+    img.src=''; img.style.display='none'; ph.style.display='flex';
+  }
+}
+function openEventModal(id){
+  editEventId=id||null;
+  eventPendingBase64=null;
+  document.getElementById('eventModalTitle').textContent = id?'Edit Kegiatan':'Tambah Kegiatan';
+  document.getElementById('eventTitle').value='';
+  document.getElementById('eventDate').value='';
+  document.getElementById('eventTime').value='';
+  document.getElementById('eventLocation').value='';
+  document.getElementById('eventDescription').value='';
+  document.getElementById('eventImageInput').value='';
+  setEventPreview(null);
+  if(id){
+    const item=eventItems.find(e=>e.id===id);
+    if(item){
+      document.getElementById('eventTitle').value=item.title||'';
+      document.getElementById('eventDate').value=item.date||'';
+      document.getElementById('eventTime').value=item.time||'';
+      document.getElementById('eventLocation').value=item.location||'';
+      document.getElementById('eventDescription').value=item.description||'';
+      eventPendingBase64=item.imageBase64||null;
+      setEventPreview(eventPendingBase64);
+    }
+  }
+  document.getElementById('eventModal').classList.add('open');
+}
+function closeEventModal(){ document.getElementById('eventModal').classList.remove('open'); }
+function editEvent(id){ openEventModal(id); }
+async function previewEventImage(file){
+  if(!file||!file.type.startsWith('image/')) return;
+  showToast('Memproses foto...', 12000);
+  eventPendingBase64 = await compressToBase64(file, 1200, 0.78);
+  setEventPreview(eventPendingBase64);
+  showToast('Foto siap - klik Simpan Kegiatan');
+}
+async function saveEvent(){
+  const title=document.getElementById('eventTitle').value.trim();
+  const date=document.getElementById('eventDate').value;
+  const time=document.getElementById('eventTime').value.trim();
+  const location=document.getElementById('eventLocation').value.trim();
+  const description=document.getElementById('eventDescription').value.trim();
+  if(!title||!date){ showToast('Judul dan tanggal wajib diisi!'); return; }
+  const data={title,date,time,location,description,imageBase64:eventPendingBase64||null,order:Date.now(),updatedAt:serverTimestamp()};
+  try {
+    if(editEventId){ await updateDoc(doc(db,'events',editEventId), data); }
+    else { await addDoc(collection(db,'events'), {...data,createdAt:serverTimestamp()}); }
+    closeEventModal();
+    await loadEvents();
+    showToast('Kegiatan berhasil disimpan!');
+  } catch(e){ showToast('Gagal simpan kegiatan: '+e.message); }
+}
+async function deleteEvent(id){
+  if(!confirm('Hapus kegiatan ini?')) return;
+  try {
+    await deleteDoc(doc(db,'events',id));
+    await loadEvents();
+    showToast('Kegiatan dihapus');
+  } catch(e){ showToast('Gagal hapus: '+e.message); }
+}
+window.openEventModal=openEventModal;
+window.closeEventModal=closeEventModal;
+window.editEvent=editEvent;
+window.deleteEvent=deleteEvent;
+window.saveEvent=saveEvent;
+document.getElementById('eventImageInput').addEventListener('change',e=>previewEventImage(e.target.files[0]));
 
 // ===== GALERI — Base64 di Firestore =====
 let galeriItems=[], galeriReplaceId=null;
@@ -1075,3 +1317,4 @@ setInterval(updateAdminClock,1000); updateAdminClock();
 </script>
 </body>
 </html>
+
