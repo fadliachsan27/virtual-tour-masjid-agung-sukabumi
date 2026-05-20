@@ -21,6 +21,18 @@ export function toTimeInputValue(value){
   return match[1].padStart(2, '0') + ':' + match[2];
 }
 
+export function formatDateTimeId(dateValue, timeValue){
+  if(!dateValue || !timeValue) return '';
+  const date = new Date(`${dateValue}T${timeValue}:00`);
+  if(Number.isNaN(date.getTime())) return '';
+  const datePart = new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  }).format(date);
+  return `${datePart} ${timeValue}`;
+}
+
 export function compressToBase64(file, maxW, quality){
   return new Promise(resolve => {
     const url = URL.createObjectURL(file);

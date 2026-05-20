@@ -570,13 +570,13 @@
       </div>
       <div class="form-group">
         <label>Tanggal *</label>
-        <input type="date" id="eventDate"/>
+        <input type="date" id="eventDate" required/>
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label>Waktu</label>
-        <input type="time" id="eventTime"/>
+        <label>Waktu *</label>
+        <input type="time" id="eventTime" required/>
       </div>
       <div class="form-group">
         <label>Lokasi</label>
@@ -587,6 +587,7 @@
       <label>Deskripsi</label>
       <textarea id="eventDescription" placeholder="Tulis ringkasan kegiatan..."></textarea>
     </div>
+    <div id="eventDateTimeResult" style="display:none;margin-bottom:16px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);color:var(--gold);font-size:13px"></div>
     <div class="form-group">
       <label>Foto Kegiatan</label>
       <div class="preview-box" style="height:180px">
@@ -609,7 +610,7 @@
 
 <script type="module">
 import { db } from "../js/firebase.js";
-import { compressToBase64, escapeHtml, formatEventDate, toTimeInputValue } from "../js/utils.js";
+import { compressToBase64, escapeHtml, formatDateTimeId, formatEventDate, toTimeInputValue } from "../js/utils.js";
 import {
   doc, getDoc, setDoc, deleteDoc,
   collection, getDocs, addDoc, updateDoc, query, orderBy, writeBatch, serverTimestamp
@@ -969,6 +970,8 @@ function openEventModal(id){
   document.getElementById('eventTime').value='';
   document.getElementById('eventLocation').value='';
   document.getElementById('eventDescription').value='';
+  document.getElementById('eventDateTimeResult').style.display='none';
+  document.getElementById('eventDateTimeResult').textContent='';
   document.getElementById('eventImageInput').value='';
   setEventPreview(null);
   if(id){
@@ -1000,7 +1003,16 @@ async function saveEvent(){
   const time=document.getElementById('eventTime').value.trim();
   const location=document.getElementById('eventLocation').value.trim();
   const description=document.getElementById('eventDescription').value.trim();
-  if(!title||!date){ showToast('Judul dan tanggal wajib diisi!'); return; }
+  if(!title||!date||!time){
+    document.getElementById('eventTitle').reportValidity();
+    document.getElementById('eventDate').reportValidity();
+    document.getElementById('eventTime').reportValidity();
+    showToast('Judul, tanggal, dan waktu wajib diisi!');
+    return;
+  }
+  const result=document.getElementById('eventDateTimeResult');
+  result.textContent='Jadwal kegiatan: '+formatDateTimeId(date,time);
+  result.style.display='block';
   const data={title,date,time,location,description,imageBase64:eventPendingBase64||null,order:Date.now(),updatedAt:serverTimestamp()};
   try {
     if(editEventId){ await updateDoc(doc(db,'events',editEventId), data); }
