@@ -580,17 +580,48 @@
       <div class="nav-subtitle">VIRTUAL TOUR</div>
     </div>
   </div>
+
  <div class="nav-prayer-card">
     <div class="prayer-grid">
-      <div class="prayer-item"><div class="p-label">IMSAK</div><div id="imsakTime" class="p-time">04:28</div></div>
-      <div class="prayer-item"><div class="p-label">SUBUH</div><div id="subuhTime" class="p-time">04:38</div></div>
-      <div class="prayer-item"><div class="p-label">TERBIT</div><div id="terbitTime" class="p-time">05:55</div></div>
-      <div class="prayer-item"><div class="p-label">DZUHUR</div><div id="dzuhurTime" class="p-time">11:49</div></div>
-      <div class="prayer-item"><div class="p-label">ASHAR</div><div id="asharTime" class="p-time">15:11</div></div>
-      <div class="prayer-item"><div class="p-label">MAGHRIB</div><div id="maghribTime" class="p-time">17:42</div></div>
-      <div class="prayer-item"><div class="p-label">ISYA</div><div id="isyaTime" class="p-time">18:55</div></div>
+
+      <div class="prayer-item">
+        <div class="p-label">IMSAK</div>
+        <div id="imsakTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item">
+        <div class="p-label">SUBUH</div>
+        <div id="subuhTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item">
+        <div class="p-label">TERBIT</div>
+        <div id="terbitTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item active">
+        <div class="p-label">DZUHUR</div>
+        <div id="dzuhurTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item">
+        <div class="p-label">ASHAR</div>
+        <div id="asharTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item maghrib">
+        <div class="p-label">MAGHRIB</div>
+        <div id="maghribTime" class="p-time">--:--</div>
+      </div>
+
+      <div class="prayer-item">
+        <div class="p-label">ISYA</div>
+        <div id="isyaTime" class="p-time">--:--</div>
+        </div>
+
     </div>
   </div>
+  
   <div class="nav-links">
     <div class="nav-menu" id="navMenu">
       <a href="index.html" class="nav-link active">Beranda</a>
@@ -976,21 +1007,53 @@ window.addEventListener('scroll',()=>{
 window.slideLeft  = ()=>document.getElementById('pengurusSlider')?.scrollBy({left:-240,behavior:'smooth'});
 window.slideRight = ()=>document.getElementById('pengurusSlider')?.scrollBy({left:240, behavior:'smooth'});
 
-// ===== Prayer Times =====
-async function getPrayerTimes(){
+// ===== Prayer Times Realtime WIB =====
+async function getPrayerTimes() {
   try {
-    const cityId='1224'; const date=new Date();
-    const res=await fetch(`https://api.myqz.com/v1/sholat/jadwal/${cityId}/${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`);
-    const result=await res.json(); const d=result.data.jadwal;
-    document.getElementById('imsakTime').textContent   = d.imsak;
-    document.getElementById('subuhTime').textContent   = d.subuh;
-    document.getElementById('terbitTime').textContent  = d.terbit;
-    document.getElementById('dzuhurTime').textContent  = d.dzuhur;
-    document.getElementById('asharTime').textContent   = d.ashar;
-    document.getElementById('maghribTime').textContent = d.maghrib;
-    document.getElementById('isyaTime').textContent    = d.isya;
-  } catch(e){ console.error('Prayer times:', e); }
+
+    // KODE KOTA SUKABUMI
+    const cityId = "1301";
+
+    // WIB
+    const now = new Date();
+
+    const year  = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day   = String(now.getDate()).padStart(2, "0");
+
+    // API MYQURAN
+    const url =
+      `https://api.myquran.com/v2/sholat/jadwal/${cityId}/${year}/${month}/${day}`;
+
+    const response = await fetch(url);
+    const result = await response.json();
+
+    // DEBUG
+    console.log("Prayer API:", result);
+
+    if (!result.status) return;
+
+    const d = result.data.jadwal;
+
+    // UPDATE UI
+    document.getElementById("imsakTime").textContent   = d.imsak;
+    document.getElementById("subuhTime").textContent   = d.subuh;
+    document.getElementById("terbitTime").textContent  = d.terbit;
+    document.getElementById("dzuhurTime").textContent  = d.dzuhur;
+    document.getElementById("asharTime").textContent   = d.ashar;
+    document.getElementById("maghribTime").textContent = d.maghrib;
+    document.getElementById("isyaTime").textContent    = d.isya;
+
+  } catch (e) {
+    console.error("Prayer times error:", e);
+  }
 }
+
+// LOAD PERTAMA
+getPrayerTimes();
+
+// AUTO REFRESH SETIAP 1 JAM
+setInterval(getPrayerTimes, 3600000);
 
 function updateFooterClock() {
   const clock = document.getElementById("footerClock");
