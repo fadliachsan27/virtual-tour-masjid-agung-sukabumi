@@ -67,6 +67,189 @@
     .imam-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
     .imam-empty-icon { font-size: 28px; margin-bottom: 8px; }
 
+    /* ===== ISLAMIC QUOTE ===== */
+
+    .quote-section{
+      position: relative;
+
+      padding: 90px 20px 40px;
+
+      background:
+        radial-gradient(circle at top,
+        rgba(201,168,76,0.10),
+        transparent 60%);
+    }
+
+    .quote-wrapper{
+      max-width: 950px;
+      margin: auto;
+    }
+
+    .quote-top{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:18px;
+
+      margin-bottom:28px;
+    }
+
+    .quote-line{
+      width:90px;
+      height:1px;
+
+      background:
+        linear-gradient(
+          to right,
+          transparent,
+          var(--gold),
+          transparent
+        );
+    }
+
+    .quote-badge{
+      font-size:12px;
+      letter-spacing:3px;
+      text-transform:uppercase;
+
+      color:var(--gold);
+
+      border:1px solid rgba(201,168,76,0.35);
+
+      padding:8px 18px;
+
+      border-radius:50px;
+
+      background:rgba(201,168,76,0.08);
+
+      backdrop-filter:blur(10px);
+    }
+
+    .quote-card{
+      position:relative;
+
+      padding:65px 60px;
+
+      border-radius:30px;
+
+      overflow:hidden;
+
+      text-align:center;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.05),
+          rgba(255,255,255,0.02)
+        );
+
+      border:1px solid rgba(201,168,76,0.18);
+
+      backdrop-filter:blur(14px);
+
+      box-shadow:
+        0 10px 40px rgba(0,0,0,0.20),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    body.dark .quote-card{
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.04),
+          rgba(255,255,255,0.015)
+        );
+    }
+
+    .quote-pattern{
+      position:absolute;
+      inset:0;
+
+      background:
+        radial-gradient(circle at top right,
+        rgba(201,168,76,0.12),
+        transparent 35%);
+
+      pointer-events:none;
+    }
+
+    .quote-mark{
+      font-size:68px;
+      line-height:1;
+
+      color:rgba(201,168,76,0.25);
+
+      margin-bottom:22px;
+
+      font-family:serif;
+    }
+
+    .quote-text{
+      position:relative;
+      z-index:2;
+
+      font-family:'Playfair Display', serif;
+
+      font-size:34px;
+      line-height:1.8;
+
+      color:var(--text);
+
+      max-width:760px;
+      margin:auto auto 26px;
+    }
+
+    .quote-source{
+      position:relative;
+      z-index:2;
+
+      display:inline-block;
+
+      padding:10px 22px;
+
+      border-radius:30px;
+
+      background:rgba(201,168,76,0.10);
+
+      border:1px solid rgba(201,168,76,0.20);
+
+      color:var(--gold);
+
+      font-size:14px;
+      letter-spacing:1px;
+    }
+
+    @media(max-width:768px){
+
+      .quote-section{
+        padding:70px 18px 20px;
+      }
+
+      .quote-card{
+        padding:45px 24px;
+        border-radius:24px;
+      }
+
+      .quote-text{
+        font-size:24px;
+        line-height:1.7;
+      }
+
+      .quote-mark{
+        font-size:52px;
+      }
+
+      .quote-line{
+        width:45px;
+      }
+
+      .quote-badge{
+        font-size:10px;
+        letter-spacing:2px;
+        padding:7px 14px;
+      }
+    }
+        
     /* FOOTER*/
 
   :root{
@@ -449,6 +632,43 @@
   <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
 </section>
 
+<!-- ===== ISLAMIC QUOTE ===== -->
+<section class="quote-section">
+  <div class="container">
+
+    <div class="quote-wrapper">
+
+      <div class="quote-top">
+        <div class="quote-line"></div>
+
+        <div class="quote-badge">
+          ✨ Quotes of The Day
+        </div>
+
+        <div class="quote-line"></div>
+      </div>
+
+      <div class="quote-card">
+
+        <div class="quote-pattern"></div>
+
+        <div class="quote-mark">❝</div>
+
+        <p class="quote-text" id="quoteText">
+          “Sesungguhnya bersama kesulitan ada kemudahan.”
+        </p>
+
+        <div class="quote-source" id="quoteSource">
+          — QS. Al-Insyirah: 6
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
 <!-- ===== TENTANG MASJID ===== -->
 <section class="tentang-section" id="tentang">
   <div class="container">
@@ -566,15 +786,6 @@
       </div>
     </div>
   </div>
-</section>
-
-<!-- PROFIL SECTION -->
-<section class="section" id="profil">
-  <div class="container">
-  </div>
-</section>
-
-</div>
 </section>
 
 <!-- FOOTER -->
@@ -798,6 +1009,41 @@ function updateFooterClock() {
 
 setInterval(updateFooterClock, 1000);
 updateFooterClock();
+
+// ===== Quotes Of The Day =====
+const quotes = [
+  {
+    text: "Sesungguhnya bersama kesulitan ada kemudahan.",
+    source: "QS. Al-Insyirah: 6"
+  },
+  {
+    text: "Dan bersabarlah. Sesungguhnya Allah beserta orang-orang yang sabar.",
+    source: "QS. Al-Anfal: 46"
+  },
+  {
+    text: "Sebaik-baik manusia adalah yang paling bermanfaat bagi manusia lainnya.",
+    source: "HR. Ahmad"
+  },
+  {
+    text: "Janganlah kamu berputus asa dari rahmat Allah.",
+    source: "QS. Az-Zumar: 53"
+  },
+  {
+    text: "Sesungguhnya Allah tidak melihat rupa kalian, tetapi melihat hati dan amal kalian.",
+    source: "HR. Muslim"
+  }
+];
+
+function loadQuoteOfTheDay(){
+  const today = new Date().getDate();
+  const quote = quotes[today % quotes.length];
+
+  const quoteText = document.getElementById("quoteText");
+  const quoteSource = document.getElementById("quoteSource");
+
+  if(quoteText) quoteText.textContent = `“${quote.text}”`;
+  if(quoteSource) quoteSource.textContent = `— ${quote.source}`;
+}
 
 // ===== INIT =====
 (async()=>{
