@@ -9,6 +9,14 @@
   <style>
     body { padding-top: var(--navbar-h); }
     .section { padding-top: 60px; padding-bottom: 80px; }
+    .galeri-group { margin-top: 30px; }
+    .galeri-group:first-of-type { margin-top: 0; }
+    .galeri-group-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
 
     /* ===== GALERI GRID ===== */
     .galeri-grid {
@@ -132,7 +140,7 @@
       <h2 class="section-title">Keindahan Masjid Agung Sukabumi</h2>
     </div>
 
-    <div class="galeri-grid" id="galeriGrid">
+    <div id="galeriGroups">
       <div class="galeri-loading">
         <div class="loading-spinner"></div>
         Memuat foto galeri...
@@ -183,25 +191,54 @@ document.getElementById('themeToggle').addEventListener('click',()=>{
 let galeriSrcs=[], lightboxIdx=0;
 
 async function loadAndRenderGaleri(){
-  const grid=document.getElementById('galeriGrid');
+  const groupsContainer=document.getElementById('galeriGroups');
   try {
     const snap=await getDocs(query(collection(db,'galeri'), orderBy('order','asc')));
-    if(snap.empty){ renderEmpty(grid); return; }
-    grid.innerHTML=''; galeriSrcs=[];
+    if(snap.empty){ renderEmpty(groupsContainer); return; }
+    groupsContainer.innerHTML=''; galeriSrcs=[];
+    const fotoLuar=[], fotoDalam=[];
     snap.forEach(d=>{
       const item=d.data();
-      galeriSrcs.push(item.base64);
-      const idx=galeriSrcs.length-1;
-      const el=document.createElement('div'); el.className='galeri-item';
-      el.onclick=()=>openLightbox(idx);
-      el.innerHTML=`<img src="${item.base64}" alt="Foto ${idx+1}" loading="lazy"/>
-        <div class="galeri-item-num">${idx+1} / ${snap.size}</div>`;
-      grid.appendChild(el);
+      if(!item.base64) return;
+      if(item.kategori==='dalam') fotoDalam.push(item);
+      else fotoLuar.push(item);
     });
-  } catch(e){ renderEmpty(grid); console.error(e); }
+    if(fotoLuar.length===0 && fotoDalam.length===0){ renderEmpty(groupsContainer); return; }
+
+    const totalFoto = fotoLuar.length + fotoDalam.length;
+    let startIndex = 0;
+    startIndex = renderGroup(groupsContainer, 'Foto Bagian Luar', fotoLuar, startIndex, totalFoto);
+    renderGroup(groupsContainer, 'Foto Bagian Dalam', fotoDalam, startIndex, totalFoto);
+  } catch(e){ renderEmpty(groupsContainer); console.error(e); }
 }
-function renderEmpty(grid){
-  grid.innerHTML='<div class="galeri-empty"><div class="galeri-empty-icon">🖼️</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
+function renderGroup(container, title, items, startIndex, totalFoto){
+  const group=document.createElement('div');
+  group.className='galeri-group';
+  group.innerHTML=`<h3 class="galeri-group-title">${title}</h3>`;
+  const grid=document.createElement('div');
+  grid.className='galeri-grid';
+  if(items.length===0){
+    grid.innerHTML='<div class="galeri-empty" style="padding:30px 20px"><div class="galeri-empty-sub">Belum ada foto pada kategori ini.</div></div>';
+    group.appendChild(grid);
+    container.appendChild(group);
+    return startIndex;
+  }
+  items.forEach((item, localIndex)=>{
+    galeriSrcs.push(item.base64);
+    const idx=galeriSrcs.length-1;
+    const el=document.createElement('div');
+    el.className='galeri-item';
+    el.onclick=()=>openLightbox(idx);
+    el.innerHTML=`<img src="${item.base64}" alt="${title}" loading="lazy"/>
+      <div class="galeri-item-num">${startIndex + localIndex + 1} / ${totalFoto}</div>`;
+    grid.appendChild(el);
+  });
+  group.appendChild(grid);
+  container.appendChild(group);
+  return startIndex + items.length;
+}
+function renderEmpty(container){
+  container.innerHTML='<div class="galeri-empty"><div class="galeri-empty-icon">🖼️</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
 }
 
 // ===== Lightbox =====
