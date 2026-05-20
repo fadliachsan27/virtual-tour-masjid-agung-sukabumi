@@ -115,7 +115,7 @@
       <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
     </div>
     <button class="btn-theme" id="themeToggle" title="Ganti Tema">
-      <span class="icon-light">🌙</span><span class="icon-dark">☀️</span>
+      <span class="icon-light">ðŸŒ™</span><span class="icon-dark">â˜€ï¸</span>
     </button>
     <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -144,41 +144,23 @@
 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-close" onclick="closeLightbox()">âœ•</button>
   <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)">&#8249;</button>
   <img id="lightboxImg" src="" alt=""/>
   <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)">&#8250;</button>
   <div class="lightbox-counter" id="lightboxCounter"></div>
 </div>
 
-<footer class="footer"><p>© 2025 Masjid Agung Sukabumi Virtual Tour</p></footer>
+<footer class="footer"><p>Â© 2025 Masjid Agung Sukabumi Virtual Tour</p></footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy }
+import { db } from "./js/firebase.js";
+import { initNavbarScroll, initThemeToggle } from "./js/theme.js";
+import { collection, getDocs, query, orderBy }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// ⚠ GANTI DENGAN CONFIG FIREBASE ANDA
-const firebaseConfig = {
-  apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
-  authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
-  projectId: "vt-masjid-agung-sukabumi",
-  storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
-  messagingSenderId: "633933684627",
-  appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
-  measurementId: "G-GG88GW221Z"
-};
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-// Theme
-if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
-window.addEventListener('scroll',()=>{ document.querySelector('.navbar').classList.toggle('scrolled', window.scrollY>60); });
-document.getElementById('themeToggle').addEventListener('click',()=>{
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light');
-});
+initThemeToggle();
+initNavbarScroll();
 
 // ===== Galeri dari Firestore (Base64) =====
 let galeriSrcs=[], lightboxIdx=0;
@@ -202,7 +184,7 @@ async function loadAndRenderGaleri(){
   } catch(e){ renderEmpty(grid); console.error(e); }
 }
 function renderEmpty(grid){
-  grid.innerHTML='<div class="galeri-empty"><div class="galeri-empty-icon">🖼️</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
+  grid.innerHTML='<div class="galeri-empty"><div class="galeri-empty-icon">ðŸ–¼ï¸</div><div class="galeri-empty-title">Belum Ada Foto</div><div class="galeri-empty-sub">Silakan masukkan foto melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</div></div>';
 }
 
 // ===== Lightbox =====
@@ -230,3 +212,4 @@ loadAndRenderGaleri();
 </script>
 </body>
 </html>
+

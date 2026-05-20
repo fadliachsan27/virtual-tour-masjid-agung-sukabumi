@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Masjid Agung Sukabumi - Virtual Tour</title>
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/events.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
@@ -66,28 +67,9 @@
     .imam-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
     .imam-empty-icon { font-size: 28px; margin-bottom: 8px; }
 
-    /* ===== HIGHLIGHT EVENT ===== */
-    .event-highlight-section { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); }
-    body.dark .event-highlight-section { background: rgba(255,255,255,0.02); }
-    .event-highlight-card { display: grid; grid-template-columns: minmax(280px, 0.9fr) 1.1fr; gap: 34px; align-items: stretch; margin-top: 34px; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
-    body.dark .event-highlight-card { background: rgba(255,255,255,0.04); }
-    .event-highlight-media { min-height: 300px; background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(0,0,0,0.08)); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .event-highlight-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .event-highlight-placeholder { font-family: 'Playfair Display', serif; font-size: 54px; color: var(--gold); }
-    .event-highlight-content { padding: 34px 34px 34px 0; display: flex; flex-direction: column; justify-content: center; }
-    .event-highlight-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-    .event-pill { display: inline-flex; align-items: center; gap: 6px; color: var(--gold); background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25); border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 700; }
-    .event-highlight-title { font-family: 'Playfair Display', serif; color: var(--text); font-size: 30px; line-height: 1.25; margin-bottom: 12px; }
-    .event-highlight-desc { color: var(--text-muted); font-size: 15px; line-height: 1.8; margin-bottom: 24px; }
-    .event-empty-card { margin-top: 30px; padding: 44px 20px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border); border-radius: 16px; background: var(--bg); }
-    body.dark .event-empty-card { background: rgba(255,255,255,0.03); }
-
     @media (max-width: 900px) {
       .tentang-inner { grid-template-columns: 1fr; gap: 36px; }
       .imam-grid { grid-template-columns: 1fr; }
-      .event-highlight-card { grid-template-columns: 1fr; }
-      .event-highlight-content { padding: 0 24px 28px; }
-      .event-highlight-media { min-height: 220px; }
     }
     @media (max-width: 600px) {
       .tentang-stats { grid-template-columns: 1fr 1fr; }
@@ -132,8 +114,8 @@
       <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
     </div>
     <button class="btn-theme" id="themeToggle" title="Ganti Tema">
-      <span class="icon-light">🌙</span>
-      <span class="icon-dark">☀️</span>
+      <span class="icon-light">ðŸŒ™</span>
+      <span class="icon-dark">â˜€ï¸</span>
     </button>
     <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -149,21 +131,21 @@
   <div id="hero-panorama"></div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG SUKABUMI</div>
+    <div class="hero-badge">â–· VIRTUAL TOUR 360Â° MASJID AGUNG SUKABUMI</div>
     <h1 class="hero-title">
       Jelajahi Keindahan<br/>
       <span class="hero-title-gold">Masjid Agung Sukabumi</span>
     </h1>
     <p class="hero-desc">
-      Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
+      Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360Â° yang
       memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
     </p>
     <div class="hero-actions">
-      <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour ▶</a>
+      <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour â–¶</a>
       <a href="#tentang" class="btn-secondary">Tentang Masjid</a>
     </div>
   </div>
-  <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
+  <div class="hero-hint">ðŸ–± Drag untuk menjelajah panorama 360Â°</div>
 </section>
 
 <!-- ===== TENTANG MASJID ===== -->
@@ -188,7 +170,7 @@
             <div class="tentang-stat-label">Tahun Berdiri</div>
           </div>
           <div class="tentang-stat">
-            <div class="tentang-stat-num" id="statLuas">12.000 m²</div>
+            <div class="tentang-stat-num" id="statLuas">12.000 mÂ²</div>
             <div class="tentang-stat-label">Luas Area</div>
           </div>
           <div class="tentang-stat">
@@ -199,28 +181,28 @@
       </div>
       <div class="tentang-features" id="tentangFitur">
         <div class="tentang-feature">
-          <div class="tentang-feature-icon">🕌</div>
+          <div class="tentang-feature-icon">ðŸ•Œ</div>
           <div>
             <div class="tentang-feature-title">Ruang Utama Shalat</div>
             <div class="tentang-feature-desc">Pusat ibadah dengan mihrab megah, mimbar berukir indah, dan kubah utama yang menakjubkan, mampu menampung ribuan jamaah secara bersamaan.</div>
           </div>
         </div>
         <div class="tentang-feature">
-          <div class="tentang-feature-icon">🏛️</div>
+          <div class="tentang-feature-icon">ðŸ›ï¸</div>
           <div>
             <div class="tentang-feature-title">Aula & Selasar Multifungsi</div>
             <div class="tentang-feature-desc">Ruang serbaguna yang digunakan untuk kajian ilmu, pengajian rutin, peringatan hari besar Islam, serta berbagai kegiatan sosial kemasyarakatan.</div>
           </div>
         </div>
         <div class="tentang-feature">
-          <div class="tentang-feature-icon">📚</div>
+          <div class="tentang-feature-icon">ðŸ“š</div>
           <div>
             <div class="tentang-feature-title">Perpustakaan Islam</div>
             <div class="tentang-feature-desc">Koleksi kitab dan buku Islam yang lengkap tersedia untuk menunjang pendidikan agama masyarakat dan generasi muda Muslim.</div>
           </div>
         </div>
         <div class="tentang-feature">
-          <div class="tentang-feature-icon">🌿</div>
+          <div class="tentang-feature-icon">ðŸŒ¿</div>
           <div>
             <div class="tentang-feature-title">Halaman & Taman Asri</div>
             <div class="tentang-feature-desc">Area luar masjid yang rindang dan asri, menjadi tempat istirahat yang nyaman bagi jamaah sebelum dan sesudah ibadah.</div>
@@ -242,7 +224,7 @@
     <div class="pengurus-slider-wrap">
       <div class="pengurus-slider" id="pengurusSlider">
         <div class="pengurus-empty">
-          <div class="pengurus-empty-icon">👥</div>
+          <div class="pengurus-empty-icon">ðŸ‘¥</div>
           <div>Data pengurus belum ditambahkan. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
         </div>
       </div>
@@ -265,20 +247,20 @@
     <div class="imam-grid">
       <div class="imam-group">
         <div class="imam-group-header">
-          <div class="imam-group-icon">🎙️</div>
+          <div class="imam-group-icon">ðŸŽ™ï¸</div>
           <div class="imam-group-title">Imam Harian</div>
         </div>
         <div class="imam-list" id="imamList">
-          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data imam. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+          <div class="imam-empty"><div class="imam-empty-icon">ðŸ“‹</div><div>Belum ada data imam. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
         </div>
       </div>
       <div class="imam-group">
         <div class="imam-group-header">
-          <div class="imam-group-icon">📢</div>
+          <div class="imam-group-icon">ðŸ“¢</div>
           <div class="imam-group-title">Muadzin Harian</div>
         </div>
         <div class="imam-list" id="muadzinList">
-          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data muadzin. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+          <div class="imam-empty"><div class="imam-empty-icon">ðŸ“‹</div><div>Belum ada data muadzin. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
         </div>
       </div>
     </div>
@@ -304,27 +286,15 @@
   <div class="container">
 
 <footer class="footer">
-  <p>© 2025 Masjid Agung Sukabumi Virtual Tour</p>
+  <p>Â© 2025 Masjid Agung Sukabumi Virtual Tour</p>
 </footer>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy }
+import { db } from "./js/firebase.js";
+import { initNavbarScroll, initThemeToggle } from "./js/theme.js";
+import { escapeHtml, formatEventDate } from "./js/utils.js";
+import { doc, getDoc, collection, getDocs, query, orderBy }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// ⚠ GANTI DENGAN CONFIG FIREBASE ANDA
-const firebaseConfig = {
-  apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
-  authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
-  projectId: "vt-masjid-agung-sukabumi",
-  storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
-  messagingSenderId: "633933684627",
-  appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
-  measurementId: "G-GG88GW221Z"
-};
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
 
 // ===== Hero Panorama =====
 function startHero(src){
@@ -357,7 +327,7 @@ async function loadMasjidInfo(){
       if(items.length>0 && document.getElementById('tentangFitur'))
         document.getElementById('tentangFitur').innerHTML=items.map(f=>`
           <div class="tentang-feature">
-            <div class="tentang-feature-icon">${f.icon||'🕌'}</div>
+            <div class="tentang-feature-icon">${f.icon||'ðŸ•Œ'}</div>
             <div><div class="tentang-feature-title">${f.judul}</div><div class="tentang-feature-desc">${f.deskripsi}</div></div>
           </div>`).join('');
     }
@@ -377,7 +347,7 @@ async function loadPengurus(){
       const card=document.createElement('div'); card.className='pengurus-card';
       const avatarHtml=item.fotoBase64
         ?`<img class="pengurus-avatar" src="${item.fotoBase64}" alt="${item.nama}"/>`
-        :`<div class="pengurus-avatar-placeholder">👤</div>`;
+        :`<div class="pengurus-avatar-placeholder">ðŸ‘¤</div>`;
       card.innerHTML=`${avatarHtml}
         <div class="pengurus-jabatan">${item.jabatan||'Pengurus'}</div>
         <div class="pengurus-nama">${item.nama||'-'}</div>
@@ -410,15 +380,6 @@ async function loadImamMuadzin(){
   } catch(e){ console.error('loadImamMuadzin:', e); }
 }
 
-function formatEventDate(value){
-  if(!value) return 'Tanggal belum diatur';
-  const date = new Date(value + 'T00:00:00');
-  if(Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-}
-function escapeHtml(value){
-  return String(value||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
 async function loadLatestEvent(){
   const wrap=document.getElementById('latestEventWrap');
   if(!wrap) return;
@@ -453,17 +414,8 @@ async function loadLatestEvent(){
   }
 }
 
-// ===== Theme =====
-const themeBtn=document.getElementById('themeToggle');
-if(themeBtn) themeBtn.addEventListener('click',()=>{
-  document.body.classList.toggle('dark');
-  localStorage.setItem('theme', document.body.classList.contains('dark')?'dark':'light');
-});
-if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark');
-window.addEventListener('scroll',()=>{
-  const nav=document.getElementById('navbar');
-  if(nav) nav.classList.toggle('scrolled', window.scrollY>60);
-});
+initThemeToggle();
+initNavbarScroll('#navbar');
 window.slideLeft  = ()=>document.getElementById('pengurusSlider')?.scrollBy({left:-240,behavior:'smooth'});
 window.slideRight = ()=>document.getElementById('pengurusSlider')?.scrollBy({left:240, behavior:'smooth'});
 
@@ -496,3 +448,5 @@ async function getPrayerTimes(){
 </script>
 </body>
 </html>
+
+

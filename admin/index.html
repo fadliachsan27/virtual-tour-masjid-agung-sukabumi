@@ -197,20 +197,20 @@
     <div class="sidebar-brand-sub">MASJID AGUNG SUKABUMI</div>
   </div>
   <div class="sidebar-nav">
-    <a href="#dashboard" class="active" onclick="showPage('dashboard',this)">📊 Dashboard</a>
-    <a href="#info" onclick="showPage('info',this)">🕌 Informasi Masjid</a>
-    <a href="#pengurus" onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
-    <a href="#imam" onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
+    <a href="#dashboard" class="active" onclick="showPage('dashboard',this)">ðŸ“Š Dashboard</a>
+    <a href="#info" onclick="showPage('info',this)">ðŸ•Œ Informasi Masjid</a>
+    <a href="#pengurus" onclick="showPage('pengurus',this)">ðŸ‘¥ Profil Pengurus</a>
+    <a href="#imam" onclick="showPage('imam',this)">ðŸŽ™ï¸ Imam & Muadzin</a>
     <a href="#events" onclick="showPage('events',this)">Kegiatan</a>
-    <a href="#galeri" onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
-    <a href="#hero" onclick="showPage('hero',this)">🌄 Background Hero</a>
-    <a href="#panorama" onclick="showPage('panorama',this)">🔄 Foto Panorama</a>
-    <a href="#settings" onclick="showPage('settings',this)">⚙ Pengaturan</a>
+    <a href="#galeri" onclick="showPage('galeri',this)">ðŸ–¼ï¸ Kelola Galeri</a>
+    <a href="#hero" onclick="showPage('hero',this)">ðŸŒ„ Background Hero</a>
+    <a href="#panorama" onclick="showPage('panorama',this)">ðŸ”„ Foto Panorama</a>
+    <a href="#settings" onclick="showPage('settings',this)">âš™ Pengaturan</a>
   </div>
   <div class="sidebar-bottom">
-    <a href="../index.html">← Lihat Website</a>
-    <!-- <a href="../galeri.html">🖼 Lihat Galeri</a> -->
-    <a href="#" onclick="doLogout()">🚪 Logout</a>
+    <a href="../index.html">â† Lihat Website</a>
+    <!-- <a href="../galeri.html">ðŸ–¼ Lihat Galeri</a> -->
+    <a href="#" onclick="doLogout()">ðŸšª Logout</a>
   </div>
 </nav>
 
@@ -253,7 +253,7 @@
     <div class="card">
      <div class="quick-actions">
   <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-    <h2 style="font-family: 'Playfair Display', serif; color: var(--gold);">🚀 Status & Kendali Admin</h2>
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--gold);">ðŸš€ Status & Kendali Admin</h2>
     <div id="adminClock" style="text-align: right; font-size: 0.9rem; color: var(--muted);">
       </div>
   </div>
@@ -268,12 +268,12 @@
     </thead>
     <tbody>
       <tr>
-        <td><button class="btn-action" onclick="showTab('panorama')">📸 Kelola Panorama</button></td>
+        <td><button class="btn-action" onclick="showTab('panorama')">ðŸ“¸ Kelola Panorama</button></td>
         <td><span class="badge">Ready</span></td>
         <td class="last-updated">Memuat...</td>
       </tr>
       <tr>
-        <td><button class="btn-action" onclick="showTab('settings')">🔐 Ganti Password</button></td>
+        <td><button class="btn-action" onclick="showTab('settings')">ðŸ” Ganti Password</button></td>
         <td><span class="badge badge-secure">Secure</span></td>
         <td class="last-updated">Memuat...</td>
       </tr>
@@ -286,7 +286,7 @@
   <!-- INFORMASI MASJID -->
   <div id="page-info" style="display:none">
     <div class="page-header">
-      <div class="page-title">🕌 Informasi Masjid</div>
+      <div class="page-title">ðŸ•Œ Informasi Masjid</div>
       <div class="page-sub">Edit teks penjelasan, statistik, dan fitur yang tampil di beranda</div>
     </div>
     <div class="card">
@@ -313,7 +313,7 @@
         </div>
         <div class="form-group">
           <label>Luas Area</label>
-          <input type="text" id="infoLuas" placeholder="12.000 m²"/>
+          <input type="text" id="infoLuas" placeholder="12.000 mÂ²"/>
         </div>
         <div class="form-group">
           <label>Jumlah Menara</label>
@@ -326,15 +326,15 @@
       <div id="fiturList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
       <button class="btn-sm" onclick="addFiturRow()">+ Tambah Fitur</button>
       <hr class="section-sep"/>
-      <button class="btn-save" onclick="saveInfoMasjid()">💾 Simpan Informasi Masjid</button>
+      <button class="btn-save" onclick="saveInfoMasjid()">ðŸ’¾ Simpan Informasi Masjid</button>
     </div>
   </div>
 
   <!-- PROFIL PENGURUS -->
   <div id="page-pengurus" style="display:none">
     <div class="page-header">
-      <div class="page-title">👥 Profil Pengurus</div>
-      <div class="page-sub">Kelola profil pengurus BKM Masjid Agung Sukabumi — tampil sebagai slider di beranda</div>
+      <div class="page-title">ðŸ‘¥ Profil Pengurus</div>
+      <div class="page-sub">Kelola profil pengurus BKM Masjid Agung Sukabumi â€” tampil sebagai slider di beranda</div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
@@ -350,11 +350,11 @@
   <!-- IMAM & MUADZIN -->
   <div id="page-imam" style="display:none">
     <div class="page-header">
-      <div class="page-title">🎙️ Imam & Muadzin Harian</div>
+      <div class="page-title">ðŸŽ™ï¸ Imam & Muadzin Harian</div>
       <div class="page-sub">Atur jadwal imam dan muadzin yang tampil di beranda</div>
     </div>
     <div class="card">
-      <div class="card-title">🎙️ Imam Harian</div>
+      <div class="card-title">ðŸŽ™ï¸ Imam Harian</div>
       <table class="jadwal-table">
         <thead><tr><th>Hari</th><th>Nama Imam</th><th>Keterangan</th><th></th></tr></thead>
         <tbody id="imamTableBody"></tbody>
@@ -381,12 +381,12 @@
         </div>
       </div>
       <div style="margin-top:16px">
-        <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
+        <button class="btn-save" onclick="saveImamMuadzin()">ðŸ’¾ Simpan Jadwal</button>
       </div>
     </div>
 
     <div class="card">
-      <div class="card-title">📢 Muadzin Harian</div>
+      <div class="card-title">ðŸ“¢ Muadzin Harian</div>
       <table class="jadwal-table">
         <thead><tr><th>Hari</th><th>Nama Muadzin</th><th>Keterangan</th><th></th></tr></thead>
         <tbody id="muadzinTableBody"></tbody>
@@ -413,7 +413,7 @@
         </div>
       </div>
       <div style="margin-top:16px">
-        <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
+        <button class="btn-save" onclick="saveImamMuadzin()">ðŸ’¾ Simpan Jadwal</button>
       </div>
     </div>
   </div>
@@ -438,7 +438,7 @@
   <!-- GALERI -->
   <div id="page-galeri" style="display:none">
     <div class="page-header">
-      <div class="page-title">🖼️ Kelola Galeri Foto</div>
+      <div class="page-title">ðŸ–¼ï¸ Kelola Galeri Foto</div>
       <div class="page-sub">Tambah, ganti, dan hapus foto galeri publik</div>
     </div>
     <div class="card">
@@ -450,14 +450,14 @@
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="document.getElementById('galeriAddInput').click()">+ Tambah Foto</button>
           <button class="btn-save btn-blue" style="margin-top:0;padding:9px 18px" onclick="document.getElementById('galeriBulkInput').click()">+ Upload Banyak</button>
-          <button class="btn-reset" style="margin-top:0;padding:9px 16px" onclick="confirmClearGaleri()">🗑 Hapus Semua</button>
+          <button class="btn-reset" style="margin-top:0;padding:9px 16px" onclick="confirmClearGaleri()">ðŸ—‘ Hapus Semua</button>
         </div>
       </div>
       <input type="file" id="galeriAddInput" accept="image/*" onchange="addGaleriFiles(this.files)"/>
       <input type="file" id="galeriBulkInput" accept="image/*" multiple onchange="addGaleriFiles(this.files)"/>
       <input type="file" id="galeriReplaceInput" accept="image/*" onchange="replaceGaleriFile(this.files[0])"/>
       <div class="upload-area" id="galeriDropZone" onclick="document.getElementById('galeriBulkInput').click()" style="margin-bottom:20px">
-        <div class="upload-icon">🖼️</div>
+        <div class="upload-icon">ðŸ–¼ï¸</div>
         <div class="upload-text"><strong>Drag & drop atau klik untuk pilih foto</strong></div>
         <div class="upload-progress-bar" id="galeriProgress"><div class="upload-progress-fill" id="galeriProgressFill"></div></div>
       </div>
@@ -468,8 +468,8 @@
   <!-- HERO -->
   <div id="page-hero" style="display:none">
     <div class="page-header">
-      <div class="page-title">🌄 Background Hero</div>
-      <div class="page-sub">Ganti foto 360° di halaman depan website</div>
+      <div class="page-title">ðŸŒ„ Background Hero</div>
+      <div class="page-sub">Ganti foto 360Â° di halaman depan website</div>
     </div>
     <div class="card">
       <div class="card-title">Preview Background</div>
@@ -478,46 +478,46 @@
         <div class="preview-label">HERO PANORAMA</div>
       </div>
       <div class="upload-area" id="heroUploadArea" onclick="document.getElementById('heroFileInput').click()">
-        <div class="upload-icon">📷</div>
-        <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop foto 360° di sini</div>
+        <div class="upload-icon">ðŸ“·</div>
+        <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop foto 360Â° di sini</div>
       </div>
       <input type="file" id="heroFileInput" accept="image/*"/>
       <br/>
-      <button class="btn-save" onclick="saveHeroBg()">💾 Simpan Background</button>
-      <button class="btn-reset" onclick="resetHeroBg()">↩ Reset Default</button>
+      <button class="btn-save" onclick="saveHeroBg()">ðŸ’¾ Simpan Background</button>
+      <button class="btn-reset" onclick="resetHeroBg()">â†© Reset Default</button>
     </div>
   </div>
 
   <!-- PANORAMA -->
   <div id="page-panorama" style="display:none">
     <div class="page-header">
-      <div class="page-title">🔄 Foto Panorama Virtual Tour</div>
-      <div class="page-sub">Upload foto 360° untuk setiap lokasi virtual tour</div>
+      <div class="page-title">ðŸ”„ Foto Panorama Virtual Tour</div>
+      <div class="page-sub">Upload foto 360Â° untuk setiap lokasi virtual tour</div>
     </div>
     <div class="card">
       <div class="card-title">Pilih Lokasi</div>
       <div class="loc-tabs">
-        <button class="loc-tab active" onclick="selectPanoLoc(0,this)">🕌 Ruang Utama</button>
-        <button class="loc-tab" onclick="selectPanoLoc(1,this)">🏛️ Aula & Selasar</button>
-        <button class="loc-tab" onclick="selectPanoLoc(2,this)">🌿 Halaman & Taman</button>
-        <button class="loc-tab" onclick="selectPanoLoc(3,this)">🔔 Menara & Kubah</button>
+        <button class="loc-tab active" onclick="selectPanoLoc(0,this)">ðŸ•Œ Ruang Utama</button>
+        <button class="loc-tab" onclick="selectPanoLoc(1,this)">ðŸ›ï¸ Aula & Selasar</button>
+        <button class="loc-tab" onclick="selectPanoLoc(2,this)">ðŸŒ¿ Halaman & Taman</button>
+        <button class="loc-tab" onclick="selectPanoLoc(3,this)">ðŸ”” Menara & Kubah</button>
       </div>
       <div id="panoPreviewBox" class="preview-box" style="height:280px;margin-bottom:16px"></div>
       <div class="upload-area" id="panoUploadArea" onclick="document.getElementById('panoFileInput').click()">
-        <div class="upload-icon">🌐</div>
-        <div class="upload-text"><strong>Upload foto equirectangular 360°</strong> untuk lokasi ini</div>
+        <div class="upload-icon">ðŸŒ</div>
+        <div class="upload-text"><strong>Upload foto equirectangular 360Â°</strong> untuk lokasi ini</div>
       </div>
       <input type="file" id="panoFileInput" accept="image/*"/>
       <br/>
-      <button class="btn-save" onclick="savePano()">💾 Simpan Foto Lokasi Ini</button>
-      <button class="btn-reset" onclick="resetPano()">↩ Reset Default</button>
+      <button class="btn-save" onclick="savePano()">ðŸ’¾ Simpan Foto Lokasi Ini</button>
+      <button class="btn-reset" onclick="resetPano()">â†© Reset Default</button>
     </div>
   </div>
 
   <!-- SETTINGS -->
   <div id="page-settings" style="display:none">
     <div class="page-header">
-      <div class="page-title">⚙ Pengaturan</div>
+      <div class="page-title">âš™ Pengaturan</div>
       <div class="page-sub">Konfigurasi akun dan sistem</div>
     </div>
     <div class="card">
@@ -525,7 +525,7 @@
       <div class="form-group"><label>Username Baru</label><input type="text" id="newUser" placeholder="Masukkan username baru"/></div>
       <div class="form-group"><label>Password Baru</label><input type="password" id="newPass" placeholder="Masukkan password baru"/></div>
       <div class="form-group"><label>Konfirmasi Password</label><input type="password" id="confPass" placeholder="Ulangi password baru"/></div>
-      <button class="btn-save" onclick="saveCredentials()">💾 Simpan Kredensial</button>
+      <button class="btn-save" onclick="saveCredentials()">ðŸ’¾ Simpan Kredensial</button>
     </div>
   </div>
 
@@ -536,7 +536,7 @@
   <div class="modal">
     <div class="modal-title" id="pengurusModalTitle">Tambah Pengurus</div>
     <div style="text-align:center;margin-bottom:16px">
-      <div id="pengurusAvatarPreview" class="pengurus-admin-placeholder" onclick="document.getElementById('pengurusFotoInput').click()" style="margin:0 auto 8px">👤</div>
+      <div id="pengurusAvatarPreview" class="pengurus-admin-placeholder" onclick="document.getElementById('pengurusFotoInput').click()" style="margin:0 auto 8px">ðŸ‘¤</div>
       <input type="file" id="pengurusFotoInput" accept="image/*" onchange="previewPengurusFoto(this.files[0])"/>
       <div style="font-size:12px;color:var(--muted)">Klik foto untuk upload gambar</div>
     </div>
@@ -554,7 +554,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-reset" style="margin:0" onclick="closePengurusModal()">Batal</button>
-      <button class="btn-save" style="margin:0" onclick="savePengurus()">💾 Simpan</button>
+      <button class="btn-save" style="margin:0" onclick="savePengurus()">ðŸ’¾ Simpan</button>
     </div>
   </div>
 </div>
@@ -608,25 +608,12 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { db } from "../js/firebase.js";
+import { compressToBase64, escapeHtml, formatEventDate, toTimeInputValue } from "../js/utils.js";
 import {
-  getFirestore, doc, getDoc, setDoc, deleteDoc,
+  doc, getDoc, setDoc, deleteDoc,
   collection, getDocs, addDoc, updateDoc, query, orderBy, writeBatch, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-// ⚠ GANTI DENGAN CONFIG FIREBASE ANDA
-const firebaseConfig = {
-  apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
-  authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
-  projectId: "vt-masjid-agung-sukabumi",
-  storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
-  messagingSenderId: "633933684627",
-  appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
-  measurementId: "G-GG88GW221Z"
-};
-
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
 
 // ===== AUTH CHECK =====
 if (localStorage.getItem('adminLoggedIn') !== '1') window.location.href = 'login.html';
@@ -658,24 +645,6 @@ function showToast(msg, dur){
   t._timer=setTimeout(()=>t.classList.remove('show'), dur||3000);
 }
 window.showToast = showToast;
-
-// ===== IMAGE COMPRESSION → BASE64 =====
-function compressToBase64(file, maxW, quality){
-  return new Promise(res=>{
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = ()=>{
-      URL.revokeObjectURL(url);
-      const ratio = Math.min(1, maxW/img.width);
-      const w = Math.round(img.width*ratio), h = Math.round(img.height*ratio);
-      const c = document.createElement('canvas'); c.width=w; c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      res(c.toDataURL('image/jpeg', quality));
-    };
-    img.onerror = ()=>{ URL.revokeObjectURL(url); res(null); };
-    img.src = url;
-  });
-}
 
 // ===== DASHBOARD STATS =====
 async function updateDashboardStats(){
@@ -714,13 +683,13 @@ async function loadInfoForm(){
       document.getElementById('infoMenara').value    = d.menara||'';
     }
     fiturRows = fiturSnap.exists() ? (fiturSnap.data().items||[]) : [
-      {icon:'🕌',judul:'Ruang Utama Shalat',deskripsi:'Pusat ibadah dengan mihrab megah dan kubah utama yang menakjubkan.'},
-      {icon:'🏛️',judul:'Aula & Selasar Multifungsi',deskripsi:'Ruang serbaguna untuk kajian, pengajian, dan kegiatan sosial.'},
-      {icon:'📚',judul:'Perpustakaan Islam',deskripsi:'Koleksi kitab dan buku Islam untuk pendidikan agama.'},
-      {icon:'🌿',judul:'Halaman & Taman Asri',deskripsi:'Area luar masjid yang rindang dan nyaman.'},
+      {icon:'ðŸ•Œ',judul:'Ruang Utama Shalat',deskripsi:'Pusat ibadah dengan mihrab megah dan kubah utama yang menakjubkan.'},
+      {icon:'ðŸ›ï¸',judul:'Aula & Selasar Multifungsi',deskripsi:'Ruang serbaguna untuk kajian, pengajian, dan kegiatan sosial.'},
+      {icon:'ðŸ“š',judul:'Perpustakaan Islam',deskripsi:'Koleksi kitab dan buku Islam untuk pendidikan agama.'},
+      {icon:'ðŸŒ¿',judul:'Halaman & Taman Asri',deskripsi:'Area luar masjid yang rindang dan nyaman.'},
     ];
     renderFiturRows();
-  } catch(e){ showToast('⚠ Gagal memuat data: '+e.message); }
+  } catch(e){ showToast('âš  Gagal memuat data: '+e.message); }
 }
 function renderFiturRows(){
   const container = document.getElementById('fiturList');
@@ -729,10 +698,10 @@ function renderFiturRows(){
       <div class="form-group" style="margin:0"><input type="text" value="${f.icon}" onchange="fiturRows[${i}].icon=this.value" style="text-align:center;font-size:18px" maxlength="4"/></div>
       <div class="form-group" style="margin:0"><input type="text" value="${f.judul}" onchange="fiturRows[${i}].judul=this.value" placeholder="Judul Fitur"/></div>
       <div class="form-group" style="margin:0"><input type="text" value="${f.deskripsi}" onchange="fiturRows[${i}].deskripsi=this.value" placeholder="Deskripsi"/></div>
-      <button class="btn-danger" style="padding:6px 10px" onclick="deleteFiturRow(${i})">🗑</button>
+      <button class="btn-danger" style="padding:6px 10px" onclick="deleteFiturRow(${i})">ðŸ—‘</button>
     </div>`).join('');
 }
-function addFiturRow(){ fiturRows.push({icon:'🕌',judul:'',deskripsi:''}); renderFiturRows(); }
+function addFiturRow(){ fiturRows.push({icon:'ðŸ•Œ',judul:'',deskripsi:''}); renderFiturRows(); }
 function deleteFiturRow(i){ fiturRows.splice(i,1); renderFiturRows(); }
 async function saveInfoMasjid(){
   document.querySelectorAll('#fiturList > div').forEach((div,i)=>{
@@ -752,8 +721,8 @@ async function saveInfoMasjid(){
       setDoc(doc(db,'masjid_info','info'), info),
       setDoc(doc(db,'masjid_info','fitur'), {items: fiturRows})
     ]);
-    showToast('✅ Informasi masjid berhasil disimpan!');
-  } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
+    showToast('âœ… Informasi masjid berhasil disimpan!');
+  } catch(e){ showToast('âš  Gagal simpan: '+e.message); }
 }
 window.addFiturRow = addFiturRow;
 window.deleteFiturRow = deleteFiturRow;
@@ -770,7 +739,7 @@ async function loadPengurus(){
     pengurusItems = [];
     snap.forEach(d => pengurusItems.push({id: d.id, ...d.data()}));
     renderPengurusGrid();
-  } catch(e){ showToast('⚠ Gagal memuat pengurus: '+e.message); }
+  } catch(e){ showToast('âš  Gagal memuat pengurus: '+e.message); }
 }
 function renderPengurusGrid(){
   const grid = document.getElementById('pengurusAdminGrid');
@@ -782,14 +751,14 @@ function renderPengurusGrid(){
     const card=document.createElement('div'); card.className='pengurus-admin-card';
     const avatarHtml = item.fotoBase64
       ? `<img class="pengurus-admin-avatar" src="${item.fotoBase64}" alt="${item.nama}"/>`
-      : `<div class="pengurus-admin-placeholder">👤</div>`;
+      : `<div class="pengurus-admin-placeholder">ðŸ‘¤</div>`;
     card.innerHTML=`${avatarHtml}
       <div class="pengurus-admin-jabatan">${item.jabatan||'Pengurus'}</div>
       <div class="pengurus-admin-nama">${item.nama||'-'}</div>
       <div style="font-size:11px;color:var(--muted)">${item.periode||''}</div>
       <div class="pengurus-admin-actions">
-        <button class="btn-sm" onclick="editPengurus('${item.id}')">✏️ Edit</button>
-        <button class="btn-danger" onclick="deletePengurus('${item.id}')">🗑</button>
+        <button class="btn-sm" onclick="editPengurus('${item.id}')">âœï¸ Edit</button>
+        <button class="btn-danger" onclick="deletePengurus('${item.id}')">ðŸ—‘</button>
       </div>`;
     grid.appendChild(card);
   });
@@ -801,7 +770,7 @@ function openPengurusModal(id){
   document.getElementById('pengurusJabatan').value='';
   document.getElementById('pengurusPeriode').value='';
   document.getElementById('pengurusFotoInput').value='';
-  document.getElementById('pengurusAvatarPreview').innerHTML='👤';
+  document.getElementById('pengurusAvatarPreview').innerHTML='ðŸ‘¤';
   if(id){
     const item = pengurusItems.find(p=>p.id===id);
     if(item){
@@ -818,29 +787,29 @@ function openPengurusModal(id){
 }
 async function previewPengurusFoto(file){
   if(!file||!file.type.startsWith('image/')) return;
-  showToast('⏳ Memproses foto...', 10000);
+  showToast('â³ Memproses foto...', 10000);
   pengurusPendingBase64 = await compressToBase64(file, 600, 0.85);
   document.getElementById('pengurusAvatarPreview').innerHTML=`<img src="${pengurusPendingBase64}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
-  showToast('📷 Foto siap — klik Simpan');
+  showToast('ðŸ“· Foto siap â€” klik Simpan');
 }
 async function savePengurus(){
   const nama    = document.getElementById('pengurusNama').value.trim();
   const jabatan = document.getElementById('pengurusJabatan').value.trim();
   const periode = document.getElementById('pengurusPeriode').value.trim();
-  if(!nama||!jabatan){ showToast('⚠ Nama dan Jabatan wajib diisi!'); return; }
+  if(!nama||!jabatan){ showToast('âš  Nama dan Jabatan wajib diisi!'); return; }
   const data = { nama, jabatan, periode, fotoBase64: pengurusPendingBase64||null, order: Date.now(), createdAt: serverTimestamp() };
   try {
     if(editPengurusId){ await updateDoc(doc(db,'pengurus',editPengurusId), {nama,jabatan,periode,fotoBase64:pengurusPendingBase64||null}); }
     else { await addDoc(collection(db,'pengurus'), data); }
     closePengurusModal();
     await loadPengurus();
-    showToast('✅ Pengurus berhasil disimpan!');
-  } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
+    showToast('âœ… Pengurus berhasil disimpan!');
+  } catch(e){ showToast('âš  Gagal simpan: '+e.message); }
 }
 async function deletePengurus(id){
   if(!confirm('Hapus pengurus ini?')) return;
-  try { await deleteDoc(doc(db,'pengurus',id)); await loadPengurus(); showToast('🗑 Pengurus dihapus'); }
-  catch(e){ showToast('⚠ '+e.message); }
+  try { await deleteDoc(doc(db,'pengurus',id)); await loadPengurus(); showToast('ðŸ—‘ Pengurus dihapus'); }
+  catch(e){ showToast('âš  '+e.message); }
 }
 function closePengurusModal(){ document.getElementById('pengurusModal').classList.remove('open'); }
 function editPengurus(id){ openPengurusModal(id); }
@@ -860,7 +829,7 @@ async function loadImamMuadzin(){
     imamData   = snap.exists() ? (snap.data().imam||[])   : [];
     muadzinData= snap.exists() ? (snap.data().muadzin||[]) : [];
     renderImamMuadzinTables();
-  } catch(e){ showToast('⚠ '+e.message); }
+  } catch(e){ showToast('âš  '+e.message); }
 }
 function renderImamMuadzinTables(){ renderImamTable(); renderMuadzinTable(); }
 function renderImamTable(){
@@ -871,7 +840,7 @@ function renderImamTable(){
         <td><span class="hari-badge">${item.hari}</span></td>
         <td>${item.nama}</td>
         <td style="color:var(--muted)">${item.keterangan||'-'}</td>
-        <td><button class="btn-danger" onclick="deleteImamRow(${i})">🗑</button></td>
+        <td><button class="btn-danger" onclick="deleteImamRow(${i})">ðŸ—‘</button></td>
       </tr>`).join('');
 }
 function renderMuadzinTable(){
@@ -882,14 +851,14 @@ function renderMuadzinTable(){
         <td><span class="hari-badge">${item.hari}</span></td>
         <td>${item.nama}</td>
         <td style="color:var(--muted)">${item.keterangan||'-'}</td>
-        <td><button class="btn-danger" onclick="deleteMuadzinRow(${i})">🗑</button></td>
+        <td><button class="btn-danger" onclick="deleteMuadzinRow(${i})">ðŸ—‘</button></td>
       </tr>`).join('');
 }
 function addImamRow(){
   const hari=document.getElementById('addImamHari').value;
   const nama=document.getElementById('addImamNama').value.trim();
   const ket =document.getElementById('addImamKet').value.trim();
-  if(!nama){ showToast('⚠ Nama imam wajib diisi!'); return; }
+  if(!nama){ showToast('âš  Nama imam wajib diisi!'); return; }
   imamData.push({hari,nama,keterangan:ket});
   document.getElementById('addImamNama').value=''; document.getElementById('addImamKet').value='';
   renderImamTable();
@@ -898,7 +867,7 @@ function addMuadzinRow(){
   const hari=document.getElementById('addMuadzinHari').value;
   const nama=document.getElementById('addMuadzinNama').value.trim();
   const ket =document.getElementById('addMuadzinKet').value.trim();
-  if(!nama){ showToast('⚠ Nama muadzin wajib diisi!'); return; }
+  if(!nama){ showToast('âš  Nama muadzin wajib diisi!'); return; }
   muadzinData.push({hari,nama,keterangan:ket});
   document.getElementById('addMuadzinNama').value=''; document.getElementById('addMuadzinKet').value='';
   renderMuadzinTable();
@@ -908,9 +877,9 @@ function deleteMuadzinRow(i){ muadzinData.splice(i,1); renderMuadzinTable(); }
 async function saveImamMuadzin(){
   try {
     await setDoc(doc(db,'imam_muadzin','jadwal'), {imam:imamData, muadzin:muadzinData});
-    showToast('✅ Jadwal imam & muadzin berhasil disimpan!');
+    showToast('âœ… Jadwal imam & muadzin berhasil disimpan!');
     updateDashboardStats();
-  } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
+  } catch(e){ showToast('âš  Gagal simpan: '+e.message); }
 }
 window.addImamRow=addImamRow; window.addMuadzinRow=addMuadzinRow;
 window.deleteImamRow=deleteImamRow; window.deleteMuadzinRow=deleteMuadzinRow;
@@ -921,20 +890,6 @@ let eventItems = [];
 let editEventId = null;
 let eventPendingBase64 = null;
 
-function escapeHtml(value){
-  return String(value||'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
-}
-function formatEventDate(value){
-  if(!value) return 'Tanggal belum diatur';
-  const date = new Date(value + 'T00:00:00');
-  if(Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-}
-function toTimeInputValue(value){
-  const match=String(value||'').match(/(\d{1,2})[:.](\d{2})/);
-  if(!match) return '';
-  return match[1].padStart(2,'0')+':'+match[2];
-}
 async function loadEvents(){
   const grid=document.getElementById('eventAdminGrid');
   if(!grid) return;
@@ -1070,12 +1025,12 @@ window.deleteEvent=deleteEvent;
 window.saveEvent=saveEvent;
 document.getElementById('eventImageInput').addEventListener('change',e=>previewEventImage(e.target.files[0]));
 
-// ===== GALERI — Base64 di Firestore =====
+// ===== GALERI â€” Base64 di Firestore =====
 let galeriItems=[], galeriReplaceId=null;
 
 async function loadGaleri(){
   const grid = document.getElementById('galeriAdminGrid');
-  grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">⏳ Memuat...</div>';
+  grid.innerHTML='<div style="color:var(--muted);text-align:center;padding:30px;grid-column:1/-1">â³ Memuat...</div>';
   try {
     const snap = await getDocs(query(collection(db,'galeri'), orderBy('order','asc')));
     galeriItems=[];
@@ -1083,7 +1038,7 @@ async function loadGaleri(){
     document.getElementById('galeriCount').textContent = galeriItems.length+' foto';
     renderGaleriGrid();
     updateDashboardStats();
-  } catch(e){ showToast('⚠ Gagal memuat galeri: '+e.message); grid.innerHTML=''; }
+  } catch(e){ showToast('âš  Gagal memuat galeri: '+e.message); grid.innerHTML=''; }
 }
 function renderGaleriGrid(){
   const grid=document.getElementById('galeriAdminGrid');
@@ -1096,8 +1051,8 @@ function renderGaleriGrid(){
     div.innerHTML=`<img src="${item.base64}" alt="Foto ${idx+1}" loading="lazy"/>
       <div class="galeri-item-num">#${idx+1}</div>
       <div class="galeri-item-overlay"><div class="galeri-item-actions">
-        <button class="btn-item-replace" onclick="triggerReplace('${item.id}')">🔄 Ganti</button>
-        <button class="btn-item-delete" onclick="deleteGaleriItem('${item.id}')">🗑</button>
+        <button class="btn-item-replace" onclick="triggerReplace('${item.id}')">ðŸ”„ Ganti</button>
+        <button class="btn-item-delete" onclick="deleteGaleriItem('${item.id}')">ðŸ—‘</button>
       </div></div>`;
     grid.appendChild(div);
   });
@@ -1108,7 +1063,7 @@ async function addGaleriFiles(files){
   if(arr.length===0) return;
   document.getElementById('galeriProgress').style.display='block';
   document.getElementById('galeriProgressFill').style.width='0%';
-  showToast('⏳ Menyimpan '+arr.length+' foto ke Firestore...', 60000);
+  showToast('â³ Menyimpan '+arr.length+' foto ke Firestore...', 60000);
   for(let i=0;i<arr.length;i++){
     const base64 = await compressToBase64(arr[i], 1200, 0.78);
     if(!base64) continue;
@@ -1117,26 +1072,26 @@ async function addGaleriFiles(files){
   }
   document.getElementById('galeriProgress').style.display='none';
   await loadGaleri();
-  showToast('✅ '+arr.length+' foto berhasil disimpan!');
+  showToast('âœ… '+arr.length+' foto berhasil disimpan!');
   document.getElementById('galeriAddInput').value='';
   document.getElementById('galeriBulkInput').value='';
 }
 function triggerReplace(id){ galeriReplaceId=id; document.getElementById('galeriReplaceInput').value=''; document.getElementById('galeriReplaceInput').click(); }
 async function replaceGaleriFile(file){
   if(!file||!galeriReplaceId) return;
-  showToast('⏳ Memproses...', 15000);
+  showToast('â³ Memproses...', 15000);
   const base64 = await compressToBase64(file, 1200, 0.78);
-  if(!base64){ showToast('⚠ Gagal proses foto'); return; }
+  if(!base64){ showToast('âš  Gagal proses foto'); return; }
   await updateDoc(doc(db,'galeri',galeriReplaceId), {base64});
   galeriReplaceId=null;
   await loadGaleri();
-  showToast('✅ Foto berhasil diganti!');
+  showToast('âœ… Foto berhasil diganti!');
 }
 async function deleteGaleriItem(id){
   if(!confirm('Hapus foto ini?')) return;
   await deleteDoc(doc(db,'galeri',id));
   await loadGaleri();
-  showToast('🗑 Foto dihapus');
+  showToast('ðŸ—‘ Foto dihapus');
 }
 async function confirmClearGaleri(){
   if(!confirm('Hapus SEMUA foto dari galeri?')) return;
@@ -1145,7 +1100,7 @@ async function confirmClearGaleri(){
   snap.forEach(d=>batch.delete(d.ref));
   await batch.commit();
   await loadGaleri();
-  showToast('🗑 Semua foto galeri dihapus');
+  showToast('ðŸ—‘ Semua foto galeri dihapus');
 }
 window.triggerReplace=triggerReplace; window.deleteGaleriItem=deleteGaleriItem; window.confirmClearGaleri=confirmClearGaleri;
 document.getElementById('galeriReplaceInput').addEventListener('change',e=>replaceGaleriFile(e.target.files[0]));
@@ -1167,19 +1122,19 @@ async function loadHeroPreview(){
 }
 async function handleHeroFile(file){
   if(!file||!file.type.startsWith('image/')) return;
-  showToast('⏳ Memproses...', 15000);
+  showToast('â³ Memproses...', 15000);
   heroPendingBase64 = await compressToBase64(file, 3000, 0.85);
   document.getElementById('heroPreviewImg').src=heroPendingBase64;
-  showToast('📷 Foto dipilih — klik Simpan');
+  showToast('ðŸ“· Foto dipilih â€” klik Simpan');
 }
 async function saveHeroBg(){
-  if(!heroPendingBase64){ showToast('⚠ Pilih foto dulu!'); return; }
-  try { await setDoc(doc(db,'panorama','hero_bg'), {base64:heroPendingBase64}); showToast('✅ Background hero disimpan!'); }
-  catch(e){ showToast('⚠ '+e.message); }
+  if(!heroPendingBase64){ showToast('âš  Pilih foto dulu!'); return; }
+  try { await setDoc(doc(db,'panorama','hero_bg'), {base64:heroPendingBase64}); showToast('âœ… Background hero disimpan!'); }
+  catch(e){ showToast('âš  '+e.message); }
 }
 async function resetHeroBg(){
-  try { await deleteDoc(doc(db,'panorama','hero_bg')); heroPendingBase64=null; document.getElementById('heroPreviewImg').src='../images/hero-360.png'; document.getElementById('heroFileInput').value=''; showToast('↩ Background direset ke default'); }
-  catch(e){ showToast('⚠ '+e.message); }
+  try { await deleteDoc(doc(db,'panorama','hero_bg')); heroPendingBase64=null; document.getElementById('heroPreviewImg').src='../images/hero-360.png'; document.getElementById('heroFileInput').value=''; showToast('â†© Background direset ke default'); }
+  catch(e){ showToast('âš  '+e.message); }
 }
 document.getElementById('heroFileInput').addEventListener('change',e=>handleHeroFile(e.target.files[0]));
 const ha=document.getElementById('heroUploadArea');
@@ -1188,8 +1143,8 @@ ha.addEventListener('dragleave',()=>ha.classList.remove('drag-over'));
 ha.addEventListener('drop',e=>{e.preventDefault();ha.classList.remove('drag-over');handleHeroFile(e.dataTransfer.files[0]);});
 window.saveHeroBg=saveHeroBg; window.resetHeroBg=resetHeroBg;
 
-// ===== PANORAMA — Chunked Base64 di Firestore =====
-// Firestore max 1MB/doc, foto 360° bisa besar → pecah jadi chunk 700KB
+// ===== PANORAMA â€” Chunked Base64 di Firestore =====
+// Firestore max 1MB/doc, foto 360Â° bisa besar â†’ pecah jadi chunk 700KB
 const CHUNK_SIZE = 700000; // 700KB per chunk (aman di bawah batas 1MB Firestore)
 const panoLocations=[
   {name:'Ruang Utama (Mihrab)',key:'pano_0'},{name:'Aula & Selasar',key:'pano_1'},
@@ -1254,22 +1209,22 @@ function selectPanoLoc(idx,el){
 }
 async function handlePanoFile(file){
   if(!file||!file.type.startsWith('image/')) return;
-  showToast('⏳ Memproses foto 360°...', 30000);
+  showToast('â³ Memproses foto 360Â°...', 30000);
   // Kompres lebih agresif agar tetap kecil: max 3000px, quality 0.75
   panoPendingBase64[currentPanoLoc]=await compressToBase64(file,3000,0.75);
   initPanoPreview();
-  showToast('📸 Foto dipilih — klik Simpan');
+  showToast('ðŸ“¸ Foto dipilih â€” klik Simpan');
 }
 async function savePano(){
   const base64=panoPendingBase64[currentPanoLoc];
-  if(!base64){ showToast('⚠ Belum ada foto!'); return; }
+  if(!base64){ showToast('âš  Belum ada foto!'); return; }
   const key=panoLocations[currentPanoLoc].key;
-  showToast('⏳ Menyimpan foto panorama...', 60000);
+  showToast('â³ Menyimpan foto panorama...', 60000);
   try {
     await savePanoChunked(key, base64);
     panoLoadedBase64[currentPanoLoc]=base64;
-    showToast('✅ Foto "'+panoLocations[currentPanoLoc].name+'" disimpan!');
-  } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
+    showToast('âœ… Foto "'+panoLocations[currentPanoLoc].name+'" disimpan!');
+  } catch(e){ showToast('âš  Gagal simpan: '+e.message); }
 }
 async function resetPano(){
   const key=panoLocations[currentPanoLoc].key;
@@ -1277,8 +1232,8 @@ async function resetPano(){
     await deletePanoChunked(key);
     delete panoPendingBase64[currentPanoLoc]; delete panoLoadedBase64[currentPanoLoc];
     document.getElementById('panoFileInput').value=''; initPanoPreview();
-    showToast('↩ Foto "'+panoLocations[currentPanoLoc].name+'" direset');
-  } catch(e){ showToast('⚠ '+e.message); }
+    showToast('â†© Foto "'+panoLocations[currentPanoLoc].name+'" direset');
+  } catch(e){ showToast('âš  '+e.message); }
 }
 document.getElementById('panoFileInput').addEventListener('change',e=>handlePanoFile(e.target.files[0]));
 const pa=document.getElementById('panoUploadArea');
@@ -1287,18 +1242,18 @@ pa.addEventListener('dragleave',()=>pa.classList.remove('drag-over'));
 pa.addEventListener('drop',e=>{e.preventDefault();pa.classList.remove('drag-over');handlePanoFile(e.dataTransfer.files[0]);});
 window.selectPanoLoc=selectPanoLoc; window.savePano=savePano; window.resetPano=resetPano;
 
-// ===== SETTINGS — Kredensial =====
+// ===== SETTINGS â€” Kredensial =====
 async function saveCredentials(){
   const u=document.getElementById('newUser').value.trim();
   const p=document.getElementById('newPass').value;
   const c=document.getElementById('confPass').value;
-  if(!u||!p){ showToast('⚠ Username dan password wajib diisi!'); return; }
-  if(p!==c){ showToast('⚠ Password tidak cocok!'); return; }
+  if(!u||!p){ showToast('âš  Username dan password wajib diisi!'); return; }
+  if(p!==c){ showToast('âš  Password tidak cocok!'); return; }
   try {
     await setDoc(doc(db,'admin_settings','credentials'), {username:u, password:p});
     localStorage.setItem('admin_user',u); localStorage.setItem('admin_pass',p);
-    showToast('✅ Kredensial berhasil diperbarui!');
-  } catch(e){ showToast('⚠ Gagal simpan: '+e.message); }
+    showToast('âœ… Kredensial berhasil diperbarui!');
+  } catch(e){ showToast('âš  Gagal simpan: '+e.message); }
 }
 window.saveCredentials=saveCredentials;
 
@@ -1322,4 +1277,5 @@ setInterval(updateAdminClock,1000); updateAdminClock();
 </script>
 </body>
 </html>
+
 
