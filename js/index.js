@@ -236,12 +236,15 @@ async function loadEvents() {
         }
       }
       const countdownText = getEventCountdown(item.tanggal);
+      const summaryText = item.deskripsi
+        ? (item.deskripsi.length > 120 ? item.deskripsi.slice(0, 120).trim() + '...' : item.deskripsi)
+        : '-';
       return `
         <div class="event-card" onclick="openEventDetail('${item.id}')">
           ${mediaHtml}
           <div class="event-content">
             <h3 class="event-title">${item.judul || '-'}</h3>
-            <p class="event-desc">${item.deskripsi || '-'}</p>
+            <p class="event-desc">${summaryText}</p>
             <div class="event-meta">
               <div class="event-date">
                 <span>📅</span> ${formatIndonesianDate(item.tanggal)}
