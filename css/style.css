@@ -9,6 +9,7 @@
   --text: #1a1a1a;
   --text-muted: #6b6b6b;
   --surface: #ffffff;
+  --card-bg: #ffffff;
   --border: rgba(0,0,0,0.08);
   --navbar-h: 68px;
 }
@@ -24,7 +25,8 @@ body.dark {
   --bg: #0e0e0e;
   --text: rgba(255,255,255,0.9);
   --text-muted: rgba(255,255,255,0.45);
-  --surface: rgba(255,255,255,0.05);
+  --surface: rgba(255,255,255,0.08);
+  --card-bg: #111111;
   --border: rgba(255,255,255,0.1);
 }
 
@@ -413,4 +415,196 @@ body.dark .btn-theme .icon-dark { display: block; }
     font-size: 1.2rem;
     border: 2px dashed #ccc;
     margin: 20px;
+}
+
+/* ===== EVENTS SECTION ===== */
+.event-section {
+  padding: 80px 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.event-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 30px;
+  margin-top: 40px;
+}
+.event-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.event-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--gold);
+  box-shadow: 0 15px 35px rgba(201, 168, 76, 0.15);
+}
+.event-media {
+  width: 100%;
+  aspect-ratio: 16/9;
+  position: relative;
+  background: #000;
+  overflow: hidden;
+}
+.event-media img, .event-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.event-card:hover .event-media img {
+  transform: scale(1.05);
+}
+.event-media-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(201, 168, 76, 0.9);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.event-content {
+  padding: 22px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.event-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.event-desc {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 16px;
+  flex: 1;
+  white-space: pre-line;
+}
+.event-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.event-countdown {
+  color: var(--gold);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.event-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-weight: 600;
+}
+.event-empty {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+  width: 100%;
+  grid-column: 1 / -1;
+}
+.event-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+.event-detail-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  padding: 24px;
+  z-index: 1200;
+}
+body.dark .event-detail-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+.event-detail-overlay.open {
+  display: flex;
+}
+.event-detail-card {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 60px);
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+.event-detail-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+}
+.event-detail-media {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  overflow: hidden;
+}
+.event-detail-media img,
+.event-detail-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.event-detail-body {
+  padding: 28px 30px 32px;
+}
+.event-detail-body h3 {
+  margin: 0 0 12px;
+  font-size: clamp(22px, 2vw, 32px);
+  line-height: 1.1;
+}
+.event-detail-body p {
+  margin: 0 0 16px;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+.event-detail-body #eventDetailDate {
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.event-detail-countdown {
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 0.25px;
 }

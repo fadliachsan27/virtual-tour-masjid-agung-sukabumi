@@ -1,557 +1,1334 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel - Masjid Agung Sukabumi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --gold:#c9a84c;--bg:#0e0e0e;
-      --surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.1);
-      --text:rgba(255,255,255,0.85);--muted:rgba(255,255,255,0.4);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
-    body{background:var(--bg);color:var(--text);font-family:'Lato',sans-serif;min-height:100vh;display:flex}
+
+    :root {
+      --gold: #c9a84c;
+      --bg: #0e0e0e;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.1);
+      --text: rgba(255, 255, 255, 0.85);
+      --muted: rgba(255, 255, 255, 0.4);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      height: 100vh;
+      display: flex;
+      overflow: hidden; /* prevent body scroll, allow main to scroll */
+    }
+
     /* SIDEBAR */
-    .sidebar{width:230px;min-height:100vh;background:rgba(0,0,0,0.4);border-right:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;padding:28px 0}
-    .sidebar-brand{padding:0 20px 24px;border-bottom:1px solid var(--border);margin-bottom:16px}
-    .sidebar-brand-title{font-family:'Playfair Display',serif;color:var(--gold);font-size:15px}
-    .sidebar-brand-sub{font-size:10px;letter-spacing:2px;color:var(--muted);margin-top:2px}
-    .sidebar-nav a{display:flex;align-items:center;gap:10px;padding:11px 20px;color:var(--muted);text-decoration:none;font-size:14px;transition:all 0.2s;border-left:3px solid transparent}
-    .sidebar-nav a:hover{color:#fff;background:rgba(255,255,255,0.04)}
-    .sidebar-nav a.active{color:var(--gold);border-left-color:var(--gold);background:rgba(201,168,76,0.07)}
-    .sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--border)}
-    .sidebar-bottom a{color:var(--muted);font-size:13px;text-decoration:none;display:block;margin-bottom:8px}
-    .sidebar-bottom a:hover{color:#ff6b6b}
-    /* MAIN */
-    .main{flex:1;padding:36px 40px;overflow-y:auto}
-    .page-header{margin-bottom:32px}
-    .page-title{font-family:'Playfair Display',serif;font-size:26px;color:#fff}
-    .page-sub{color:var(--muted);font-size:14px;margin-top:4px}
-    .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:24px}
-    .card-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold);margin-bottom:18px;display:flex;align-items:center;gap:8px}
-    /* BUTTONS */
-    .btn-save{padding:11px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--gold),#a07830);color:#fff;font-size:14px;cursor:pointer;font-family:'Lato',sans-serif;font-weight:700;transition:opacity 0.2s;margin-top:12px}
-    .btn-save:hover{opacity:0.9}
-    .btn-reset{padding:11px 20px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;margin-top:12px;margin-left:10px;font-family:'Lato',sans-serif}
-    .btn-reset:hover{color:#fff;border-color:rgba(255,255,255,0.3)}
-    .btn-danger{padding:8px 14px;border-radius:8px;border:none;background:rgba(255,80,80,0.15);color:#ff6b6b;font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;transition:all 0.2s;border:1px solid rgba(255,80,80,0.3)}
-    .btn-danger:hover{background:rgba(255,80,80,0.3)}
-    .btn-sm{padding:7px 14px;border-radius:8px;border:none;background:rgba(201,168,76,0.15);color:var(--gold);font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;border:1px solid rgba(201,168,76,0.3)}
-    .btn-sm:hover{background:rgba(201,168,76,0.25)}
-    .btn-blue{background:linear-gradient(135deg,#3a7bd5,#1a5bb5)!important}
-    /* FORMS */
-    .form-group{margin-bottom:16px}
-    .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-    .form-group input,.form-group textarea,.form-group select{width:100%;padding:11px 14px;border-radius:8px;background:#1e1e1e;border:1px solid var(--border);color:#fff;font-size:14px;font-family:'Lato',sans-serif;outline:none;resize:vertical}
-    .form-group select option{background:#1e1e1e;color:#fff}
-    .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--gold)}
-    .form-group textarea{min-height:90px}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    .form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-    /* STATS */
-    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
-    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
-    .stat-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--gold)}
-    .stat-label{color:var(--muted);font-size:12px;margin-top:4px}
-    /* UPLOAD */
-    .upload-area{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;background:rgba(255,255,255,0.02)}
-    .upload-area:hover,.upload-area.drag-over{border-color:var(--gold);background:rgba(201,168,76,0.07)}
-    .upload-icon{font-size:28px;margin-bottom:8px}
-    .upload-text{color:var(--muted);font-size:13px}
-    .upload-text strong{color:var(--gold)}
-    input[type="file"]{display:none}
-    /* PREVIEW */
-    .preview-box{width:100%;height:240px;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#111;position:relative;margin-bottom:16px}
-    .preview-box .preview-img{width:100%;height:100%;object-fit:cover}
-    .preview-label{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.7);color:var(--gold);font-size:11px;padding:4px 10px;border-radius:10px;letter-spacing:1px}
-    /* TOAST */
-    .toast{position:fixed;bottom:24px;right:24px;z-index:999;background:#1a1a1a;border:1px solid var(--gold);border-radius:10px;padding:14px 20px;color:var(--gold);font-size:14px;transform:translateY(80px);opacity:0;transition:all 0.3s;max-width:300px}
-    .toast.show{transform:translateY(0);opacity:1}
-    /* GALERI */
-    .galeri-admin-section{margin-top:22px}
-    .galeri-admin-section-title{font-size:14px;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-    .galeri-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
-    .galeri-admin-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:rgba(255,255,255,0.03);border:1px solid var(--border);cursor:pointer;transition:border-color 0.2s}
-    .galeri-admin-item:hover{border-color:var(--gold)}
-    .galeri-admin-item img{width:100%;height:100%;object-fit:cover}
-    .galeri-item-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,transparent 55%);opacity:0;transition:opacity 0.25s;display:flex;flex-direction:column;justify-content:flex-end;padding:10px}
-    .galeri-admin-item:hover .galeri-item-overlay{opacity:1}
-    .galeri-item-actions{display:flex;gap:6px}
-    .btn-item-replace{flex:1;padding:6px 8px;border-radius:7px;border:none;background:rgba(201,168,76,0.9);color:#000;font-size:11px;cursor:pointer;font-weight:700}
-    .btn-item-delete{padding:6px 10px;border-radius:7px;border:none;background:rgba(255,70,70,0.8);color:#fff;font-size:12px;cursor:pointer;font-weight:700}
-    .galeri-item-num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.6);color:var(--muted);font-size:10px;padding:3px 8px;border-radius:6px}
-    .galeri-count{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);color:var(--gold);font-size:12px;padding:5px 12px;border-radius:20px}
-    /* PENGURUS */
-    .pengurus-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:16px}
-    .pengurus-admin-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:20px;text-align:center;transition:border-color 0.2s}
-    .pengurus-admin-card:hover{border-color:rgba(201,168,76,0.4)}
-    .pengurus-admin-avatar{width:70px;height:70px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);margin:0 auto 10px;display:block}
-    .pengurus-admin-placeholder{width:70px;height:70px;border-radius:50%;border:2px dashed var(--border);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,0.02);cursor:pointer}
-    .pengurus-admin-placeholder:hover{border-color:var(--gold)}
-    .pengurus-admin-jabatan{font-size:10px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;text-transform:uppercase}
-    .pengurus-admin-nama{font-size:14px;color:var(--text);margin-bottom:8px;font-family:'Playfair Display',serif}
-    .pengurus-admin-actions{display:flex;gap:6px;justify-content:center;margin-top:10px}
-    /* IMAM/MUADZIN TABLE */
-    .jadwal-table{width:100%;border-collapse:collapse;margin-top:8px}
-    .jadwal-table th{text-align:left;font-size:11px;letter-spacing:1px;color:var(--gold);padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase}
-    .jadwal-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px;color:var(--text)}
-    .jadwal-table tr:last-child td{border-bottom:none}
-    .jadwal-table tr:hover td{background:rgba(255,255,255,0.03)}
-    .hari-badge{font-size:11px;font-weight:700;color:var(--gold);background:rgba(201,168,76,0.12);border-radius:6px;padding:3px 8px;display:inline-block}
-    .add-row-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;padding:16px;background:rgba(255,255,255,0.02);border-radius:10px;margin-top:12px;border:1px dashed var(--border)}
-    .add-row-form input,.add-row-form select{padding:9px 12px;border-radius:8px;background:#1e1e1e;border:1px solid var(--border);color:#fff;font-size:13px;font-family:'Lato',sans-serif;outline:none;width:100%}
-    .add-row-form select option{background:#1e1e1e;color:#fff}
-    .add-row-form input:focus,.add-row-form select:focus{border-color:var(--gold)}
-    .loc-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-    .loc-tab{padding:8px 16px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:'Lato',sans-serif;transition:all 0.2s}
-    .loc-tab:hover,.loc-tab.active{background:rgba(201,168,76,0.15);border-color:var(--gold);color:var(--gold)}
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;align-items:center;justify-content:center}
-    .modal-overlay.open{display:flex}
-    .modal{background:#1a1a1a;border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:480px}
-    .modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);margin-bottom:20px}
-    .modal-footer{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
-    .upload-progress-bar{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;margin-top:12px;overflow:hidden;display:none}
-    .upload-progress-fill{height:100%;background:var(--gold);border-radius:2px;width:0%;transition:width 0.3s}
-    .section-sep{border:none;border-top:1px solid var(--border);margin:20px 0}
-    @media(max-width:768px){
-      .stats-row{grid-template-columns:1fr 1fr}
-      .form-row,.form-row-3{grid-template-columns:1fr}
-      .add-row-form{grid-template-columns:1fr 1fr;gap:8px}
+    .sidebar {
+      width: 230px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      z-index: 1000;
     }
+
+    .sidebar-brand {
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px
+    }
+
+    .sidebar-brand-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 15px
+    }
+
+    .sidebar-brand-sub {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-top: 2px
+    }
+
+    .sidebar-nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.2s;
+      border-left: 3px solid transparent
+    }
+
+    .sidebar-nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04)
+    }
+
+    .sidebar-nav a.active {
+      color: var(--gold);
+      border-left-color: var(--gold);
+      background: rgba(201, 168, 76, 0.07)
+    }
+
+    .sidebar-bottom {
+      margin-top: auto;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border)
+    }
+
+    .sidebar-bottom a {
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+      display: block;
+      margin-bottom: 8px
+    }
+
+    .sidebar-bottom a:hover {
+      color: #ff6b6b
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      margin-left: 230px; /* reserve space for fixed sidebar */
+      padding: 36px 40px;
+      height: 100vh;
+      overflow-y: auto; /* only main scrolls */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .page-header {
+      margin-bottom: 32px
+    }
+
+    .page-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #fff
+    }
+
+    .page-sub {
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 4px
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 24px
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--gold);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    /* BUTTONS */
+    .btn-save {
+      padding: 11px 24px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, var(--gold), #a07830);
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      font-weight: 700;
+      transition: opacity 0.2s;
+      margin-top: 12px
+    }
+
+    .btn-save:hover {
+      opacity: 0.9
+    }
+
+    .btn-reset {
+      padding: 11px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 12px;
+      margin-left: 10px;
+      font-family: 'Lato', sans-serif
+    }
+
+    .btn-reset:hover {
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.3)
+    }
+
+    .btn-danger {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255, 80, 80, 0.15);
+      color: #ff6b6b;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      transition: all 0.2s;
+      border: 1px solid rgba(255, 80, 80, 0.3)
+    }
+
+    .btn-danger:hover {
+      background: rgba(255, 80, 80, 0.3)
+    }
+
+    .btn-sm {
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(201, 168, 76, 0.15);
+      color: var(--gold);
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Lato', sans-serif;
+      border: 1px solid rgba(201, 168, 76, 0.3)
+    }
+
+    .btn-sm:hover {
+      background: rgba(201, 168, 76, 0.25)
+    }
+
+    .btn-blue {
+      background: linear-gradient(135deg, #3a7bd5, #1a5bb5) !important
+    }
+
+    /* FORMS */
+    .form-group {
+      margin-bottom: 16px
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 8px;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 14px;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      resize: vertical
+    }
+
+    .form-group select option {
+      background: #1e1e1e;
+      color: #fff
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--gold)
+    }
+
+    .form-group textarea {
+      min-height: 90px
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px
+    }
+
+    /* STATS */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px
+    }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: var(--gold)
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 4px
+    }
+
+    /* UPLOAD */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255, 255, 255, 0.02)
+    }
+
+    .upload-area:hover,
+    .upload-area.drag-over {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.07)
+    }
+
+    .upload-icon {
+      font-size: 28px;
+      margin-bottom: 8px
+    }
+
+    .upload-text {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .upload-text strong {
+      color: var(--gold)
+    }
+
+    input[type="file"] {
+      display: none
+    }
+
+    /* PREVIEW */
+    .preview-box {
+      width: 100%;
+      height: 240px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #111;
+      position: relative;
+      margin-bottom: 16px
+    }
+
+    .preview-box .preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .preview-label {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--gold);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 10px;
+      letter-spacing: 1px
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999;
+      background: #1a1a1a;
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      padding: 14px 20px;
+      color: var(--gold);
+      font-size: 14px;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s;
+      max-width: 300px
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    /* GALERI */
+    .galeri-admin-section {
+      margin-top: 22px
+    }
+
+    .galeri-admin-section-title {
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .galeri-admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px
+    }
+
+    .galeri-admin-item {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.2s
+    }
+
+    .galeri-admin-item:hover {
+      border-color: var(--gold)
+    }
+
+    .galeri-admin-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .galeri-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.25s;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 10px
+    }
+
+    .galeri-admin-item:hover .galeri-item-overlay {
+      opacity: 1
+    }
+
+    .galeri-item-actions {
+      display: flex;
+      gap: 6px
+    }
+
+    .btn-item-replace {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 7px;
+      border: none;
+      background: rgba(201, 168, 76, 0.9);
+      color: #000;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .btn-item-delete {
+      padding: 6px 10px;
+      border-radius: 7px;
+      border: none;
+      background: rgba(255, 70, 70, 0.8);
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 700
+    }
+
+    .galeri-item-num {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--muted);
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 6px
+    }
+
+    .galeri-count {
+      background: rgba(201, 168, 76, 0.12);
+      border: 1px solid rgba(201, 168, 76, 0.3);
+      color: var(--gold);
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 20px
+    }
+
+    /* PENGURUS */
+    .pengurus-admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 16px
+    }
+
+    .pengurus-admin-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      transition: border-color 0.2s
+    }
+
+    .pengurus-admin-card:hover {
+      border-color: rgba(201, 168, 76, 0.4)
+    }
+
+    .pengurus-admin-avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      margin: 0 auto 10px;
+      display: block
+    }
+
+    .pengurus-admin-placeholder {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px dashed var(--border);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: rgba(255, 255, 255, 0.02);
+      cursor: pointer
+    }
+
+    .pengurus-admin-placeholder:hover {
+      border-color: var(--gold)
+    }
+
+    .pengurus-admin-jabatan {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 6px;
+      text-transform: uppercase
+    }
+
+    .pengurus-admin-nama {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 8px;
+      font-family: 'Playfair Display', serif
+    }
+
+    .pengurus-admin-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px
+    }
+
+    /* IMAM/MUADZIN TABLE */
+    .jadwal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px
+    }
+
+    .jadwal-table th {
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--gold);
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase
+    }
+
+    .jadwal-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 14px;
+      color: var(--text)
+    }
+
+    .jadwal-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .jadwal-table tr:hover td {
+      background: rgba(255, 255, 255, 0.03)
+    }
+
+    .hari-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.12);
+      border-radius: 6px;
+      padding: 3px 8px;
+      display: inline-block
+    }
+
+    .add-row-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      margin-top: 12px;
+      border: 1px dashed var(--border)
+    }
+
+    .add-row-form input,
+    .add-row-form select {
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: #1e1e1e;
+      border: 1px solid var(--border);
+      color: #fff;
+      font-size: 13px;
+      font-family: 'Lato', sans-serif;
+      outline: none;
+      width: 100%
+    }
+
+    .add-row-form select option {
+      background: #1e1e1e;
+      color: #fff
+    }
+
+    .add-row-form input:focus,
+    .add-row-form select:focus {
+      border-color: var(--gold)
+    }
+
+    .loc-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap
+    }
+
+    .loc-tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-family: 'Lato', sans-serif;
+      transition: all 0.2s
+    }
+
+    .loc-tab:hover,
+    .loc-tab.active {
+      background: rgba(201, 168, 76, 0.15);
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 800;
+      align-items: center;
+      justify-content: center
+    }
+
+    .modal-overlay.open {
+      display: flex
+    }
+
+    .modal {
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 90%;
+      max-width: 480px
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: var(--gold);
+      margin-bottom: 20px
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: flex-end
+    }
+
+    .upload-progress-bar {
+      height: 4px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+      display: none
+    }
+
+    .upload-progress-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s
+    }
+
+    .section-sep {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0
+    }
+
+    @media(max-width:768px) {
+      .stats-row {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .form-row,
+      .form-row-3 {
+        grid-template-columns: 1fr
+      }
+
+      .add-row-form {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px
+      }
+    }
+
     .admin-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
-  overflow: hidden;
-}
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-.admin-table th, .admin-table td {
-  padding: 15px;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
+    .admin-table th,
+    .admin-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
 
-.admin-table th {
-  background: rgba(201, 168, 76, 0.1);
-  color: var(--gold);
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-}
+    .admin-table th {
+      background: rgba(201, 168, 76, 0.1);
+      color: var(--gold);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
 
-.btn-action {
-  background: var(--gold);
-  color: #000;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 0.85rem;
-  transition: 0.3s;
-}
+    .btn-action {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: 0.3s;
+    }
 
-.btn-action:hover {
-  background: #e0c070;
-  transform: translateY(-2px);
-}
+    .btn-action:hover {
+      background: #e0c070;
+      transform: translateY(-2px);
+    }
 
-.badge {
-  background: rgba(46, 204, 113, 0.2);
-  color: #2ecc71;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
+    .badge {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+    }
 
-.badge-secure {
-  background: rgba(52, 152, 219, 0.2);
-  color: #3498db;
-}
+    .badge-secure {
+      background: rgba(52, 152, 219, 0.2);
+      color: #3498db;
+    }
+
+    .media-change-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .media-change-badge:hover {
+      background: var(--gold);
+      color: #000;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+    }
   </style>
 </head>
+
 <body>
 
-<!-- ===== SIDEBAR ===== -->
-<nav class="sidebar">
-  <div class="sidebar-brand">
-    <div class="sidebar-brand-title">Admin Panel</div>
-    <div class="sidebar-brand-sub">MASJID AGUNG SUKABUMI</div>
-  </div>
-  <div class="sidebar-nav">
-    <a href="#dashboard" class="active" onclick="showPage('dashboard',this)">📊 Dashboard</a>
-    <a href="#info"      onclick="showPage('info',this)">🕌 Informasi Masjid</a>
-    <a href="#pengurus"  onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
-    <a href="#imam"      onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
-    <a href="#galeri"    onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
-    <a href="#hero"      onclick="showPage('hero',this)">🌄 Background Hero</a>
-    <!-- <a href="#panorama"  onclick="showPage('panorama',this)">🔄 Foto Panorama</a> -->
-    <a href="#settings"  onclick="showPage('settings',this)">⚙ Pengaturan</a>
-  </div>
-  <div class="sidebar-bottom">
-    <a href="../index.html">← Lihat Website</a>
-    <a href="#" onclick="doLogout()">🚪 Logout</a>
-  </div>
-</nav>
-
-<!-- ===== MAIN CONTENT ===== -->
-<main class="main">
-
-  <!-- DASHBOARD -->
-  <div id="page-dashboard">
-    <div class="page-header">
-      <div class="page-title">Dashboard</div>
-      <div class="page-sub">Selamat datang di panel admin Masjid Agung Sukabumi</div>
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-title">Admin Panel</div>
+      <div class="sidebar-brand-sub">MASJID AGUNG SUKABUMI</div>
     </div>
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-num" id="statGaleri">0</div>
-        <div class="stat-label">Foto Galeri</div>
+    <div class="sidebar-nav">
+      <a href="#dashboard" class="active" onclick="showPage('dashboard',this)">📊 Dashboard</a>
+      <a href="#info" onclick="showPage('info',this)">🕌 Informasi Masjid</a>
+      <a href="#pengurus" onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
+      <a href="#imam" onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
+      <a href="#galeri" onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
+      <a href="#event" onclick="showPage('event',this)">📅 Kelola Kegiatan</a>
+      <a href="#hero" onclick="showPage('hero',this)">🌄 Background Hero</a>
+      <!-- <a href="#panorama"  onclick="showPage('panorama',this)">🔄 Foto Panorama</a> -->
+      <a href="#settings" onclick="showPage('settings',this)">⚙ Pengaturan</a>
+    </div>
+    <div class="sidebar-bottom">
+      <a href="../index.html">← Lihat Website</a>
+      <a href="#" onclick="doLogout()">🚪 Logout</a>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Selamat datang di panel admin Masjid Agung Sukabumi</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statPengurus">0</div>
-        <div class="stat-label">Profil Pengurus</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="statGaleri">0</div>
+          <div class="stat-label">Foto Galeri</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statPengurus">0</div>
+          <div class="stat-label">Profil Pengurus</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statImam">0</div>
+          <div class="stat-label">Data Imam</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statMuadzin">0</div>
+          <div class="stat-label">Data Muadzin</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statImam">0</div>
-        <div class="stat-label">Data Imam</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="statMuadzin">0</div>
-        <div class="stat-label">Data Muadzin</div>
+      <div class="card">
+        <div class="quick-actions">
+          <div class="card-header">
+            <h2 style="font-family:'Playfair Display',serif;color:var(--gold);">🚀 Status & Kendali Admin</h2>
+            <div id="adminClock"></div>
+          </div>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Aksi Cepat</th>
+                <th>Status Sistem</th>
+                <th>Terakhir Update</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><button class="btn-action" onclick="showPage('panorama',null)">📸 Kelola Panorama</button></td>
+                <td><span class="badge">Ready</span></td>
+                <td class="last-updated">Memuat...</td>
+              </tr>
+              <tr>
+                <td><button class="btn-action" onclick="showPage('settings',null)">🔐 Ganti Password</button></td>
+                <td><span class="badge badge-secure">Secure</span></td>
+                <td class="last-updated">Memuat...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-    <div class="card">
-      <div class="quick-actions">
-        <div class="card-header">
-          <h2 style="font-family:'Playfair Display',serif;color:var(--gold);">🚀 Status & Kendali Admin</h2>
-          <div id="adminClock"></div>
+
+    <!-- INFORMASI MASJID -->
+    <div id="page-info" style="display:none">
+      <div class="page-header">
+        <div class="page-title">🕌 Informasi Masjid</div>
+        <div class="page-sub">Edit teks penjelasan, statistik, dan fitur yang tampil di beranda</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Deskripsi Utama</div>
+        <div class="form-group">
+          <label>Judul Bagian Tentang</label>
+          <input type="text" id="infoJudul" placeholder="Tentang Masjid Agung Sukabumi" />
+        </div>
+        <div class="form-group">
+          <label>Deskripsi (pisahkan paragraf dengan baris kosong)</label>
+          <textarea id="infoDeskripsi" style="min-height:160px" placeholder="Tulis deskripsi masjid..."></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Statistik Masjid</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Kapasitas Jamaah</label>
+            <input type="text" id="infoKapasitas" placeholder="5.000+" />
+          </div>
+          <div class="form-group">
+            <label>Tahun Berdiri</label>
+            <input type="text" id="infoBerdiri" placeholder="1960" />
+          </div>
+          <div class="form-group">
+            <label>Luas Area</label>
+            <input type="text" id="infoLuas" placeholder="12.000 m²" />
+          </div>
+          <div class="form-group">
+            <label>Jumlah Menara</label>
+            <input type="text" id="infoMenara" placeholder="2" />
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Fitur / Fasilitas Masjid</div>
+        <div id="fiturList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
+        <button class="btn-sm" onclick="addFiturRow()">+ Tambah Fitur</button>
+        <hr class="section-sep" />
+        <button class="btn-save" onclick="saveInfoMasjid()">💾 Simpan Informasi Masjid</button>
+      </div>
+    </div>
+
+    <!-- PROFIL PENGURUS -->
+    <div id="page-pengurus" style="display:none">
+      <div class="page-header">
+        <div class="page-title">👥 Profil Pengurus</div>
+        <div class="page-sub">Kelola profil pengurus BKM Masjid Agung Sukabumi — tampil sebagai slider di beranda</div>
+      </div>
+      <div class="card">
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div class="card-title" style="margin-bottom:0">Daftar Pengurus</div>
+          <button class="btn-save" style="margin-top:0" onclick="openPengurusModal()">+ Tambah Pengurus</button>
+        </div>
+        <div class="pengurus-admin-grid" id="pengurusAdminGrid">
+          <div style="color:var(--muted);font-size:13px;padding:20px">Belum ada data pengurus.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAM & MUADZIN -->
+    <div id="page-imam" style="display:none">
+      <div class="page-header">
+        <div class="page-title">🎙️ Imam & Muadzin Harian</div>
+        <div class="page-sub">Atur jadwal imam dan muadzin yang tampil di beranda</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎙️ Imam Harian</div>
+        <table class="jadwal-table">
+          <thead>
+            <tr>
+              <th>Hari</th>
+              <th>Nama Imam</th>
+              <th>Keterangan</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="imamTableBody"></tbody>
+        </table>
+        <div class="add-row-form" id="addImamForm">
+          <div class="form-group" style="margin:0">
+            <label>Hari</label>
+            <select id="addImamHari">
+              <option>Senin</option>
+              <option>Selasa</option>
+              <option>Rabu</option>
+              <option>Kamis</option>
+              <option>Jumat</option>
+              <option>Sabtu</option>
+              <option>Minggu</option>
+              <option>Senin-Kamis</option>
+              <option>Setiap Hari</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Nama Imam</label>
+            <input type="text" id="addImamNama" placeholder="H. Ahmad Fauzi" />
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Keterangan (opsional)</label>
+            <input type="text" id="addImamKet" placeholder="Imam Rawatib" />
+          </div>
+          <div style="padding-bottom:0">
+            <button class="btn-save" style="margin-top:0" onclick="addImamRow()">+ Tambah</button>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📢 Muadzin Harian</div>
+        <table class="jadwal-table">
+          <thead>
+            <tr>
+              <th>Hari</th>
+              <th>Nama Muadzin</th>
+              <th>Keterangan</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="muadzinTableBody"></tbody>
+        </table>
+        <div class="add-row-form">
+          <div class="form-group" style="margin:0">
+            <label>Hari</label>
+            <select id="addMuadzinHari">
+              <option>Senin</option>
+              <option>Selasa</option>
+              <option>Rabu</option>
+              <option>Kamis</option>
+              <option>Jumat</option>
+              <option>Sabtu</option>
+              <option>Minggu</option>
+              <option>Senin-Kamis</option>
+              <option>Setiap Hari</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Nama Muadzin</label>
+            <input type="text" id="addMuadzinNama" placeholder="M. Ridwan" />
+          </div>
+          <div class="form-group" style="margin:0">
+            <label>Keterangan (opsional)</label>
+            <input type="text" id="addMuadzinKet" placeholder="Muadzin Tetap" />
+          </div>
+          <div>
+            <button class="btn-save" style="margin-top:0" onclick="addMuadzinRow()">+ Tambah</button>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALERI -->
+    <div id="page-galeri" style="display:none">
+      <div class="page-header">
+        <div class="page-title">🖼️ Kelola Galeri Foto</div>
+        <div class="page-sub">Tambah, ganti, dan hapus foto galeri publik</div>
+      </div>
+      <div class="card">
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="card-title" style="margin-bottom:0">Foto Galeri</div>
+            <div class="galeri-count" id="galeriCount">0 foto</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="triggerAddGaleri('luar')">+ Tambah
+              Foto Bagian Luar</button>
+            <button class="btn-save btn-blue" style="margin-top:0;padding:9px 18px"
+              onclick="triggerBulkGaleri('luar')">+ Upload Banyak (Luar)</button>
+            <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="triggerAddGaleri('dalam')">+ Tambah
+              Foto Bagian Dalam</button>
+            <button class="btn-save btn-blue" style="margin-top:0;padding:9px 18px"
+              onclick="triggerBulkGaleri('dalam')">+ Upload Banyak (Dalam)</button>
+            <button class="btn-reset" style="margin-top:0;padding:9px 16px" onclick="confirmClearGaleri()">🗑 Hapus
+              Semua</button>
+          </div>
+        </div>
+        <input type="file" id="galeriAddInput" accept="image/*"
+          onchange="addGaleriFiles(this.files, window.activeGaleriUploadKategori)" />
+        <input type="file" id="galeriBulkInput" accept="image/*" multiple
+          onchange="addGaleriFiles(this.files, window.activeGaleriUploadKategori)" />
+        <input type="file" id="galeriReplaceInput" accept="image/*" onchange="replaceGaleriFile(this.files[0])" />
+        <div class="upload-area" id="galeriDropZone" onclick="document.getElementById('galeriBulkInput').click()"
+          style="margin-bottom:20px">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text"><strong>Drag & drop atau klik untuk pilih foto</strong> (kategori aktif: <span
+              id="galeriKategoriAktifText">Foto bagian luar</span>)</div>
+          <div class="upload-progress-bar" id="galeriProgress">
+            <div class="upload-progress-fill" id="galeriProgressFill"></div>
+          </div>
+        </div>
+        <div class="galeri-admin-section">
+          <div class="galeri-admin-section-title">
+            <span>Foto bagian luar</span>
+            <span id="galeriCountLuar">0 foto</span>
+          </div>
+          <div class="galeri-admin-grid" id="galeriAdminGridLuar"></div>
+        </div>
+        <div class="galeri-admin-section">
+          <div class="galeri-admin-section-title">
+            <span>Foto bagian dalam</span>
+            <span id="galeriCountDalam">0 foto</span>
+          </div>
+          <div class="galeri-admin-grid" id="galeriAdminGridDalam"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERO -->
+    <div id="page-hero" style="display:none">
+      <div class="page-header">
+        <div class="page-title">🌄 Background Hero</div>
+        <div class="page-sub">Ganti foto 360° di halaman depan website</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Preview Background</div>
+        <div class="preview-box">
+          <img id="heroPreviewImg" class="preview-img" src="../images/hero-360.png" alt="Hero" />
+          <div class="preview-label">HERO PANORAMA</div>
+        </div>
+        <div class="upload-area" id="heroUploadArea" onclick="document.getElementById('heroFileInput').click()">
+          <div class="upload-icon">📷</div>
+          <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop foto 360° di sini</div>
+        </div>
+        <input type="file" id="heroFileInput" accept="image/*" />
+        <br />
+        <button class="btn-save" onclick="saveHeroBg()">💾 Simpan Background</button>
+        <button class="btn-reset" onclick="resetHeroBg()">↩ Reset Default</button>
+      </div>
+    </div>
+
+    <!-- PANORAMA -->
+    <div id="page-panorama" style="display:none">
+      <div class="page-header">
+        <div class="page-title">🔄 Foto Panorama Virtual Tour</div>
+        <div class="page-sub">Upload foto 360° untuk setiap lokasi virtual tour</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pilih Lokasi</div>
+        <div class="loc-tabs">
+          <button class="loc-tab active" onclick="selectPanoLoc(0,this)">🕌 Ruang Utama</button>
+          <button class="loc-tab" onclick="selectPanoLoc(1,this)">🏛️ Aula & Selasar</button>
+          <button class="loc-tab" onclick="selectPanoLoc(2,this)">🌿 Halaman & Taman</button>
+          <button class="loc-tab" onclick="selectPanoLoc(3,this)">🔔 Menara & Kubah</button>
+        </div>
+        <div id="panoPreviewBox" class="preview-box" style="height:280px;margin-bottom:16px"></div>
+        <div class="upload-area" id="panoUploadArea" onclick="document.getElementById('panoFileInput').click()">
+          <div class="upload-icon">🌐</div>
+          <div class="upload-text"><strong>Upload foto equirectangular 360°</strong> untuk lokasi ini</div>
+        </div>
+        <input type="file" id="panoFileInput" accept="image/*" />
+        <br />
+        <button class="btn-save" onclick="savePano()">💾 Simpan Foto Lokasi Ini</button>
+        <button class="btn-reset" onclick="resetPano()">↩ Reset Default</button>
+      </div>
+    </div>
+
+    <!-- EVENT -->
+    <div id="page-event" style="display:none">
+      <div class="page-header">
+        <div class="page-title">📅 Kelola Kegiatan</div>
+        <div class="page-sub">Kelola kegiatan mendatang</div>
+      </div>
+      <div class="card">
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div class="card-title" style="margin-bottom:0">Daftar Event</div>
+          <button class="btn-save" style="margin-top:0" onclick="openEventModal()">+ Tambah Event</button>
         </div>
         <table class="admin-table">
           <thead>
             <tr>
-              <th>Aksi Cepat</th>
-              <th>Status Sistem</th>
-              <th>Terakhir Update</th>
+              <th>Media</th>
+              <th>Judul Event</th>
+              <th>Tanggal</th>
+              <th>Deskripsi / Info</th>
+              <th>Aksi</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="eventAdminTableBody">
             <tr>
-              <td><button class="btn-action" onclick="showPage('panorama',null)">📸 Kelola Panorama</button></td>
-              <td><span class="badge">Ready</span></td>
-              <td class="last-updated">Memuat...</td>
-            </tr>
-            <tr>
-              <td><button class="btn-action" onclick="showPage('settings',null)">🔐 Ganti Password</button></td>
-              <td><span class="badge badge-secure">Secure</span></td>
-              <td class="last-updated">Memuat...</td>
+              <td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data event.</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-  </div>
 
-  <!-- INFORMASI MASJID -->
-  <div id="page-info" style="display:none">
-    <div class="page-header">
-      <div class="page-title">🕌 Informasi Masjid</div>
-      <div class="page-sub">Edit teks penjelasan, statistik, dan fitur yang tampil di beranda</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Deskripsi Utama</div>
-      <div class="form-group">
-        <label>Judul Bagian Tentang</label>
-        <input type="text" id="infoJudul" placeholder="Tentang Masjid Agung Sukabumi"/>
+    <!-- SETTINGS -->
+    <div id="page-settings" style="display:none">
+      <div class="page-header">
+        <div class="page-title">⚙ Pengaturan</div>
+        <div class="page-sub">Konfigurasi akun dan sistem</div>
       </div>
-      <div class="form-group">
-        <label>Deskripsi (pisahkan paragraf dengan baris kosong)</label>
-        <textarea id="infoDeskripsi" style="min-height:160px" placeholder="Tulis deskripsi masjid..."></textarea>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">Statistik Masjid</div>
-      <div class="form-row">
+      <div class="card">
+        <div class="card-title">Ganti Kredensial Admin</div>
         <div class="form-group">
-          <label>Kapasitas Jamaah</label>
-          <input type="text" id="infoKapasitas" placeholder="5.000+"/>
+          <label>Username Baru</label>
+          <input type="text" id="newUser" placeholder="Masukkan username baru" />
         </div>
         <div class="form-group">
-          <label>Tahun Berdiri</label>
-          <input type="text" id="infoBerdiri" placeholder="1960"/>
+          <label>Password Baru</label>
+          <input type="password" id="newPass" placeholder="Masukkan password baru" />
         </div>
         <div class="form-group">
-          <label>Luas Area</label>
-          <input type="text" id="infoLuas" placeholder="12.000 m²"/>
+          <label>Konfirmasi Password</label>
+          <input type="password" id="confPass" placeholder="Ulangi password baru" />
         </div>
-        <div class="form-group">
-          <label>Jumlah Menara</label>
-          <input type="text" id="infoMenara" placeholder="2"/>
-        </div>
+        <button class="btn-save" onclick="saveCredentials()">💾 Simpan Kredensial</button>
       </div>
     </div>
-    <div class="card">
-      <div class="card-title">Fitur / Fasilitas Masjid</div>
-      <div id="fiturList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px"></div>
-      <button class="btn-sm" onclick="addFiturRow()">+ Tambah Fitur</button>
-      <hr class="section-sep"/>
-      <button class="btn-save" onclick="saveInfoMasjid()">💾 Simpan Informasi Masjid</button>
-    </div>
-  </div>
 
-  <!-- PROFIL PENGURUS -->
-  <div id="page-pengurus" style="display:none">
-    <div class="page-header">
-      <div class="page-title">👥 Profil Pengurus</div>
-      <div class="page-sub">Kelola profil pengurus BKM Masjid Agung Sukabumi — tampil sebagai slider di beranda</div>
-    </div>
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div class="card-title" style="margin-bottom:0">Daftar Pengurus</div>
-        <button class="btn-save" style="margin-top:0" onclick="openPengurusModal()">+ Tambah Pengurus</button>
-      </div>
-      <div class="pengurus-admin-grid" id="pengurusAdminGrid">
-        <div style="color:var(--muted);font-size:13px;padding:20px">Belum ada data pengurus.</div>
-      </div>
-    </div>
-  </div>
+  </main>
 
-  <!-- IMAM & MUADZIN -->
-  <div id="page-imam" style="display:none">
-    <div class="page-header">
-      <div class="page-title">🎙️ Imam & Muadzin Harian</div>
-      <div class="page-sub">Atur jadwal imam dan muadzin yang tampil di beranda</div>
-    </div>
-    <div class="card">
-      <div class="card-title">🎙️ Imam Harian</div>
-      <table class="jadwal-table">
-        <thead>
-          <tr><th>Hari</th><th>Nama Imam</th><th>Keterangan</th><th></th></tr>
-        </thead>
-        <tbody id="imamTableBody"></tbody>
-      </table>
-      <div class="add-row-form" id="addImamForm">
-        <div class="form-group" style="margin:0">
-          <label>Hari</label>
-          <select id="addImamHari">
-            <option>Senin</option><option>Selasa</option><option>Rabu</option>
-            <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
-            <option>Senin-Kamis</option><option>Setiap Hari</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin:0">
-          <label>Nama Imam</label>
-          <input type="text" id="addImamNama" placeholder="H. Ahmad Fauzi"/>
-        </div>
-        <div class="form-group" style="margin:0">
-          <label>Keterangan (opsional)</label>
-          <input type="text" id="addImamKet" placeholder="Imam Rawatib"/>
-        </div>
-        <div style="padding-bottom:0">
-          <button class="btn-save" style="margin-top:0" onclick="addImamRow()">+ Tambah</button>
-        </div>
-      </div>
-      <div style="margin-top:16px">
-        <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">📢 Muadzin Harian</div>
-      <table class="jadwal-table">
-        <thead>
-          <tr><th>Hari</th><th>Nama Muadzin</th><th>Keterangan</th><th></th></tr>
-        </thead>
-        <tbody id="muadzinTableBody"></tbody>
-      </table>
-      <div class="add-row-form">
-        <div class="form-group" style="margin:0">
-          <label>Hari</label>
-          <select id="addMuadzinHari">
-            <option>Senin</option><option>Selasa</option><option>Rabu</option>
-            <option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option>
-            <option>Senin-Kamis</option><option>Setiap Hari</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin:0">
-          <label>Nama Muadzin</label>
-          <input type="text" id="addMuadzinNama" placeholder="M. Ridwan"/>
-        </div>
-        <div class="form-group" style="margin:0">
-          <label>Keterangan (opsional)</label>
-          <input type="text" id="addMuadzinKet" placeholder="Muadzin Tetap"/>
-        </div>
-        <div>
-          <button class="btn-save" style="margin-top:0" onclick="addMuadzinRow()">+ Tambah</button>
-        </div>
-      </div>
-      <div style="margin-top:16px">
-        <button class="btn-save" onclick="saveImamMuadzin()">💾 Simpan Jadwal</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- GALERI -->
-  <div id="page-galeri" style="display:none">
-    <div class="page-header">
-      <div class="page-title">🖼️ Kelola Galeri Foto</div>
-      <div class="page-sub">Tambah, ganti, dan hapus foto galeri publik</div>
-    </div>
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="card-title" style="margin-bottom:0">Foto Galeri</div>
-          <div class="galeri-count" id="galeriCount">0 foto</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="triggerAddGaleri('luar')">+ Tambah Foto Bagian Luar</button>
-          <button class="btn-save btn-blue" style="margin-top:0;padding:9px 18px" onclick="triggerBulkGaleri('luar')">+ Upload Banyak (Luar)</button>
-          <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="triggerAddGaleri('dalam')">+ Tambah Foto Bagian Dalam</button>
-          <button class="btn-save btn-blue" style="margin-top:0;padding:9px 18px" onclick="triggerBulkGaleri('dalam')">+ Upload Banyak (Dalam)</button>
-          <button class="btn-reset" style="margin-top:0;padding:9px 16px" onclick="confirmClearGaleri()">🗑 Hapus Semua</button>
-        </div>
-      </div>
-      <input type="file" id="galeriAddInput" accept="image/*" onchange="addGaleriFiles(this.files, window.activeGaleriUploadKategori)"/>
-      <input type="file" id="galeriBulkInput" accept="image/*" multiple onchange="addGaleriFiles(this.files, window.activeGaleriUploadKategori)"/>
-      <input type="file" id="galeriReplaceInput" accept="image/*" onchange="replaceGaleriFile(this.files[0])"/>
-      <div class="upload-area" id="galeriDropZone" onclick="document.getElementById('galeriBulkInput').click()" style="margin-bottom:20px">
-        <div class="upload-icon">🖼️</div>
-        <div class="upload-text"><strong>Drag & drop atau klik untuk pilih foto</strong> (kategori aktif: <span id="galeriKategoriAktifText">Foto bagian luar</span>)</div>
-        <div class="upload-progress-bar" id="galeriProgress"><div class="upload-progress-fill" id="galeriProgressFill"></div></div>
-      </div>
-      <div class="galeri-admin-section">
-        <div class="galeri-admin-section-title">
-          <span>Foto bagian luar</span>
-          <span id="galeriCountLuar">0 foto</span>
-        </div>
-        <div class="galeri-admin-grid" id="galeriAdminGridLuar"></div>
-      </div>
-      <div class="galeri-admin-section">
-        <div class="galeri-admin-section-title">
-          <span>Foto bagian dalam</span>
-          <span id="galeriCountDalam">0 foto</span>
-        </div>
-        <div class="galeri-admin-grid" id="galeriAdminGridDalam"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HERO -->
-  <div id="page-hero" style="display:none">
-    <div class="page-header">
-      <div class="page-title">🌄 Background Hero</div>
-      <div class="page-sub">Ganti foto 360° di halaman depan website</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Preview Background</div>
-      <div class="preview-box">
-        <img id="heroPreviewImg" class="preview-img" src="../images/hero-360.png" alt="Hero"/>
-        <div class="preview-label">HERO PANORAMA</div>
-      </div>
-      <div class="upload-area" id="heroUploadArea" onclick="document.getElementById('heroFileInput').click()">
-        <div class="upload-icon">📷</div>
-        <div class="upload-text"><strong>Klik untuk upload</strong> atau drag & drop foto 360° di sini</div>
-      </div>
-      <input type="file" id="heroFileInput" accept="image/*"/>
-      <br/>
-      <button class="btn-save" onclick="saveHeroBg()">💾 Simpan Background</button>
-      <button class="btn-reset" onclick="resetHeroBg()">↩ Reset Default</button>
-    </div>
-  </div>
-
-  <!-- PANORAMA -->
-  <div id="page-panorama" style="display:none">
-    <div class="page-header">
-      <div class="page-title">🔄 Foto Panorama Virtual Tour</div>
-      <div class="page-sub">Upload foto 360° untuk setiap lokasi virtual tour</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Pilih Lokasi</div>
-      <div class="loc-tabs">
-        <button class="loc-tab active" onclick="selectPanoLoc(0,this)">🕌 Ruang Utama</button>
-        <button class="loc-tab" onclick="selectPanoLoc(1,this)">🏛️ Aula & Selasar</button>
-        <button class="loc-tab" onclick="selectPanoLoc(2,this)">🌿 Halaman & Taman</button>
-        <button class="loc-tab" onclick="selectPanoLoc(3,this)">🔔 Menara & Kubah</button>
-      </div>
-      <div id="panoPreviewBox" class="preview-box" style="height:280px;margin-bottom:16px"></div>
-      <div class="upload-area" id="panoUploadArea" onclick="document.getElementById('panoFileInput').click()">
-        <div class="upload-icon">🌐</div>
-        <div class="upload-text"><strong>Upload foto equirectangular 360°</strong> untuk lokasi ini</div>
-      </div>
-      <input type="file" id="panoFileInput" accept="image/*"/>
-      <br/>
-      <button class="btn-save" onclick="savePano()">💾 Simpan Foto Lokasi Ini</button>
-      <button class="btn-reset" onclick="resetPano()">↩ Reset Default</button>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div id="page-settings" style="display:none">
-    <div class="page-header">
-      <div class="page-title">⚙ Pengaturan</div>
-      <div class="page-sub">Konfigurasi akun dan sistem</div>
-    </div>
-    <div class="card">
-      <div class="card-title">Ganti Kredensial Admin</div>
-      <div class="form-group">
-        <label>Username Baru</label>
-        <input type="text" id="newUser" placeholder="Masukkan username baru"/>
+  <!-- ===== MODAL TAMBAH/EDIT PENGURUS ===== -->
+  <div class="modal-overlay" id="pengurusModal">
+    <div class="modal">
+      <div class="modal-title" id="pengurusModalTitle">Tambah Pengurus</div>
+      <div style="text-align:center;margin-bottom:16px">
+        <div id="pengurusAvatarPreview" class="pengurus-admin-placeholder"
+          onclick="document.getElementById('pengurusFotoInput').click()" style="margin:0 auto 8px">👤</div>
+        <input type="file" id="pengurusFotoInput" accept="image/*" onchange="previewPengurusFoto(this.files[0])" />
+        <div style="font-size:12px;color:var(--muted)">Klik foto untuk upload gambar</div>
       </div>
       <div class="form-group">
-        <label>Password Baru</label>
-        <input type="password" id="newPass" placeholder="Masukkan password baru"/>
+        <label>Nama Lengkap *</label>
+        <input type="text" id="pengurusNama" placeholder="H. Ahmad Fauzi" />
       </div>
       <div class="form-group">
-        <label>Konfirmasi Password</label>
-        <input type="password" id="confPass" placeholder="Ulangi password baru"/>
+        <label>Jabatan *</label>
+        <input type="text" id="pengurusJabatan" placeholder="Ketua BKM" />
       </div>
-      <button class="btn-save" onclick="saveCredentials()">💾 Simpan Kredensial</button>
+      <div class="form-group">
+        <label>Periode Jabatan</label>
+        <input type="text" id="pengurusPeriode" placeholder="2022 - 2027" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-reset" style="margin:0" onclick="closePengurusModal()">Batal</button>
+        <button class="btn-save" style="margin:0" onclick="savePengurus()">💾 Simpan</button>
+      </div>
     </div>
   </div>
 
-</main>
+  <!-- ===== MODAL TAMBAH/EDIT EVENT ===== -->
+  <div class="modal-overlay" id="eventModal">
+    <div class="modal" style="max-width:800px">
+      <div class="modal-title" id="eventModalTitle">Tambah Event</div>
 
-<!-- ===== MODAL TAMBAH/EDIT PENGURUS ===== -->
-<div class="modal-overlay" id="pengurusModal">
-  <div class="modal">
-    <div class="modal-title" id="pengurusModalTitle">Tambah Pengurus</div>
-    <div style="text-align:center;margin-bottom:16px">
-      <div id="pengurusAvatarPreview"
-           class="pengurus-admin-placeholder"
-           onclick="document.getElementById('pengurusFotoInput').click()"
-           style="margin:0 auto 8px">👤</div>
-      <input type="file" id="pengurusFotoInput" accept="image/*" onchange="previewPengurusFoto(this.files[0])"/>
-      <div style="font-size:12px;color:var(--muted)">Klik foto untuk upload gambar</div>
-    </div>
-    <div class="form-group">
-      <label>Nama Lengkap *</label>
-      <input type="text" id="pengurusNama" placeholder="H. Ahmad Fauzi"/>
-    </div>
-    <div class="form-group">
-      <label>Jabatan *</label>
-      <input type="text" id="pengurusJabatan" placeholder="Ketua BKM"/>
-    </div>
-    <div class="form-group">
-      <label>Periode Jabatan</label>
-      <input type="text" id="pengurusPeriode" placeholder="2022 - 2027"/>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-reset" style="margin:0" onclick="closePengurusModal()">Batal</button>
-      <button class="btn-save"  style="margin:0" onclick="savePengurus()">💾 Simpan</button>
+      <div class="form-group">
+        <label>Foto Event *</label>
+        <div id="eventMediaPreview" class="preview-box upload-area"
+          onclick="document.getElementById('eventMediaInput').click()"
+          style="height:300px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;background:#1e1e1e;border:1px dashed var(--border);border-radius:10px;overflow:hidden;cursor:pointer;flex-direction:column;gap:8px;position:relative;">
+          <span style="color:var(--muted)">Belum ada media dipilih</span>
+          <span style="font-size:12px;color:var(--gold)">📁 Klik atau Drag & Drop file di sini</span>
+        </div>
+        <input type="file" id="eventMediaInput" accept="image/*" onchange="previewEventMedia(this.files[0])"
+          style="display:none" />
+      </div>
+
+      <div class="form-group">
+        <label>Judul Event *</label>
+        <input type="text" id="eventJudul" placeholder="Kajian Akbar Menyambut Ramadhan" />
+      </div>
+
+      <div class="form-group">
+        <label>Tanggal Event / Pelaksanaan *</label>
+        <input type="date" id="eventTanggal" />
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi & Informasi Event *</label>
+        <textarea id="eventDeskripsi" style="min-height:100px" placeholder="Tuliskan info lengkap acara..."></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-reset" style="margin:0" onclick="closeEventModal()">Batal</button>
+        <button class="btn-save" style="margin:0" onclick="saveEvent()">💾 Simpan</button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- ===== TOAST ===== -->
-<div class="toast" id="toast"></div>
+  <!-- ===== CONFIRM DELETE MODAL ===== -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal">
+      <div class="modal-title">Konfirmasi Hapus</div>
+      <div class="confirm-message" id="confirmMessage">Apakah Anda yakin ingin menghapus?</div>
+      <div class="modal-footer">
+        <button class="btn-reset" style="margin:0" onclick="closeConfirmModal()">Batal</button>
+        <button class="btn-danger" style="margin:0" id="confirmActionButton">Hapus</button>
+      </div>
+    </div>
+  </div>
 
-<!-- ===== SCRIPTS ===== -->
-<script type="module" src="../js/app.js"></script>
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script type="module" src="../js/app.js"></script>
 </body>
+
 </html>

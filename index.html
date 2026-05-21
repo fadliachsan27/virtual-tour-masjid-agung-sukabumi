@@ -1,824 +1,1182 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Masjid Agung Sukabumi - Virtual Tour</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
   <style>
     /* ===== TENTANG MASJID ===== */
-    .tentang-section { padding: 80px 0; background: var(--bg); }
-    .tentang-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
-    .tentang-text .section-badge { display: inline-block; font-size: 11px; letter-spacing: 3px; color: var(--gold); border: 1px solid var(--gold); padding: 5px 14px; border-radius: 20px; margin-bottom: 18px; }
-    .tentang-text h2 { font-family: 'Playfair Display', serif; font-size: 34px; color: var(--text); line-height: 1.3; margin-bottom: 20px; }
-    .tentang-text p { color: var(--text-muted); font-size: 15px; line-height: 1.9; margin-bottom: 14px; }
-    .tentang-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 30px; }
-    .tentang-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
-    .tentang-stat-num { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--gold); }
-    .tentang-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-    .tentang-features { display: flex; flex-direction: column; gap: 14px; }
-    .tentang-feature { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; display: flex; align-items: flex-start; gap: 16px; }
-    .tentang-feature-icon { font-size: 26px; flex-shrink: 0; }
-    .tentang-feature-title { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); margin-bottom: 5px; font-weight: 700; }
-    .tentang-feature-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+    .tentang-section {
+      padding: 80px 0;
+      background: var(--bg);
+    }
+
+    .tentang-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .tentang-text .section-badge {
+      display: inline-block;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+
+    .tentang-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px;
+      color: var(--text);
+      line-height: 1.3;
+      margin-bottom: 20px;
+    }
+
+    .tentang-text p {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.9;
+      margin-bottom: 14px;
+    }
+
+    .tentang-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .tentang-stat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .tentang-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: var(--gold);
+    }
+
+    .tentang-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .tentang-features {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .tentang-feature {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .tentang-feature-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .tentang-feature-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 5px;
+      font-weight: 700;
+    }
+
+    .tentang-feature-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
 
     /* ===== PROFIL PENGURUS SLIDER ===== */
-    .pengurus-section { padding: 80px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    body.dark .pengurus-section { background: rgba(255,255,255,0.02); }
-    .pengurus-slider-wrap { position: relative; margin-top: 40px; }
-    .pengurus-slider { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-    .pengurus-slider::-webkit-scrollbar { height: 4px; }
-    .pengurus-slider::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
-    .pengurus-slider::-webkit-scrollbar-track { background: var(--border); border-radius: 2px; }
-    .pengurus-card { flex: 0 0 220px; scroll-snap-align: start; background: var(--bg); border: 1px solid var(--border); border-radius: 18px; padding: 28px 20px 22px; text-align: center; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; }
-    body.dark .pengurus-card { background: rgba(255,255,255,0.04); }
-    .pengurus-card:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 12px 30px rgba(201,168,76,0.12); }
-    .pengurus-avatar { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); margin: 0 auto 14px; display: block; background: var(--border); }
-    .pengurus-avatar-placeholder { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--border); margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: var(--surface); }
-    .pengurus-jabatan { font-size: 10px; letter-spacing: 2px; color: var(--gold); background: rgba(201,168,76,0.12); border-radius: 20px; padding: 3px 10px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; }
-    .pengurus-nama { font-family: 'Playfair Display', serif; font-size: 16px; color: var(--text); margin-bottom: 6px; }
-    .pengurus-periode { font-size: 12px; color: var(--text-muted); }
-    .slider-nav { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .slider-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .slider-btn:hover { border-color: var(--gold); color: var(--gold); }
-    .pengurus-empty { text-align: center; padding: 50px 20px; color: var(--text-muted); width: 100%; }
-    .pengurus-empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .pengurus-section {
+      padding: 80px 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    body.dark .pengurus-section {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .pengurus-slider-wrap {
+      position: relative;
+      margin-top: 40px;
+    }
+
+    .pengurus-slider {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 16px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .pengurus-slider::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .pengurus-slider::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    .pengurus-slider::-webkit-scrollbar-track {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .pengurus-card {
+      flex: 0 0 220px;
+      scroll-snap-align: start;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 20px 22px;
+      text-align: center;
+      transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+
+    body.dark .pengurus-card {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .pengurus-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(201, 168, 76, 0.12);
+    }
+
+    .pengurus-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold);
+      margin: 0 auto 14px;
+      display: block;
+      background: var(--border);
+    }
+
+    .pengurus-avatar-placeholder {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      border: 3px solid var(--border);
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      background: var(--surface);
+    }
+
+    .pengurus-jabatan {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.12);
+      border-radius: 20px;
+      padding: 3px 10px;
+      display: inline-block;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .pengurus-nama {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .pengurus-periode {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .slider-nav {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .slider-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .slider-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .pengurus-empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-muted);
+      width: 100%;
+    }
+
+    .pengurus-empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
 
     /* ===== IMAM & MUADZIN ===== */
-    .imam-section { padding: 80px 0; background: var(--bg); }
-    .imam-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; }
-    .imam-group { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 24px 26px; }
-    .imam-group-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
-    .imam-group-icon { font-size: 22px; }
-    .imam-group-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--text); }
-    .imam-list { display: flex; flex-direction: column; gap: 12px; }
-    .imam-item { display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; transition: border-color 0.2s; }
-    body.dark .imam-item { background: rgba(255,255,255,0.03); }
-    .imam-item:hover { border-color: rgba(201,168,76,0.4); }
-    .imam-hari-badge { flex-shrink: 0; min-width: 76px; font-size: 11px; font-weight: 700; color: var(--gold); background: rgba(201,168,76,0.12); border-radius: 8px; padding: 5px 8px; text-align: center; letter-spacing: 0.5px; }
-    .imam-nama-col { flex: 1; }
-    .imam-nama { font-size: 14px; color: var(--text); font-weight: 600; }
-    .imam-keterangan { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .imam-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: 13px; }
-    .imam-empty-icon { font-size: 28px; margin-bottom: 8px; }
+    .imam-section {
+      padding: 80px 0;
+      background: var(--bg);
+    }
+
+    .imam-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 36px;
+    }
+
+    .imam-group {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 26px;
+    }
+
+    .imam-group-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .imam-group-icon {
+      font-size: 22px;
+    }
+
+    .imam-group-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .imam-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .imam-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.2s;
+    }
+
+    body.dark .imam-item {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .imam-item:hover {
+      border-color: rgba(201, 168, 76, 0.4);
+    }
+
+    .imam-hari-badge {
+      flex-shrink: 0;
+      min-width: 76px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(201, 168, 76, 0.12);
+      border-radius: 8px;
+      padding: 5px 8px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .imam-nama-col {
+      flex: 1;
+    }
+
+    .imam-nama {
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .imam-keterangan {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .imam-empty {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .imam-empty-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
 
     /* ===== ISLAMIC QUOTE ===== */
 
-    .quote-section{
+    .quote-section {
       position: relative;
 
       padding: 90px 20px 40px;
 
       background:
         radial-gradient(circle at top,
-        rgba(201,168,76,0.10),
-        transparent 60%);
+          rgba(201, 168, 76, 0.10),
+          transparent 60%);
     }
 
-    .quote-wrapper{
+    .quote-wrapper {
       max-width: 950px;
       margin: auto;
     }
 
-    .quote-top{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:18px;
+    .quote-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
 
-      margin-bottom:28px;
+      margin-bottom: 28px;
     }
 
-    .quote-line{
-      width:90px;
-      height:1px;
+    .quote-line {
+      width: 90px;
+      height: 1px;
 
       background:
-        linear-gradient(
-          to right,
+        linear-gradient(to right,
           transparent,
           var(--gold),
-          transparent
-        );
+          transparent);
     }
 
-    .quote-badge{
-      font-size:12px;
-      letter-spacing:3px;
-      text-transform:uppercase;
+    .quote-badge {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
 
-      color:var(--gold);
+      color: var(--gold);
 
-      border:1px solid rgba(201,168,76,0.35);
+      border: 1px solid rgba(201, 168, 76, 0.35);
 
-      padding:8px 18px;
+      padding: 8px 18px;
 
-      border-radius:50px;
+      border-radius: 50px;
 
-      background:rgba(201,168,76,0.08);
+      background: rgba(201, 168, 76, 0.08);
 
-      backdrop-filter:blur(10px);
+      backdrop-filter: blur(10px);
     }
 
-    .quote-card{
-      position:relative;
+    .quote-card {
+      position: relative;
 
-      padding:65px 60px;
+      padding: 65px 60px;
 
-      border-radius:30px;
+      border-radius: 30px;
 
-      overflow:hidden;
+      overflow: hidden;
 
-      text-align:center;
+      text-align: center;
 
       background:
-        linear-gradient(
-          145deg,
-          rgba(255,255,255,0.05),
-          rgba(255,255,255,0.02)
-        );
+        linear-gradient(145deg,
+          rgba(255, 255, 255, 0.05),
+          rgba(255, 255, 255, 0.02));
 
-      border:1px solid rgba(201,168,76,0.18);
+      border: 1px solid rgba(201, 168, 76, 0.18);
 
-      backdrop-filter:blur(14px);
+      backdrop-filter: blur(14px);
 
       box-shadow:
-        0 10px 40px rgba(0,0,0,0.20),
-        inset 0 1px 0 rgba(255,255,255,0.04);
+        0 10px 40px rgba(0, 0, 0, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
     }
 
-    body.dark .quote-card{
+    body.dark .quote-card {
       background:
-        linear-gradient(
-          145deg,
-          rgba(255,255,255,0.04),
-          rgba(255,255,255,0.015)
-        );
+        linear-gradient(145deg,
+          rgba(255, 255, 255, 0.04),
+          rgba(255, 255, 255, 0.015));
     }
 
-    .quote-pattern{
-      position:absolute;
-      inset:0;
+    .quote-pattern {
+      position: absolute;
+      inset: 0;
 
       background:
         radial-gradient(circle at top right,
-        rgba(201,168,76,0.12),
-        transparent 35%);
+          rgba(201, 168, 76, 0.12),
+          transparent 35%);
 
-      pointer-events:none;
+      pointer-events: none;
     }
 
-    .quote-mark{
-      font-size:68px;
-      line-height:1;
+    .quote-mark {
+      font-size: 68px;
+      line-height: 1;
 
-      color:rgba(201,168,76,0.25);
+      color: rgba(201, 168, 76, 0.25);
 
-      margin-bottom:22px;
+      margin-bottom: 22px;
 
-      font-family:serif;
+      font-family: serif;
     }
 
-    .quote-text{
-      position:relative;
-      z-index:2;
+    .quote-text {
+      position: relative;
+      z-index: 2;
 
-      font-family:'Playfair Display', serif;
+      font-family: 'Playfair Display', serif;
 
-      font-size:34px;
-      line-height:1.8;
+      font-size: 34px;
+      line-height: 1.8;
 
-      color:var(--text);
+      color: var(--text);
 
-      max-width:760px;
-      margin:auto auto 26px;
+      max-width: 760px;
+      margin: auto auto 26px;
     }
 
-    .quote-source{
-      position:relative;
-      z-index:2;
+    .quote-source {
+      position: relative;
+      z-index: 2;
 
-      display:inline-block;
+      display: inline-block;
 
-      padding:10px 22px;
+      padding: 10px 22px;
 
-      border-radius:30px;
+      border-radius: 30px;
 
-      background:rgba(201,168,76,0.10);
+      background: rgba(201, 168, 76, 0.10);
 
-      border:1px solid rgba(201,168,76,0.20);
+      border: 1px solid rgba(201, 168, 76, 0.20);
 
-      color:var(--gold);
+      color: var(--gold);
 
-      font-size:14px;
-      letter-spacing:1px;
+      font-size: 14px;
+      letter-spacing: 1px;
     }
 
-    @media(max-width:768px){
+    @media(max-width:768px) {
 
-      .quote-section{
-        padding:70px 18px 20px;
+      .quote-section {
+        padding: 70px 18px 20px;
       }
 
-      .quote-card{
-        padding:45px 24px;
-        border-radius:24px;
+      .quote-card {
+        padding: 45px 24px;
+        border-radius: 24px;
       }
 
-      .quote-text{
-        font-size:24px;
-        line-height:1.7;
+      .quote-text {
+        font-size: 24px;
+        line-height: 1.7;
       }
 
-      .quote-mark{
-        font-size:52px;
+      .quote-mark {
+        font-size: 52px;
       }
 
-      .quote-line{
-        width:45px;
+      .quote-line {
+        width: 45px;
       }
 
-      .quote-badge{
-        font-size:10px;
-        letter-spacing:2px;
-        padding:7px 14px;
+      .quote-badge {
+        font-size: 10px;
+        letter-spacing: 2px;
+        padding: 7px 14px;
       }
     }
-        
+
     /* FOOTER*/
 
-  :root{
-    /* LIGHT MODE */
-    --footer-bg: #ffffff;
-    --footer-text: #111111;
-    --footer-text-soft: rgba(0,0,0,.70);
+    :root {
+      /* LIGHT MODE */
+      --footer-bg: #ffffff;
+      --footer-text: #111111;
+      --footer-text-soft: rgba(0, 0, 0, .70);
 
-    --footer-border: rgba(0,0,0,.08);
+      --footer-border: rgba(0, 0, 0, .08);
 
-    --footer-social-bg: rgba(0,0,0,.05);
-    --footer-social-border: rgba(0,0,0,.08);
-    --footer-social-hover: rgba(0,0,0,.10);
+      --footer-social-bg: rgba(0, 0, 0, .05);
+      --footer-social-border: rgba(0, 0, 0, .08);
+      --footer-social-hover: rgba(0, 0, 0, .10);
 
-    --footer-glow: rgba(255,255,255,.20);
-  }
+      --footer-glow: rgba(255, 255, 255, .20);
+    }
 
-  body.dark{
-    /* DARK MODE */
-    --footer-bg: #131313;
-    --footer-text: #ffffff;
-    --footer-text-soft: rgba(255,255,255,.75);
+    body.dark {
+      /* DARK MODE */
+      --footer-bg: #131313;
+      --footer-text: #ffffff;
+      --footer-text-soft: rgba(255, 255, 255, .75);
 
-    --footer-border: rgba(255,255,255,.08);
+      --footer-border: rgba(255, 255, 255, .08);
 
-    --footer-social-bg: rgba(255,255,255,.06);
-    --footer-social-border: rgba(255,255,255,.10);
-    --footer-social-hover: rgba(255,255,255,.12);
+      --footer-social-bg: rgba(255, 255, 255, .06);
+      --footer-social-border: rgba(255, 255, 255, .10);
+      --footer-social-hover: rgba(255, 255, 255, .12);
 
-    --footer-glow: rgba(255,255,255,.04);
-  }
+      --footer-glow: rgba(255, 255, 255, .04);
+    }
 
-  /* ==========================
+    /* ==========================
       FOOTER
   ========================== */
 
-  .footer{
-    position:relative;
-    width:100%;
+    .footer {
+      position: relative;
+      width: 100%;
 
-    background: var(--footer-bg);
-    color: var(--footer-text);
+      background: var(--footer-bg);
+      color: var(--footer-text);
 
-    overflow:hidden;
-    margin-top:80px;
+      overflow: hidden;
+      margin-top: 80px;
 
-    transition:
-      background .35s ease,
-      color .35s ease;
-  }
+      transition:
+        background .35s ease,
+        color .35s ease;
+    }
 
-  /* Glow */
-  .footer::before{
-    content:"";
-    position:absolute;
+    /* Glow */
+    .footer::before {
+      content: "";
+      position: absolute;
 
-    top:-120px;
-    left:50%;
+      top: -120px;
+      left: 50%;
 
-    transform:translateX(-50%);
+      transform: translateX(-50%);
 
-    width:450px;
-    height:220px;
+      width: 450px;
+      height: 220px;
 
-    background:radial-gradient(
-      circle,
-      var(--footer-glow),
-      transparent 70%
-    );
+      background: radial-gradient(circle,
+          var(--footer-glow),
+          transparent 70%);
 
-    pointer-events:none;
-  }
+      pointer-events: none;
+    }
 
-  /* ==========================
+    /* ==========================
       CONTAINER
   ========================== */
 
-  .footer-container{
-    max-width:1200px;
-    margin:auto;
+    .footer-container {
+      max-width: 1200px;
+      margin: auto;
 
-    padding:65px 30px 45px;
+      padding: 65px 30px 45px;
 
-    display:grid;
-    grid-template-columns:2fr 1fr 1fr;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
 
-    gap:50px;
+      gap: 50px;
 
-    align-items:start;
+      align-items: start;
 
-    position:relative;
-    z-index:2;
-  }
+      position: relative;
+      z-index: 2;
+    }
 
-  /* ==========================
+    /* ==========================
       BRAND
   ========================== */
 
-  .footer-brand{
-    text-align:center;
-  }
+    .footer-brand {
+      text-align: center;
+    }
 
-  .footer-logo{
-    font-size:50px;
-    margin-bottom:14px;
-  }
+    .footer-logo {
+      font-size: 50px;
+      margin-bottom: 14px;
+    }
 
-  .footer-brand h3{
-    font-family:'Playfair Display', serif;
-    font-size:40px;
-    font-weight:700;
+    .footer-brand h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 40px;
+      font-weight: 700;
 
-    color:var(--footer-text);
+      color: var(--footer-text);
 
-    margin-bottom:16px;
-  }
+      margin-bottom: 16px;
+    }
 
-  .footer-brand p{
-    color:var(--footer-text-soft);
+    .footer-brand p {
+      color: var(--footer-text-soft);
 
-    font-size:16px;
-    line-height:1.9;
+      font-size: 16px;
+      line-height: 1.9;
 
-    max-width:560px;
-    margin:auto;
-  }
+      max-width: 560px;
+      margin: auto;
+    }
 
-  /* ==========================
+    /* ==========================
       SOCIAL
   ========================== */
 
-  .footer-social{
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    gap:16px;
-    margin-top:28px;
-  }
+      gap: 16px;
+      margin-top: 28px;
+    }
 
-  .footer-social a{
-    width:52px;
-    height:52px;
+    .footer-social a {
+      width: 52px;
+      height: 52px;
 
-    border-radius:50%;
+      border-radius: 50%;
 
-    background:var(--footer-social-bg);
-    border:1px solid var(--footer-social-border);
+      background: var(--footer-social-bg);
+      border: 1px solid var(--footer-social-border);
 
-    display:flex;
-    justify-content:center;
-    align-items:center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-    text-decoration:none;
+      text-decoration: none;
 
-    color:var(--footer-text);
+      color: var(--footer-text);
 
-    font-size:22px;
+      font-size: 22px;
 
-    transition:all .3s ease;
-  }
+      transition: all .3s ease;
+    }
 
-  .footer-social a:hover{
-    transform:translateY(-5px);
-    background:var(--footer-social-hover);
-  }
+    .footer-social a:hover {
+      transform: translateY(-5px);
+      background: var(--footer-social-hover);
+    }
 
-  /* ==========================
+    /* ==========================
       LINKS
   ========================== */
 
-  .footer-links{
-    text-align:center;
-  }
+    .footer-links {
+      text-align: center;
+    }
 
-  .footer-links h4{
-    font-size:24px;
-    margin-bottom:24px;
+    .footer-links h4 {
+      font-size: 24px;
+      margin-bottom: 24px;
 
-    color:var(--footer-text);
-  }
+      color: var(--footer-text);
+    }
 
-  .footer-links a{
-    display:block;
+    .footer-links a {
+      display: block;
 
-    color:var(--footer-text-soft);
+      color: var(--footer-text-soft);
 
-    text-decoration:none;
+      text-decoration: none;
 
-    margin-bottom:16px;
+      margin-bottom: 16px;
 
-    transition:.3s ease;
+      transition: .3s ease;
 
-    font-size:16px;
-  }
+      font-size: 16px;
+    }
 
-  .footer-links a:hover{
-    color:var(--footer-text);
-  }
+    .footer-links a:hover {
+      color: var(--footer-text);
+    }
 
-  /* ==========================
+    /* ==========================
       CONTACT
   ========================== */
 
-  .footer-contact{
-    text-align:center;
-  }
+    .footer-contact {
+      text-align: center;
+    }
 
-  .footer-contact h4{
-    font-size:24px;
-    margin-bottom:24px;
+    .footer-contact h4 {
+      font-size: 24px;
+      margin-bottom: 24px;
 
-    color:var(--footer-text);
-  }
+      color: var(--footer-text);
+    }
 
-  .footer-contact p{
-    color:var(--footer-text-soft);
+    .footer-contact p {
+      color: var(--footer-text-soft);
 
-    font-size:15px;
-    margin-bottom:14px;
+      font-size: 15px;
+      margin-bottom: 14px;
 
-    line-height:1.8;
-  }
+      line-height: 1.8;
+    }
 
-  #footerClock{
-    color:var(--footer-text);
-    font-weight:600;
-  }
+    #footerClock {
+      color: var(--footer-text);
+      font-weight: 600;
+    }
 
-  /* ==========================
+    /* ==========================
       BOTTOM
   ========================== */
 
-  .footer-bottom{
-    border-top:1px solid var(--footer-border);
+    .footer-bottom {
+      border-top: 1px solid var(--footer-border);
 
-    text-align:center;
+      text-align: center;
 
-    padding:22px;
+      padding: 22px;
 
-    position:relative;
-    z-index:2;
-  }
+      position: relative;
+      z-index: 2;
+    }
 
-  .footer-bottom p{
-    color:var(--footer-text-soft);
+    .footer-bottom p {
+      color: var(--footer-text-soft);
 
-    font-size:14px;
-    margin:0;
-  }
+      font-size: 14px;
+      margin: 0;
+    }
 
-  /* ==========================
+    /* ==========================
       RESPONSIVE
   ========================== */
 
-  @media(max-width:900px){
+    @media(max-width:900px) {
 
-    .footer-container{
-      grid-template-columns:1fr;
-      gap:45px;
-      text-align:center;
+      .footer-container {
+        grid-template-columns: 1fr;
+        gap: 45px;
+        text-align: center;
+      }
+
+      .footer-brand h3 {
+        font-size: 34px;
+      }
+
+      .footer-brand p {
+        font-size: 15px;
+      }
     }
 
-    .footer-brand h3{
-      font-size:34px;
-    }
+    @media(max-width:500px) {
 
-    .footer-brand p{
-      font-size:15px;
-    }
-  }
+      .footer-container {
+        padding: 50px 20px 35px;
+      }
 
-  @media(max-width:500px){
+      .footer-logo {
+        font-size: 42px;
+      }
 
-    .footer-container{
-      padding:50px 20px 35px;
-    }
+      .footer-brand h3 {
+        font-size: 28px;
+      }
 
-    .footer-logo{
-      font-size:42px;
-    }
+      .footer-brand p {
+        font-size: 14px;
+      }
 
-    .footer-brand h3{
-      font-size:28px;
-    }
+      .footer-social a {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
 
-    .footer-brand p{
-      font-size:14px;
+      .footer-links h4,
+      .footer-contact h4 {
+        font-size: 22px;
+      }
     }
-
-    .footer-social a{
-      width:44px;
-      height:44px;
-      font-size:18px;
-    }
-
-    .footer-links h4,
-    .footer-contact h4{
-      font-size:22px;
-    }
-  }
 
     @media (max-width: 900px) {
-      .tentang-inner { grid-template-columns: 1fr; gap: 36px; }
-      .imam-grid { grid-template-columns: 1fr; }
+      .tentang-inner {
+        grid-template-columns: 1fr;
+        gap: 36px;
+      }
+
+      .imam-grid {
+        grid-template-columns: 1fr;
+      }
     }
+
     @media (max-width: 600px) {
-      .tentang-stats { grid-template-columns: 1fr 1fr; }
-      .pengurus-card { flex: 0 0 180px; }
+      .tentang-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .pengurus-card {
+        flex: 0 0 180px;
+      }
     }
   </style>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar" id="navbar">
-  <div class="nav-brand">
-    <div class="nav-logo">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
-        <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
-        <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
-        <circle cx="18" cy="5" r="2" fill="#c9a84c"/>
-      </svg>
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2" />
+          <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c" />
+          <rect x="15" y="22" width="6" height="8" fill="#c9a84c" />
+          <circle cx="18" cy="5" r="2" fill="#c9a84c" />
+        </svg>
+      </div>
+      <div>
+        <div class="nav-title">Masjid Agung Sukabumi</div>
+        <div class="nav-subtitle">VIRTUAL TOUR</div>
+      </div>
     </div>
-    <div>
-      <div class="nav-title">Masjid Agung Sukabumi</div>
-      <div class="nav-subtitle">VIRTUAL TOUR</div>
-    </div>
-  </div>
 
- <div class="nav-prayer-card">
-    <div class="prayer-grid">
+    <div class="nav-prayer-card">
+      <div class="prayer-grid">
 
-      <div class="prayer-item">
-        <div class="p-label">IMSAK</div>
-        <div id="imsakTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item">
-        <div class="p-label">SUBUH</div>
-        <div id="subuhTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item">
-        <div class="p-label">TERBIT</div>
-        <div id="terbitTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item active">
-        <div class="p-label">DZUHUR</div>
-        <div id="dzuhurTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item">
-        <div class="p-label">ASHAR</div>
-        <div id="asharTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item maghrib">
-        <div class="p-label">MAGHRIB</div>
-        <div id="maghribTime" class="p-time">--:--</div>
-      </div>
-
-      <div class="prayer-item">
-        <div class="p-label">ISYA</div>
-        <div id="isyaTime" class="p-time">--:--</div>
+        <div class="prayer-item">
+          <div class="p-label">IMSAK</div>
+          <div id="imsakTime" class="p-time">--:--</div>
         </div>
 
-    </div>
-  </div>
-  
-  <div class="nav-links">
-    <div class="nav-menu" id="navMenu">
-      <a href="index.html" class="nav-link active">Beranda</a>
-      <a href="galeri.html" class="nav-link">Galeri</a>
-      <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
-    </div>
-    <button class="btn-theme" id="themeToggle" title="Ganti Tema">
-      <span class="icon-light">🌙</span>
-      <span class="icon-dark">☀️</span>
-    </button>
-    <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
-    </a>
-  </div>
-</nav>
-
-<!-- HERO SECTION -->
-<section class="hero" id="heroSection">
-  <div id="hero-panorama"></div>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG SUKABUMI</div>
-    <h1 class="hero-title">
-      Jelajahi Keindahan<br/>
-      <span class="hero-title-gold">Masjid Agung Sukabumi</span>
-    </h1>
-    <p class="hero-desc">
-      Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
-      memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
-    </p>
-    <div class="hero-actions">
-      <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour ▶</a>
-      <a href="#tentang" class="btn-secondary">Tentang Masjid</a>
-    </div>
-  </div>
-  <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
-</section>
-
-<!-- ===== ISLAMIC QUOTE ===== -->
-<section class="quote-section">
-  <div class="container">
-
-    <div class="quote-wrapper">
-
-      <div class="quote-top">
-        <div class="quote-line"></div>
-
-        <div class="quote-badge">
-          ✨ Quotes of The Day
+        <div class="prayer-item">
+          <div class="p-label">SUBUH</div>
+          <div id="subuhTime" class="p-time">--:--</div>
         </div>
 
-        <div class="quote-line"></div>
-      </div>
+        <div class="prayer-item">
+          <div class="p-label">TERBIT</div>
+          <div id="terbitTime" class="p-time">--:--</div>
+        </div>
 
-      <div class="quote-card">
+        <div class="prayer-item active">
+          <div class="p-label">DZUHUR</div>
+          <div id="dzuhurTime" class="p-time">--:--</div>
+        </div>
 
-        <div class="quote-pattern"></div>
+        <div class="prayer-item">
+          <div class="p-label">ASHAR</div>
+          <div id="asharTime" class="p-time">--:--</div>
+        </div>
 
-        <div class="quote-mark">❝</div>
+        <div class="prayer-item maghrib">
+          <div class="p-label">MAGHRIB</div>
+          <div id="maghribTime" class="p-time">--:--</div>
+        </div>
 
-        <p class="quote-text" id="quoteText">
-          “Sesungguhnya bersama kesulitan ada kemudahan.”
-        </p>
-
-        <div class="quote-source" id="quoteSource">
-          — QS. Al-Insyirah: 6
+        <div class="prayer-item">
+          <div class="p-label">ISYA</div>
+          <div id="isyaTime" class="p-time">--:--</div>
         </div>
 
       </div>
-
     </div>
 
-  </div>
-</section>
+    <div class="nav-links">
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link active">Beranda</a>
+        <a href="galeri.html" class="nav-link">Galeri</a>
+        <a href="virtual-tour.html" class="nav-link">Virtual Tour</a>
+      </div>
+      <button class="btn-theme" id="themeToggle" title="Ganti Tema">
+        <span class="icon-light">🌙</span>
+        <span class="icon-dark">☀️</span>
+      </button>
+      <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+    </div>
+  </nav>
 
-<!-- ===== TENTANG MASJID ===== -->
-<section class="tentang-section" id="tentang">
-  <div class="container">
-    <div class="tentang-inner">
-      <div class="tentang-text">
-        <div class="section-badge">TENTANG MASJID</div>
-        <h2 id="tentangJudul">Tentang Masjid Agung Sukabumi</h2>
-        <div id="tentangDeskripsi">
-          <p>Masjid Agung Sukabumi adalah masjid kebanggaan masyarakat Kota Sukabumi, Jawa Barat. Masjid ini merupakan pusat kegiatan keagamaan, sosial, dan budaya Islam di Kota Sukabumi, berdiri megah di jantung kota sebagai simbol keimanan dan peradaban Islam.</p>
-          <p>Dibangun dengan arsitektur yang memadukan nilai-nilai Islam dan kearifan budaya lokal, Masjid Agung Sukabumi menjadi tempat ibadah yang nyaman bagi ribuan jamaah setiap harinya, terutama saat shalat Jumat dan hari-hari besar Islam.</p>
-          <p>Masjid ini terus berkembang dalam pelayanan kepada umat, dengan berbagai program pendidikan Islam, sosial kemasyarakatan, dan pemberdayaan ekonomi umat yang dikelola secara profesional oleh Badan Kemakmuran Masjid (BKM).</p>
-        </div>
-        <div class="tentang-stats">
-          <div class="tentang-stat">
-            <div class="tentang-stat-num" id="statKapasitas">5.000+</div>
-            <div class="tentang-stat-label">Kapasitas Jamaah</div>
+  <!-- HERO SECTION -->
+  <section class="hero" id="heroSection">
+    <div id="hero-panorama"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG SUKABUMI</div>
+      <h1 class="hero-title">
+        Jelajahi Keindahan<br />
+        <span class="hero-title-gold">Masjid Agung Sukabumi</span>
+      </h1>
+      <p class="hero-desc">
+        Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
+        memukau. Jelajahi setiap sudut masjid bersejarah kami dari mana saja di seluruh dunia.
+      </p>
+      <div class="hero-actions">
+        <a href="virtual-tour.html" class="btn-primary">Mulai Virtual Tour ▶</a>
+        <a href="#tentang" class="btn-secondary">Tentang Masjid</a>
+      </div>
+    </div>
+    <div class="hero-hint">🖱 Drag untuk menjelajah panorama 360°</div>
+  </section>
+
+  <!-- ===== ISLAMIC QUOTE ===== -->
+  <section class="quote-section">
+    <div class="container">
+
+      <div class="quote-wrapper">
+
+        <div class="quote-top">
+          <div class="quote-line"></div>
+
+          <div class="quote-badge">
+            ✨ Quotes of The Day
           </div>
-          <div class="tentang-stat">
-            <div class="tentang-stat-num" id="statBerdiri">1960</div>
-            <div class="tentang-stat-label">Tahun Berdiri</div>
-          </div>
-          <div class="tentang-stat">
-            <div class="tentang-stat-num" id="statLuas">12.000 m²</div>
-            <div class="tentang-stat-label">Luas Area</div>
-          </div>
-          <div class="tentang-stat">
-            <div class="tentang-stat-num" id="statMenara">2</div>
-            <div class="tentang-stat-label">Jumlah Menara</div>
-          </div>
+
+          <div class="quote-line"></div>
         </div>
+
+        <div class="quote-card">
+
+          <div class="quote-pattern"></div>
+
+          <div class="quote-mark">❝</div>
+
+          <p class="quote-text" id="quoteText">
+            “Sesungguhnya bersama kesulitan ada kemudahan.”
+          </p>
+
+          <div class="quote-source" id="quoteSource">
+            — QS. Al-Insyirah: 6
+          </div>
+
+        </div>
+
       </div>
-      <div class="tentang-features" id="tentangFitur">
-        <div class="tentang-feature">
-          <div class="tentang-feature-icon">🕌</div>
-          <div>
-            <div class="tentang-feature-title">Ruang Utama Shalat</div>
-            <div class="tentang-feature-desc">Pusat ibadah dengan mihrab megah, mimbar berukir indah, dan kubah utama yang menakjubkan, mampu menampung ribuan jamaah secara bersamaan.</div>
+
+    </div>
+  </section>
+
+  <!-- ===== TENTANG MASJID ===== -->
+  <section class="tentang-section" id="tentang">
+    <div class="container">
+      <div class="tentang-inner">
+        <div class="tentang-text">
+          <div class="section-badge">TENTANG MASJID</div>
+          <h2 id="tentangJudul">Tentang Masjid Agung Sukabumi</h2>
+          <div id="tentangDeskripsi">
+            <p>Masjid Agung Sukabumi adalah masjid kebanggaan masyarakat Kota Sukabumi, Jawa Barat. Masjid ini merupakan
+              pusat kegiatan keagamaan, sosial, dan budaya Islam di Kota Sukabumi, berdiri megah di jantung kota sebagai
+              simbol keimanan dan peradaban Islam.</p>
+            <p>Dibangun dengan arsitektur yang memadukan nilai-nilai Islam dan kearifan budaya lokal, Masjid Agung
+              Sukabumi menjadi tempat ibadah yang nyaman bagi ribuan jamaah setiap harinya, terutama saat shalat Jumat
+              dan hari-hari besar Islam.</p>
+            <p>Masjid ini terus berkembang dalam pelayanan kepada umat, dengan berbagai program pendidikan Islam, sosial
+              kemasyarakatan, dan pemberdayaan ekonomi umat yang dikelola secara profesional oleh Badan Kemakmuran
+              Masjid (BKM).</p>
           </div>
-        </div>
-        <div class="tentang-feature">
-          <div class="tentang-feature-icon">🏛️</div>
-          <div>
-            <div class="tentang-feature-title">Aula & Selasar Multifungsi</div>
-            <div class="tentang-feature-desc">Ruang serbaguna yang digunakan untuk kajian ilmu, pengajian rutin, peringatan hari besar Islam, serta berbagai kegiatan sosial kemasyarakatan.</div>
+          <div class="tentang-stats">
+            <div class="tentang-stat">
+              <div class="tentang-stat-num" id="statKapasitas">5.000+</div>
+              <div class="tentang-stat-label">Kapasitas Jamaah</div>
+            </div>
+            <div class="tentang-stat">
+              <div class="tentang-stat-num" id="statBerdiri">1960</div>
+              <div class="tentang-stat-label">Tahun Berdiri</div>
+            </div>
+            <div class="tentang-stat">
+              <div class="tentang-stat-num" id="statLuas">12.000 m²</div>
+              <div class="tentang-stat-label">Luas Area</div>
+            </div>
+            <div class="tentang-stat">
+              <div class="tentang-stat-num" id="statMenara">2</div>
+              <div class="tentang-stat-label">Jumlah Menara</div>
+            </div>
           </div>
         </div>
-        <div class="tentang-feature">
-          <div class="tentang-feature-icon">📚</div>
-          <div>
-            <div class="tentang-feature-title">Perpustakaan Islam</div>
-            <div class="tentang-feature-desc">Koleksi kitab dan buku Islam yang lengkap tersedia untuk menunjang pendidikan agama masyarakat dan generasi muda Muslim.</div>
+        <div class="tentang-features" id="tentangFitur">
+          <div class="tentang-feature">
+            <div class="tentang-feature-icon">🕌</div>
+            <div>
+              <div class="tentang-feature-title">Ruang Utama Shalat</div>
+              <div class="tentang-feature-desc">Pusat ibadah dengan mihrab megah, mimbar berukir indah, dan kubah utama
+                yang menakjubkan, mampu menampung ribuan jamaah secara bersamaan.</div>
+            </div>
+          </div>
+          <div class="tentang-feature">
+            <div class="tentang-feature-icon">🏛️</div>
+            <div>
+              <div class="tentang-feature-title">Aula & Selasar Multifungsi</div>
+              <div class="tentang-feature-desc">Ruang serbaguna yang digunakan untuk kajian ilmu, pengajian rutin,
+                peringatan hari besar Islam, serta berbagai kegiatan sosial kemasyarakatan.</div>
+            </div>
+          </div>
+          <div class="tentang-feature">
+            <div class="tentang-feature-icon">📚</div>
+            <div>
+              <div class="tentang-feature-title">Perpustakaan Islam</div>
+              <div class="tentang-feature-desc">Koleksi kitab dan buku Islam yang lengkap tersedia untuk menunjang
+                pendidikan agama masyarakat dan generasi muda Muslim.</div>
+            </div>
+          </div>
+          <div class="tentang-feature">
+            <div class="tentang-feature-icon">🌿</div>
+            <div>
+              <div class="tentang-feature-title">Halaman & Taman Asri</div>
+              <div class="tentang-feature-desc">Area luar masjid yang rindang dan asri, menjadi tempat istirahat yang
+                nyaman bagi jamaah sebelum dan sesudah ibadah.</div>
+            </div>
           </div>
         </div>
-        <div class="tentang-feature">
-          <div class="tentang-feature-icon">🌿</div>
-          <div>
-            <div class="tentang-feature-title">Halaman & Taman Asri</div>
-            <div class="tentang-feature-desc">Area luar masjid yang rindang dan asri, menjadi tempat istirahat yang nyaman bagi jamaah sebelum dan sesudah ibadah.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROFIL PENGURUS ===== -->
+  <section class="pengurus-section" id="pengurus">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">KEPENGURUSAN</div>
+        <h2 class="section-title">Profil Pengurus Masjid</h2>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Badan Kemakmuran Masjid (BKM) Masjid Agung
+          Sukabumi</p>
+      </div>
+      <div class="pengurus-slider-wrap">
+        <div class="pengurus-slider" id="pengurusSlider">
+          <div class="pengurus-empty">
+            <div class="pengurus-empty-icon">👥</div>
+            <div>Data pengurus belum ditambahkan. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin
+                Panel</a></div>
+          </div>
+        </div>
+        <div class="slider-nav">
+          <button class="slider-btn" onclick="slideLeft()">&#8592;</button>
+          <button class="slider-btn" onclick="slideRight()">&#8594;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== IMAM & MUADZIN HARIAN ===== -->
+  <section class="imam-section" id="imam-muadzin">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">JADWAL HARIAN</div>
+        <h2 class="section-title">Imam & Muadzin Harian</h2>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Jadwal petugas imam dan muadzin shalat
+          berjamaah Masjid Agung Sukabumi</p>
+      </div>
+      <div class="imam-grid">
+        <div class="imam-group">
+          <div class="imam-group-header">
+            <div class="imam-group-icon">🎙️</div>
+            <div class="imam-group-title">Imam Harian</div>
+          </div>
+          <div class="imam-list" id="imamList">
+            <div class="imam-empty">
+              <div class="imam-empty-icon">📋</div>
+              <div>Belum ada data imam. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div>
+            </div>
+          </div>
+        </div>
+        <div class="imam-group">
+          <div class="imam-group-header">
+            <div class="imam-group-icon">📢</div>
+            <div class="imam-group-title">Muadzin Harian</div>
+          </div>
+          <div class="imam-list" id="muadzinList">
+            <div class="imam-empty">
+              <div class="imam-empty-icon">📋</div>
+              <div>Belum ada data muadzin. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ===== PROFIL PENGURUS ===== -->
-<section class="pengurus-section" id="pengurus">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-badge">KEPENGURUSAN</div>
-      <h2 class="section-title">Profil Pengurus Masjid</h2>
-      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Badan Kemakmuran Masjid (BKM) Masjid Agung Sukabumi</p>
-    </div>
-    <div class="pengurus-slider-wrap">
-      <div class="pengurus-slider" id="pengurusSlider">
-        <div class="pengurus-empty">
-          <div class="pengurus-empty-icon">👥</div>
-          <div>Data pengurus belum ditambahkan. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
-        </div>
+  <!-- ===== EVENT SECTION ===== -->
+  <section class="event-section" id="events">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">KEGIATAN MASJID</div>
+        <h2 class="section-title">Kegiatan Mendatang</h2>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Ikuti berbagai kegiatan kajian dan program
+          keagamaan di Masjid Agung Sukabumi</p>
       </div>
-      <div class="slider-nav">
-        <button class="slider-btn" onclick="slideLeft()">&#8592;</button>
-        <button class="slider-btn" onclick="slideRight()">&#8594;</button>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ===== IMAM & MUADZIN HARIAN ===== -->
-<section class="imam-section" id="imam-muadzin">
-  <div class="container">
-    <div class="section-header">
-      <div class="section-badge">JADWAL HARIAN</div>
-      <h2 class="section-title">Imam & Muadzin Harian</h2>
-      <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Jadwal petugas imam dan muadzin shalat berjamaah Masjid Agung Sukabumi</p>
-    </div>
-    <div class="imam-grid">
-      <div class="imam-group">
-        <div class="imam-group-header">
-          <div class="imam-group-icon">🎙️</div>
-          <div class="imam-group-title">Imam Harian</div>
-        </div>
-        <div class="imam-list" id="imamList">
-          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data imam. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+      <div class="event-grid" id="eventList">
+        <div class="event-empty">
+          <div class="event-empty-icon">📅</div>
+          <div>Belum ada event. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
         </div>
       </div>
-      <div class="imam-group">
-        <div class="imam-group-header">
-          <div class="imam-group-icon">📢</div>
-          <div class="imam-group-title">Muadzin Harian</div>
-        </div>
-        <div class="imam-list" id="muadzinList">
-          <div class="imam-empty"><div class="imam-empty-icon">📋</div><div>Belum ada data muadzin. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin</a></div></div>
+      <div class="event-detail-overlay" id="eventDetailOverlay" onclick="closeEventDetail()">
+        <div class="event-detail-card" onclick="event.stopPropagation()">
+          <button class="event-detail-close" onclick="closeEventDetail()">×</button>
+          <div class="event-detail-media" id="eventDetailMedia"></div>
+          <div class="event-detail-body">
+            <h3 id="eventDetailTitle">Judul Event</h3>
+            <p id="eventDetailDate"></p>
+            <p class="event-detail-countdown" id="eventDetailCountdown"></p>
+            <p id="eventDetailDescription"></p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER -->
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-container">
 
@@ -836,21 +1194,15 @@
 
         <!-- Social -->
         <div class="footer-social">
-          <a href="https://instagram.com/"
-            target="_blank"
-            title="Instagram">
+          <a href="https://instagram.com/" target="_blank" title="Instagram">
             <i class="fab fa-instagram"></i>
           </a>
 
-          <a href="https://youtube.com/"
-            target="_blank"
-            title="YouTube">
+          <a href="https://youtube.com/" target="_blank" title="YouTube">
             <i class="fab fa-youtube"></i>
           </a>
 
-          <a href="https://maps.google.com/"
-            target="_blank"
-            title="Lokasi">
+          <a href="https://maps.google.com/" target="_blank" title="Lokasi">
             <i class="fas fa-location-dot"></i>
           </a>
         </div>
@@ -889,6 +1241,7 @@
 
   </footer>
 
-<script type="module" src="js/index.js"></script>
+  <script type="module" src="js/index.js"></script>
 </body>
+
 </html>
