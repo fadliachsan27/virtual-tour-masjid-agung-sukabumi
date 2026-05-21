@@ -166,13 +166,143 @@ function loadQuoteOfTheDay() {
   if (quoteSource) quoteSource.textContent = `— ${quote.source}`;
 }
 
+function formatIndonesianDate(dateStr) {
+  if (!dateStr) return '-';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  try {
+    const parts = dateStr.split('-');
+    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (isNaN(date.getTime())) return dateStr;
+    const dayName = days[date.getDay()];
+    const day = date.getDate();
+    const monthName = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${dayName}, ${day} ${monthName} ${year}`;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function getEventCountdown(dateStr) {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return '';
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const today = new Date();
+  const eventDate = new Date(year, month - 1, day);
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffDays = Math.ceil((eventDate - startOfToday) / (1000 * 60 * 60 * 24));
+  if (diffDays > 1) return `${diffDays} Hari Lagi`;
+  if (diffDays === 1) return '1 Hari Lagi';
+  if (diffDays === 0) return 'Hari Ini';
+  return 'Selesai';
+}
+
+let eventItems = [];
+
+async function loadEvents() {
+  try {
+    const snap = await getDocs(query(collection(db, 'events'), orderBy('order', 'desc')));
+    const el = document.getElementById('eventList');
+    if (!el) return;
+    if (snap.empty) {
+      eventItems = [];
+      el.innerHTML = `
+        <div class="event-empty">
+          <div class="event-empty-icon">📅</div>
+          <div>Belum ada event terdekat. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
+        </div>`;
+      return;
+    }
+    eventItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    el.innerHTML = eventItems.map(item => {
+      let mediaHtml = '';
+      if (item.mediaBase64) {
+        if (item.mediaType === 'video') {
+          mediaHtml = `
+            <div class="event-media">
+              <span class="event-media-badge">Video</span>
+              <video src="${item.mediaBase64}" controls playsinline preload="metadata"></video>
+            </div>`;
+        } else {
+          mediaHtml = `
+            <div class="event-media">
+              <span class="event-media-badge">Kegiatan</span>
+              <img src="${item.mediaBase64}" alt="${item.judul || 'Event'}" loading="lazy"/>
+            </div>`;
+        }
+      }
+      const countdownText = getEventCountdown(item.tanggal);
+      return `
+        <div class="event-card" onclick="openEventDetail('${item.id}')">
+          ${mediaHtml}
+          <div class="event-content">
+            <h3 class="event-title">${item.judul || '-'}</h3>
+            <p class="event-desc">${item.deskripsi || '-'}</p>
+            <div class="event-meta">
+              <div class="event-date">
+                <span>📅</span> ${formatIndonesianDate(item.tanggal)}
+              </div>
+              <div class="event-countdown">${countdownText}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('loadEvents:', e);
+  }
+}
+
+function openEventDetail(id) {
+  const item = eventItems.find(ev => ev.id === id);
+  if (!item) return;
+  const overlay = document.getElementById('eventDetailOverlay');
+  const mediaEl = document.getElementById('eventDetailMedia');
+  const titleEl = document.getElementById('eventDetailTitle');
+  const dateEl = document.getElementById('eventDetailDate');
+  const descEl = document.getElementById('eventDetailDescription');
+
+  if (!overlay || !mediaEl || !titleEl || !dateEl || !descEl) return;
+
+  titleEl.textContent = item.judul || '-';
+  dateEl.textContent = formatIndonesianDate(item.tanggal) || '-';
+  const countdownText = getEventCountdown(item.tanggal);
+  const countdownEl = document.getElementById('eventDetailCountdown');
+  if (countdownEl) countdownEl.textContent = countdownText;
+  descEl.textContent = item.deskripsi || '-';
+
+  if (item.mediaBase64) {
+    if (item.mediaType === 'video') {
+      mediaEl.innerHTML = `<video src="${item.mediaBase64}" controls playsinline preload="metadata"></video>`;
+    } else {
+      mediaEl.innerHTML = `<img src="${item.mediaBase64}" alt="${item.judul || 'Event'}" loading="lazy"/>`;
+    }
+  } else {
+    mediaEl.innerHTML = `<div style="padding:60px 0;text-align:center;color:var(--muted)">Tidak ada media</div>`;
+  }
+
+  overlay.classList.add('open');
+}
+
+function closeEventDetail() {
+  const overlay = document.getElementById('eventDetailOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+}
+
+window.openEventDetail = openEventDetail;
+window.closeEventDetail = closeEventDetail;
+
 (async () => {
   try {
     const panoSnap = await getDoc(doc(db, 'panorama', 'hero_bg'));
     const heroSrc = panoSnap.exists() && panoSnap.data().base64 ? panoSnap.data().base64 : 'images/hero-360.png';
     startHero(heroSrc);
   } catch (e) { startHero('images/hero-360.png'); }
-  await Promise.all([loadMasjidInfo(), loadPengurus(), loadImamMuadzin()]);
+  await Promise.all([loadMasjidInfo(), loadPengurus(), loadImamMuadzin(), loadEvents()]);
   getPrayerTimes();
   loadQuoteOfTheDay();
 })();

@@ -50,9 +50,261 @@ function showPage(name, el) {
   if (name === 'imam')     loadImamMuadzin();
   if (name === 'info')     loadInfoForm();
   if (name === 'dashboard') updateDashboardStats();
+  if (name === 'event')    loadEvents();
   return false;
 }
 window.showPage = showPage;
+
+// ============================================================
+// EVENT MANAGEMENT
+// ============================================================
+let eventItems = [];
+let editEventId = null;
+let eventPendingBase64 = null;
+let eventPendingType = null;
+
+async function loadEvents() {
+  try {
+    const snap = await getDocs(query(collection(db, 'events'), orderBy('order', 'desc')));
+    eventItems = [];
+    snap.forEach(d => eventItems.push({ id: d.id, ...d.data() }));
+    renderEventTable();
+  } catch (e) { showToast('⚠ Gagal memuat event: ' + e.message); }
+}
+
+function formatIndonesianDate(dateStr) {
+  if (!dateStr) return '-';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  const months = [
+    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  ];
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  try {
+    const parts = dateStr.split('-');
+    const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    if (isNaN(date.getTime())) return dateStr;
+    const dayName = days[date.getDay()];
+    const day = date.getDate();
+    const monthName = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `${dayName}, ${day} ${monthName} ${year}`;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
+function renderEventTable() {
+  const tbody = document.getElementById('eventAdminTableBody');
+  if (!tbody) return;
+  if (eventItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data event.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = '';
+  eventItems.forEach((item, idx) => {
+    const tr = document.createElement('tr');
+    
+    let mediaHtml = '';
+    if (item.mediaBase64) {
+      if (item.mediaType === 'video') {
+        mediaHtml = `<video src="${item.mediaBase64}" style="width:100px;height:56px;object-fit:cover;border-radius:4px" preload="metadata"></video>`;
+      } else {
+        mediaHtml = `<img src="${item.mediaBase64}" style="width:100px;height:56px;object-fit:cover;border-radius:4px" alt="${item.judul}"/>`;
+      }
+    } else {
+      mediaHtml = `<span style="font-size:24px">🕌</span>`;
+    }
+    
+    tr.innerHTML = `
+      <td>${mediaHtml}</td>
+      <td style="font-weight:bold;color:#fff">${item.judul || '-'}</td>
+      <td><span class="hari-badge">${formatIndonesianDate(item.tanggal) || '-'}</span></td>
+      <td style="color:var(--muted);max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.deskripsi || '-'}</td>
+      <td>
+        <button class="btn-sm" onclick="editEvent('${item.id}')">✏️ Edit</button>
+        <button class="btn-danger" style="margin-left:5px" onclick="deleteEvent('${item.id}')">🗑</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openEventModal(id) {
+  editEventId = id || null;
+  eventPendingBase64 = null;
+  eventPendingType = 'image';
+
+  document.getElementById('eventModalTitle').textContent = id ? 'Edit Event' : 'Tambah Event';
+  document.getElementById('eventJudul').value = '';
+  document.getElementById('eventTanggal').value = '';
+  document.getElementById('eventDeskripsi').value = '';
+  document.getElementById('eventMediaInput').value = '';
+  document.getElementById('eventMediaPreview').innerHTML = `
+    <span style="color:var(--muted)">Belum ada media dipilih</span>
+    <span style="font-size:12px;color:var(--gold)">📁 Klik atau Drag & Drop file di sini</span>
+  `;
+
+  if (id) {
+    const item = eventItems.find(e => e.id === id);
+    if (item) {
+      document.getElementById('eventJudul').value = item.judul || '';
+      
+      let dateVal = '';
+      if (item.tanggal && /^\d{4}-\d{2}-\d{2}$/.test(item.tanggal)) {
+        dateVal = item.tanggal;
+      }
+      document.getElementById('eventTanggal').value = dateVal;
+      
+      document.getElementById('eventDeskripsi').value = item.deskripsi || '';
+      if (item.mediaBase64) {
+        eventPendingBase64 = item.mediaBase64;
+        document.getElementById('eventMediaPreview').innerHTML = `
+          <img src="${item.mediaBase64}" style="max-width:100%;max-height:100%;object-fit:contain"/>
+          <div class="media-change-badge" onclick="event.stopPropagation(); document.getElementById('eventMediaInput').click()"><span style="margin-right:2px;">🔄</span> Ganti Foto</div>
+        `;
+      }
+    }
+  }
+  document.getElementById('eventModal').classList.add('open');
+}
+
+async function previewEventMedia(file) {
+  if (!file) return;
+  if (file.size > 209715200) {
+    showToast('⚠ Ukuran file melebihi 200MB! Pilih file yang lebih kecil atau kompres terlebih dahulu.');
+    document.getElementById('eventMediaInput').value = '';
+    return;
+  }
+  showToast('⏳ Memproses foto...', 5000);
+  
+  if (file.type.startsWith('image/')) {
+    eventPendingType = 'image';
+    eventPendingBase64 = await compressToBase64(file, 1000, 0.8);
+    document.getElementById('eventMediaPreview').innerHTML = `
+      <img src="${eventPendingBase64}" style="max-width:100%;max-height:100%;object-fit:contain"/>
+      <div class="media-change-badge" onclick="event.stopPropagation(); document.getElementById('eventMediaInput').click()"><span style="margin-right:2px;">🔄</span> Ganti Foto</div>
+    `;
+    showToast('📸 Foto siap — klik Simpan');
+  } else {
+    showToast('⚠ Format file tidak didukung! Pilih file gambar.');
+  }
+}
+
+async function saveEvent() {
+  const judul = document.getElementById('eventJudul').value.trim();
+  const tanggal = document.getElementById('eventTanggal').value.trim();
+  const deskripsi = document.getElementById('eventDeskripsi').value.trim();
+
+  if (!judul) {
+    showToast('⚠ Judul event tidak boleh kosong!');
+    return;
+  }
+  if (!tanggal) {
+    showToast('⚠ Tanggal event tidak boleh kosong!');
+    return;
+  }
+  if (!deskripsi) {
+    showToast('⚠ Deskripsi event tidak boleh kosong!');
+    return;
+  }
+  if (!eventPendingBase64) {
+    showToast('⚠ Foto event tidak boleh kosong!');
+    return;
+  }
+
+  const data = {
+    judul,
+    tanggal,
+    deskripsi,
+    mediaBase64: eventPendingBase64 || null,
+    mediaType: eventPendingType || null,
+    order: editEventId ? (eventItems.find(e => e.id === editEventId)?.order || Date.now()) : Date.now(),
+    createdAt: serverTimestamp()
+  };
+
+  try {
+    if (editEventId) {
+      await updateDoc(doc(db, 'events', editEventId), {
+        judul, tanggal, deskripsi,
+        mediaBase64: eventPendingBase64 || null,
+        mediaType: eventPendingType || null
+      });
+    } else {
+      await addDoc(collection(db, 'events'), data);
+    }
+    closeEventModal();
+    await loadEvents();
+    showToast('✅ Event berhasil disimpan!');
+  } catch (e) {
+    showToast('⚠ Gagal menyimpan: ' + e.message);
+  }
+}
+
+async function deleteEvent(id) {
+  openConfirmModal('Hapus event ini?', async () => {
+    try {
+      await deleteDoc(doc(db, 'events', id));
+      await loadEvents();
+      showToast('🗑 Event dihapus');
+    } catch (e) {
+      showToast('⚠ Gagal menghapus: ' + e.message);
+    }
+  });
+}
+
+function openConfirmModal(message, onConfirm) {
+  const overlay = document.getElementById('confirmModal');
+  const messageEl = document.getElementById('confirmMessage');
+  const actionButton = document.getElementById('confirmActionButton');
+  if (!overlay || !messageEl || !actionButton) {
+    return onConfirm();
+  }
+
+  messageEl.textContent = message;
+  overlay.classList.add('open');
+  actionButton.onclick = async () => {
+    overlay.classList.remove('open');
+    await onConfirm();
+  };
+}
+
+function closeConfirmModal() {
+  const overlay = document.getElementById('confirmModal');
+  if (!overlay) return;
+  overlay.classList.remove('open');
+}
+
+function closeEventModal() {
+  document.getElementById('eventModal').classList.remove('open');
+}
+
+// Bind to window for global access
+window.loadEvents = loadEvents;
+window.openEventModal = openEventModal;
+window.closeEventModal = closeEventModal;
+window.saveEvent = saveEvent;
+window.deleteEvent = deleteEvent;
+window.editEvent = openEventModal;
+window.previewEventMedia = previewEventMedia;
+window.closeConfirmModal = closeConfirmModal;
+
+// Drag & drop — event media preview
+const emp = document.getElementById('eventMediaPreview');
+if (emp) {
+  emp.addEventListener('dragover', e => {
+    e.preventDefault();
+    emp.classList.add('drag-over');
+  });
+  emp.addEventListener('dragleave', () => emp.classList.remove('drag-over'));
+  emp.addEventListener('drop', e => {
+    e.preventDefault();
+    emp.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      previewEventMedia(e.dataTransfer.files[0]);
+    }
+  });
+}
 
 // ===== TOAST =====
 function showToast(msg, dur) {
@@ -150,7 +402,7 @@ function renderFiturRows() {
       <div class="form-group" style="margin:0">
         <input type="text" value="${f.deskripsi}" onchange="fiturRows[${i}].deskripsi=this.value" placeholder="Deskripsi"/>
       </div>
-      <button class="btn-danger" style="padding:6px 10px" onclick="deleteFiturRow(${i})">🗑</button>
+      <button class="btn-danger" style="padding:6px 10px" onclick="confirmDeleteFiturRow(${i})">🗑</button>
     </div>`).join('');
 }
 
@@ -162,6 +414,10 @@ function addFiturRow() {
 function deleteFiturRow(i) {
   fiturRows.splice(i, 1);
   renderFiturRows();
+}
+
+function confirmDeleteFiturRow(i) {
+  openConfirmModal('Hapus fitur ini?', () => { deleteFiturRow(i); });
 }
 
 async function saveInfoMasjid() {
@@ -195,6 +451,7 @@ async function saveInfoMasjid() {
 
 window.addFiturRow    = addFiturRow;
 window.deleteFiturRow = deleteFiturRow;
+window.confirmDeleteFiturRow = confirmDeleteFiturRow;
 window.saveInfoMasjid = saveInfoMasjid;
 
 
@@ -304,12 +561,13 @@ async function savePengurus() {
 }
 
 async function deletePengurus(id) {
-  if (!confirm('Hapus pengurus ini?')) return;
-  try {
-    await deleteDoc(doc(db, 'pengurus', id));
-    await loadPengurus();
-    showToast('🗑 Pengurus dihapus');
-  } catch (e) { showToast('⚠ ' + e.message); }
+  openConfirmModal('Hapus pengurus ini?', async () => {
+    try {
+      await deleteDoc(doc(db, 'pengurus', id));
+      await loadPengurus();
+      showToast('🗑 Pengurus dihapus');
+    } catch (e) { showToast('⚠ ' + e.message); }
+  });
 }
 
 function closePengurusModal() {
@@ -353,7 +611,7 @@ function renderImamTable() {
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
-          <td><button class="btn-danger" onclick="deleteImamRow(${i})">🗑</button></td>
+          <td><button class="btn-danger" onclick="confirmDeleteImamRow(${i})">🗑</button></td>
         </tr>`).join('');
 }
 
@@ -366,7 +624,7 @@ function renderMuadzinTable() {
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
-          <td><button class="btn-danger" onclick="deleteMuadzinRow(${i})">🗑</button></td>
+          <td><button class="btn-danger" onclick="confirmDeleteMuadzinRow(${i})">🗑</button></td>
         </tr>`).join('');
 }
 
@@ -395,6 +653,14 @@ function addMuadzinRow() {
 function deleteImamRow(i)    { imamData.splice(i, 1);    renderImamTable(); }
 function deleteMuadzinRow(i) { muadzinData.splice(i, 1); renderMuadzinTable(); }
 
+function confirmDeleteImamRow(i) {
+  openConfirmModal('Hapus jadwal imam ini?', () => { deleteImamRow(i); });
+}
+
+function confirmDeleteMuadzinRow(i) {
+  openConfirmModal('Hapus jadwal muadzin ini?', () => { deleteMuadzinRow(i); });
+}
+
 async function saveImamMuadzin() {
   try {
     await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
@@ -407,6 +673,8 @@ window.addImamRow      = addImamRow;
 window.addMuadzinRow   = addMuadzinRow;
 window.deleteImamRow   = deleteImamRow;
 window.deleteMuadzinRow = deleteMuadzinRow;
+window.confirmDeleteImamRow = confirmDeleteImamRow;
+window.confirmDeleteMuadzinRow = confirmDeleteMuadzinRow;
 window.saveImamMuadzin = saveImamMuadzin;
 
 
@@ -540,20 +808,22 @@ async function replaceGaleriFile(file) {
 }
 
 async function deleteGaleriItem(id) {
-  if (!confirm('Hapus foto ini?')) return;
-  await deleteDoc(doc(db, 'galeri', id));
-  await loadGaleri();
-  showToast('🗑 Foto dihapus');
+  openConfirmModal('Hapus foto ini?', async () => {
+    await deleteDoc(doc(db, 'galeri', id));
+    await loadGaleri();
+    showToast('🗑 Foto dihapus');
+  });
 }
 
 async function confirmClearGaleri() {
-  if (!confirm('Hapus SEMUA foto dari galeri?')) return;
-  const snap  = await getDocs(collection(db, 'galeri'));
-  const batch = writeBatch(db);
-  snap.forEach(d => batch.delete(d.ref));
-  await batch.commit();
-  await loadGaleri();
-  showToast('🗑 Semua foto galeri dihapus');
+  openConfirmModal('Hapus SEMUA foto dari galeri?', async () => {
+    const snap  = await getDocs(collection(db, 'galeri'));
+    const batch = writeBatch(db);
+    snap.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    await loadGaleri();
+    showToast('🗑 Semua foto galeri dihapus');
+  });
 }
 
 window.triggerReplace     = triggerReplace;
