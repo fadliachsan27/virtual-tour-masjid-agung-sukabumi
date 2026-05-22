@@ -137,15 +137,16 @@
 
     /* === INFO POPUP === */
     .vt-info {
-      position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+      position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
       z-index: 200; min-width: 320px; max-width: 480px;
       background: rgba(255,255,255,0.1); backdrop-filter: blur(20px);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 16px; padding: 18px 22px;
       color: #fff; text-align: center;
       transition: opacity 0.4s, transform 0.4s;
+      pointer-events: auto;
     }
-    .vt-info.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(20px); }
+    .vt-info.hidden { opacity: 0; pointer-events: none !important; transform: translateX(-50%) translateY(20px); }
     .vt-info h3 {
       font-family: 'Playfair Display', serif; font-size: 18px;
       color: #c9a84c; margin: 0 0 8px;
@@ -167,7 +168,8 @@
     /* === BOTTOM CONTROLS === */
     .vt-controls {
       position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-      z-index: 200; display: flex; gap: 10px;
+      z-index: 300; display: flex; gap: 10px;
+      pointer-events: auto;
     }
     .vt-ctrl-btn {
       width: 40px; height: 40px; border-radius: 50%;
@@ -514,6 +516,11 @@
 <div id="vt-transition-overlay"></div>
 <canvas id="vt-walk-canvas"></canvas>
 <div id="vt-vignette"></div>
+
+<!-- Audio Masjid — harus ada sebelum script utama agar getElementById berhasil -->
+<audio id="bgAudio" loop preload="auto">
+  <source src="sound-masjid.mpeg" type="audio/mpeg">
+</audio>
 
 <!-- Scripts -->
 <script src="vendor/screenfull.min.js"></script>
@@ -895,246 +902,106 @@
     document.getElementById('vt-loading').classList.add('done');
   }, 1800);
 
-  // ===== AUDIO ENGINE — Maqam Rast Arab, Reverb Masjid, Oud Pluck, Strings =====
-  var actx = null;
-  var masterGain = null;
-  var reverbNode = null;
+  // ===== AUDIO ENGINE — sound-masjid.mpeg =====
+  var bgAudio = document.getElementById('bgAudio');
   var isPlaying = false;
-  var ambientNodes = [];
-  var pluckTimer = null;
-  var melodyTimer = null;
+  var audioUnlocked = false; // apakah browser sudah izinkan audio
 
-  // Maqam Rast — root C4:
-  // C  D  E♭(half-flat)  F  G  A  B♭  C
-  // Direpresentasikan dalam Hz dari C3 ke atas
-  var rastFreqs = {
-    C3:  130.81, D3:  146.83, Eb3: 155.56, F3:  174.61,
-    G3:  196.00, A3:  220.00, Bb3: 233.08,
-    C4:  261.63, D4:  293.66, Eb4: 311.13, F4:  349.23,
-    G4:  392.00, A4:  440.00, Bb4: 466.16,
-    C5:  523.25, D5:  587.33, G5:  783.99
-  };
+  function updateBtn(playing) {
+    var btn = document.getElementById('audioBtn');
+    if (!btn) return;
+    if (playing) {
+      btn.textContent = '🔊';
+      btn.classList.add('audio-active');
+    } else {
+      btn.textContent = '🔇';
+      btn.classList.remove('audio-active');
+    }
+  }
 
-  // Melodi Maqam Rast — sangat pelan, tenang, jarang, seperti renungan
-  var melodicPhrase = [
-    { f: rastFreqs.C4,  dur: 2.5  },
-    { f: 0,             dur: 2.0  },
-    { f: rastFreqs.D4,  dur: 2.0  },
-    { f: 0,             dur: 1.5  },
-    { f: rastFreqs.Eb4, dur: 2.5  },
-    { f: 0,             dur: 2.0  },
-    { f: rastFreqs.G4,  dur: 3.0  },
-    { f: 0,             dur: 3.0  },
-    { f: rastFreqs.F4,  dur: 2.0  },
-    { f: 0,             dur: 2.0  },
-    { f: rastFreqs.Eb4, dur: 2.0  },
-    { f: 0,             dur: 1.5  },
-    { f: rastFreqs.D4,  dur: 2.0  },
-    { f: 0,             dur: 2.0  },
-    { f: rastFreqs.C4,  dur: 4.0  },
-    { f: 0,             dur: 5.0  },
-    { f: rastFreqs.G3,  dur: 2.5  },
-    { f: 0,             dur: 2.0  },
-    { f: rastFreqs.C4,  dur: 3.0  },
-    { f: 0,             dur: 6.0  },
-  ];
+  function doPlay() {
+    bgAudio.volume = 1;
+    var p = bgAudio.play();
+    if (p) {
+      p.then(function() {
+        isPlaying = true;
+        audioUnlocked = true;
+        updateBtn(true);
+      }).catch(function(err) {
+        // Autoplay diblokir browser — tunggu interaksi pengguna
+        isPlaying = false;
+        updateBtn(false);
+      });
+    } else {
+      isPlaying = true;
+      audioUnlocked = true;
+      updateBtn(true);
+    }
+  }
 
-  // Buat impulse response untuk reverb (gema ruang masjid besar)
-  function buildReverb(duration, decay) {
-    var sr = actx.sampleRate;
-    var len = Math.floor(sr * duration);
-    var buf = actx.createBuffer(2, len, sr);
-    for (var ch = 0; ch < 2; ch++) {
-      var d = buf.getChannelData(ch);
-      for (var i = 0; i < len; i++) {
-        d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay);
+  function doPause() {
+    var fadeInterval = setInterval(function() {
+      if (bgAudio.volume > 0.06) {
+        bgAudio.volume = Math.max(0, bgAudio.volume - 0.06);
+      } else {
+        bgAudio.pause();
+        bgAudio.volume = 1;
+        isPlaying = false;
+        clearInterval(fadeInterval);
       }
-    }
-    return buf;
-  }
-
-  function initAudioContext() {
-    if (actx) return;
-    actx = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Reverb convolver — gema masjid 3.5 detik
-    reverbNode = actx.createConvolver();
-    reverbNode.buffer = buildReverb(3.5, 2.2);
-
-    // Reverb gain (wet) — lebih basah untuk kesan ruang masjid luas
-    var reverbGain = actx.createGain();
-    reverbGain.gain.setValueAtTime(0.65, actx.currentTime);
-    reverbNode.connect(reverbGain);
-    reverbGain.connect(actx.destination);
-
-    // Master gain (dry + wet via masterGain → destination + reverb)
-    masterGain = actx.createGain();
-    masterGain.gain.setValueAtTime(0, actx.currentTime);
-    masterGain.connect(actx.destination);
-    masterGain.connect(reverbNode);
-  }
-
-  // === DRONE STRINGS — akord Rast berkelanjutan ===
-  function createStringDrone(freq, gainVal) {
-    var osc1 = actx.createOscillator();
-    var osc2 = actx.createOscillator(); // sedikit detune untuk efek ensemble
-    var gain = actx.createGain();
-    var lfo  = actx.createOscillator();
-    var lfoG = actx.createGain();
-
-    osc1.type = 'sine';
-    osc2.type = 'sine';
-    osc1.frequency.setValueAtTime(freq, actx.currentTime);
-    osc2.frequency.setValueAtTime(freq * 1.002, actx.currentTime); // +2 cent, sangat halus
-
-    // LPF untuk karakter strings sangat lembut
-    var lpf = actx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.frequency.setValueAtTime(600, actx.currentTime);
-    lpf.Q.setValueAtTime(0.4, actx.currentTime);
-
-    // Vibrato sangat lambat dan kecil
-    lfo.type = 'sine';
-    lfo.frequency.setValueAtTime(2.8, actx.currentTime);
-    lfoG.gain.setValueAtTime(freq * 0.002, actx.currentTime);
-    lfo.connect(lfoG);
-    lfoG.connect(osc1.frequency);
-    lfoG.connect(osc2.frequency);
-
-    gain.gain.setValueAtTime(gainVal, actx.currentTime);
-    osc1.connect(lpf); osc2.connect(lpf);
-    lpf.connect(gain);
-    gain.connect(masterGain);
-
-    osc1.start(); osc2.start(); lfo.start();
-    return { osc1, osc2, lfo, lfoG, lpf, gain };
-  }
-
-  // === OUD-LIKE PLUCK — satu nada petikan ===
-  function playOudPluck(freq, time, gainVal) {
-    if (!actx || !masterGain) return;
-    var t = time || actx.currentTime;
-
-    // Karplus-Strong approximation via oscillator + fast decay
-    var osc  = actx.createOscillator();
-    var gain = actx.createGain();
-    var lpf  = actx.createBiquadFilter();
-
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, t);
-
-    lpf.type = 'lowpass';
-    lpf.frequency.setValueAtTime(1200, t);
-    lpf.Q.setValueAtTime(0.5, t);
-
-    // Attack lembut, decay panjang seperti dawai disentuh pelan
-    gain.gain.setValueAtTime(0, t);
-    gain.gain.linearRampToValueAtTime(gainVal || 0.10, t + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-
-    osc.connect(lpf);
-    lpf.connect(gain);
-    gain.connect(masterGain);
-
-    osc.start(t);
-    osc.stop(t + 2.6);
-  }
-
-  // === SOFT NOISE — udara ruang masjid ===
-  function createRoomAir() {
-    var bufSize = actx.sampleRate * 4;
-    var buf = actx.createBuffer(1, bufSize, actx.sampleRate);
-    var d = buf.getChannelData(0);
-    for (var i = 0; i < bufSize; i++) d[i] = (Math.random() * 2 - 1) * 0.3;
-    var src = actx.createBufferSource();
-    src.buffer = buf; src.loop = true;
-    var lpf = actx.createBiquadFilter();
-    lpf.type = 'lowpass';
-    lpf.frequency.setValueAtTime(280, actx.currentTime);
-    var g = actx.createGain();
-    g.gain.setValueAtTime(0.008, actx.currentTime);
-    src.connect(lpf); lpf.connect(g); g.connect(masterGain);
-    src.start();
-    return { src, lpf, g };
-  }
-
-  // === MELODI OUD — loop frase Maqam Rast ===
-  var melodyStep = 0;
-  function scheduleMelody() {
-    if (!isPlaying) return;
-    var step = melodicPhrase[melodyStep];
-    if (step.f > 0) {
-      playOudPluck(step.f, actx.currentTime, 0.10);
-    }
-    melodyStep = (melodyStep + 1) % melodicPhrase.length;
-    var nextMs = step.dur * 1000; // tepat sesuai durasi, tidak dipercepat
-    melodyTimer = setTimeout(scheduleMelody, nextMs);
-  }
-
-  // === OUD CHORD PLUCK (satu nada awal saja, sangat pelan) ===
-  function playApeggioIntro() {
-    playOudPluck(rastFreqs.C3, actx.currentTime, 0.08);
-  }
-
-  function startAmbient() {
-    initAudioContext();
-    if (actx.state === 'suspended') actx.resume();
-    stopAmbientNodes();
-
-    // 1. Drone strings — akord C Rast, sangat lembut
-    ambientNodes.push(createStringDrone(rastFreqs.C3,  0.07));
-    ambientNodes.push(createStringDrone(rastFreqs.G3,  0.05));
-    ambientNodes.push(createStringDrone(rastFreqs.C4,  0.04));
-    ambientNodes.push(createStringDrone(rastFreqs.Eb4, 0.02));
-
-    // 2. Suara udara ruang masjid
-    ambientNodes.push(createRoomAir());
-
-    // Fade in sangat perlahan — 4 detik
-    masterGain.gain.cancelScheduledValues(actx.currentTime);
-    masterGain.gain.setValueAtTime(0, actx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(0.38, actx.currentTime + 4.0);
-
-    // 3. Nada awal tunggal yang tenang
-    setTimeout(playApeggioIntro, 2000);
-
-    // 4. Loop melodi dimulai lebih lambat
-    melodyStep = 0;
-    setTimeout(scheduleMelody, 6000);
-  }
-
-  function stopAmbientNodes() {
-    ambientNodes.forEach(function(n) {
-      try {
-        if (n.osc1)  { n.osc1.stop(); n.osc2.stop(); n.lfo.stop(); }
-        if (n.src)   n.src.stop();
-        if (n.osc)   n.osc.stop();
-      } catch(e) {}
-    });
-    ambientNodes = [];
-    if (melodyTimer) { clearTimeout(melodyTimer); melodyTimer = null; }
-  }
-
-  function stopAmbient() {
-    if (!actx || !masterGain) return;
-    masterGain.gain.cancelScheduledValues(actx.currentTime);
-    masterGain.gain.setValueAtTime(masterGain.gain.value, actx.currentTime);
-    masterGain.gain.linearRampToValueAtTime(0, actx.currentTime + 1.8);
-    setTimeout(stopAmbientNodes, 1900);
+    }, 60);
   }
 
   function toggleAudio() {
-    var btn = document.getElementById('audioBtn');
+    // Setiap klik tombol = interaksi user → audio dijamin bisa play
     if (isPlaying) {
-      stopAmbient();
-      isPlaying = false;
-      if (btn) { btn.textContent = '🔇'; btn.classList.remove('audio-active'); }
+      localStorage.setItem('masjid_audio_muted', 'true');
+      doPause();
+      updateBtn(false);
     } else {
-      startAmbient();
-      isPlaying = true;
-      if (btn) { btn.textContent = '🔊'; btn.classList.add('audio-active'); }
+      localStorage.setItem('masjid_audio_muted', 'false');
+      doPlay();
     }
   }
+
+  // Init audio saat halaman siap
+  (function initAudio() {
+    var muted = localStorage.getItem('masjid_audio_muted') === 'true';
+    if (muted) {
+      updateBtn(false);
+      return;
+    }
+    // Coba autoplay — jika diblokir, tunggu interaksi pertama
+    updateBtn(true); // tampilkan ikon 🔊 dulu (optimistic)
+    var p = bgAudio.play();
+    if (p) {
+      p.then(function() {
+        isPlaying = true;
+        audioUnlocked = true;
+      }).catch(function() {
+        // Browser blokir — pasang listener sekali pada SEMUA jenis interaksi
+        isPlaying = false;
+        updateBtn(false);
+        var events = ['click', 'touchstart', 'keydown'];
+        function unlockAudio(e) {
+          // Jangan intercept klik pada tombol audio (toggleAudio sudah handle)
+          if (e.target && e.target.id === 'audioBtn') return;
+          if (!isPlaying && localStorage.getItem('masjid_audio_muted') !== 'true') {
+            bgAudio.volume = 1;
+            bgAudio.play().then(function() {
+              isPlaying = true;
+              audioUnlocked = true;
+              updateBtn(true);
+            }).catch(function(){});
+          }
+          events.forEach(function(ev) { document.removeEventListener(ev, unlockAudio); });
+        }
+        events.forEach(function(ev) { document.addEventListener(ev, unlockAudio); });
+      });
+    } else {
+      isPlaying = true;
+    }
+  })();
 
   window.toggleAudio = toggleAudio;
 

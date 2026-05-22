@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Masjid Agung Sukabumi - Virtual Tour</title>
+  <title>Masjid Agung Kota Sukabumi - Virtual Tour</title>
   <link rel="stylesheet" href="css/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
@@ -844,6 +844,26 @@
       }
     }
 
+    /* ===== AUDIO TOGGLE BUTTON (NAVBAR) ===== */
+    .btn-audio-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-audio-toggle:hover {
+      border-color: var(--gold);
+      background: rgba(201, 168, 76, 0.12);
+    }
+
     @media (max-width: 900px) {
       .tentang-inner {
         grid-template-columns: 1fr;
@@ -881,7 +901,7 @@
         </svg>
       </div>
       <div>
-        <div class="nav-title">Masjid Agung Sukabumi</div>
+        <div class="nav-title">Masjid Agung Kota Sukabumi</div>
         <div class="nav-subtitle">VIRTUAL TOUR</div>
       </div>
     </div>
@@ -937,6 +957,9 @@
         <span class="icon-light">🌙</span>
         <span class="icon-dark">☀️</span>
       </button>
+      <button class="btn-audio-toggle" id="audioToggleBtn" title="Nyalakan / Matikan Audio">
+        <span id="audioToggleIcon">🔊</span>
+      </button>
       <a href="admin/login.html" class="btn-admin-icon" title="Login Admin">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           stroke-linecap="round" stroke-linejoin="round">
@@ -952,10 +975,10 @@
     <div id="hero-panorama"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-      <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG SUKABUMI</div>
+      <div class="hero-badge">▷ VIRTUAL TOUR 360° MASJID AGUNG KOTA SUKABUMI</div>
       <h1 class="hero-title">
         Jelajahi Keindahan<br />
-        <span class="hero-title-gold">Masjid Agung Sukabumi</span>
+        <span class="hero-title-gold">Masjid Agung Kota Sukabumi</span>
       </h1>
       <p class="hero-desc">
         Rasakan pengalaman spiritual yang mendalam melalui tur virtual 360° yang
@@ -1012,13 +1035,13 @@
       <div class="tentang-inner">
         <div class="tentang-text">
           <div class="section-badge">TENTANG MASJID</div>
-          <h2 id="tentangJudul">Tentang Masjid Agung Sukabumi</h2>
+          <h2 id="tentangJudul">Tentang Masjid Agung Kota Sukabumi</h2>
           <div id="tentangDeskripsi">
-            <p>Masjid Agung Sukabumi adalah masjid kebanggaan masyarakat Kota Sukabumi, Jawa Barat. Masjid ini merupakan
+            <p>Masjid Agung Kota Sukabumi adalah masjid kebanggaan masyarakat Kota Sukabumi, Jawa Barat. Masjid ini merupakan
               pusat kegiatan keagamaan, sosial, dan budaya Islam di Kota Sukabumi, berdiri megah di jantung kota sebagai
               simbol keimanan dan peradaban Islam.</p>
             <p>Dibangun dengan arsitektur yang memadukan nilai-nilai Islam dan kearifan budaya lokal, Masjid Agung
-              Sukabumi menjadi tempat ibadah yang nyaman bagi ribuan jamaah setiap harinya, terutama saat shalat Jumat
+              Kota Sukabumi menjadi tempat ibadah yang nyaman bagi ribuan jamaah setiap harinya, terutama saat shalat Jumat
               dan hari-hari besar Islam.</p>
             <p>Masjid ini terus berkembang dalam pelayanan kepada umat, dengan berbagai program pendidikan Islam, sosial
               kemasyarakatan, dan pemberdayaan ekonomi umat yang dikelola secara profesional oleh Badan Kemakmuran
@@ -1087,7 +1110,7 @@
       <div class="section-header">
         <div class="section-badge">KEPENGURUSAN</div>
         <h2 class="section-title">Profil Pengurus Masjid</h2>
-        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Badan Kemakmuran Masjid (BKM) Masjid Agung
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Badan Kemakmuran Masjid (BKM) Masjid Agung Kota
           Sukabumi</p>
       </div>
       <div class="pengurus-slider-wrap">
@@ -1113,7 +1136,7 @@
         <div class="section-badge">JADWAL HARIAN</div>
         <h2 class="section-title">Imam & Muadzin Harian</h2>
         <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Jadwal petugas imam dan muadzin shalat
-          berjamaah Masjid Agung Sukabumi</p>
+          berjamaah Masjid Agung Kota Sukabumi</p>
       </div>
       <div class="imam-grid">
         <div class="imam-group">
@@ -1152,7 +1175,7 @@
         <div class="section-badge">KEGIATAN MASJID</div>
         <h2 class="section-title">Kegiatan Mendatang</h2>
         <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Ikuti berbagai kegiatan kajian dan program
-          keagamaan di Masjid Agung Sukabumi</p>
+          keagamaan di Masjid Agung Kota Sukabumi</p>
       </div>
 
       <div class="event-grid" id="eventList">
@@ -1184,12 +1207,12 @@
       <div class="footer-brand">
         <div class="footer-logo">🕌</div>
 
-        <h3>Masjid Agung Sukabumi</h3>
+        <h3>Masjid Agung Kota Sukabumi</h3>
 
         <p>
           Virtual Tour 360° untuk menjelajahi
           keindahan, sejarah, dan aktivitas
-          Masjid Agung Sukabumi dari mana saja.
+          Masjid Agung Kota Sukabumi dari mana saja.
         </p>
 
         <!-- Social -->
@@ -1223,8 +1246,8 @@
         <h4>Informasi</h4>
 
         <p>📍 Kota Sukabumi, Jawa Barat</p>
-        <p>🕌 Masjid Agung Sukabumi</p>
-        <p>📧 info@masjidagungsukabumi.id</p>
+        <p>🕌 Masjid Agung Kota Sukabumi</p>
+        <p>📧 info@masjidagungkotasukabumi.id</p>
         <p>+62 871261217217</p>
         <p>🕒 <span id="footerClock"></span></p>
       </div>
@@ -1234,7 +1257,7 @@
     <!-- Bottom -->
     <div class="footer-bottom">
       <p>
-        © 2025 Masjid Agung Sukabumi Virtual Tour
+        © 2026 Masjid Agung Kota Sukabumi Virtual Tour
         • All Rights Reserved
       </p>
     </div>
@@ -1242,6 +1265,120 @@
   </footer>
 
   <script type="module" src="js/index.js"></script>
+
+  <!-- ===== AUDIO MASJID ===== -->
+  <audio id="bgAudio" loop preload="auto">
+    <source src="sound-masjid.mpeg" type="audio/mpeg">
+  </audio>
+
+  <!-- Overlay autoplay — muncul sekali saat kunjungan pertama -->
+  <div id="audioOverlay" style="
+    display:none;
+    position:fixed; inset:0; z-index:99999;
+    background:rgba(0,0,0,0.72); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center; flex-direction:column;
+  ">
+    <div style="
+      background:linear-gradient(145deg,rgba(30,24,12,0.98),rgba(20,16,8,0.98));
+      border:1px solid rgba(201,168,76,0.45);
+      border-radius:24px; padding:44px 48px; text-align:center;
+      max-width:380px; width:90%; box-shadow:0 24px 64px rgba(0,0,0,0.6);
+    ">
+      <div style="font-size:52px; margin-bottom:14px;">🕌</div>
+      <div style="
+        font-family:'Playfair Display',serif; font-size:22px;
+        color:#c9a84c; margin-bottom:10px;
+      ">Selamat Datang</div>
+      <div style="
+        font-family:'Lato',sans-serif; font-size:14px;
+        color:rgba(255,255,255,0.7); line-height:1.7; margin-bottom:28px;
+      ">Masjid Agung Kota Sukabumi Virtual Tour<br>dilengkapi dengan lantunan audio.<br>Aktifkan untuk pengalaman terbaik.</div>
+      <div style="display:flex; gap:12px; width:100%;">
+        <button id="audioOverlayYes" style="
+          flex:1;
+          background:linear-gradient(135deg,#c9a84c,#e8c96a);
+          color:#1a1200; border:none; border-radius:50px;
+          padding:14px 8px; font-size:14px; font-weight:700;
+          font-family:'Lato',sans-serif; cursor:pointer;
+          letter-spacing:0.3px; transition:opacity 0.2s;
+        ">🔊 Aktifkan</button>
+        <button id="audioOverlayNo" style="
+          flex:1;
+          background:transparent; color:rgba(255,255,255,0.6);
+          border:1px solid rgba(255,255,255,0.2); border-radius:50px;
+          padding:14px 8px; font-size:14px;
+          font-family:'Lato',sans-serif; cursor:pointer;
+          transition:opacity 0.2s;
+        ">🔇 Tanpa Audio</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var audio   = document.getElementById('bgAudio');
+    var btn     = document.getElementById('audioToggleBtn');
+    var icon    = document.getElementById('audioToggleIcon');
+    var overlay = document.getElementById('audioOverlay');
+
+    var muted = localStorage.getItem('masjid_audio_muted') === 'true';
+
+    function setIcon() {
+      icon.textContent = muted ? '🔇' : '🔊';
+      btn.style.opacity = muted ? '0.55' : '1';
+    }
+
+    function startAudio() {
+      audio.volume = 1;
+      audio.play().catch(function(){});
+    }
+
+    function hideOverlay() {
+      overlay.style.opacity = '0';
+      overlay.style.transition = 'opacity 0.4s';
+      setTimeout(function(){ overlay.style.display = 'none'; }, 400);
+    }
+
+    // Tombol toggle navbar
+    btn.addEventListener('click', function () {
+      muted = !muted;
+      localStorage.setItem('masjid_audio_muted', String(muted));
+      setIcon();
+      if (muted) { audio.pause(); } else { startAudio(); }
+    });
+
+    setIcon();
+
+    // Cek apakah sudah pilih di sesi tab ini (bukan refresh baru)
+    var visited = sessionStorage.getItem('masjid_visited');
+    if (visited) {
+      // Sudah pilih di sesi ini — langsung play atau diam sesuai preferensi
+      if (!muted) startAudio();
+      return;
+    }
+
+    // Setiap refresh / buka tab baru — tampilkan overlay
+    overlay.style.display = 'flex';
+
+    document.getElementById('audioOverlayYes').addEventListener('click', function () {
+      muted = false;
+      localStorage.setItem('masjid_audio_muted', 'false');
+      sessionStorage.setItem('masjid_visited', '1');
+      setIcon();
+      startAudio();
+      hideOverlay();
+    });
+
+    document.getElementById('audioOverlayNo').addEventListener('click', function () {
+      muted = true;
+      localStorage.setItem('masjid_audio_muted', 'true');
+      sessionStorage.setItem('masjid_visited', '1');
+      setIcon();
+      hideOverlay();
+    });
+
+  })();
+  </script>
 </body>
 
 </html>
