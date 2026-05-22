@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="target-densitydpi=device-dpi, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, minimal-ui"/>
-  <title>Virtual Tour 360° - Masjid Agung Sukabumi</title>
+  <title>Virtual Tour 360° - Masjid Agung Kota Sukabumi</title>
+  <link rel="icon" type="image/png" href="logo-MAKS-white.png" />
+  <link rel="shortcut icon" type="image/png" href="logo-MAKS-white.png" />
   <style>@-ms-viewport { width: device-width; }</style>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
 
@@ -329,7 +331,7 @@
 
 <!-- Loading Screen -->
 <div id="vt-loading">
-  <div class="vt-loading-logo">Masjid Agung Sukabumi</div>
+  <div class="vt-loading-logo">Masjid Agung Kota Sukabumi</div>
   <div class="vt-loading-bar"><div class="vt-loading-fill" id="loadingFill"></div></div>
   <div class="vt-loading-text">MEMUAT VIRTUAL TOUR 360°...</div>
 </div>
@@ -340,13 +342,9 @@
 <!-- Top Bar -->
 <div class="vt-topbar">
   <div class="vt-brand">
-    <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-      <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2"/>
-      <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c"/>
-      <rect x="15" y="22" width="6" height="8" fill="#c9a84c"/>
-    </svg>
+    <img src="logo-MAKS-transparent.png" alt="Logo Masjid Agung Kota Sukabumi" width="32" height="32" style="object-fit:contain; filter:brightness(0) invert(1);" />
     <div>
-      <span class="vt-brand-text">Masjid Agung Sukabumi</span>
+      <span class="vt-brand-text">Masjid Agung Kota Sukabumi</span>
       <span class="vt-brand-sub">VIRTUAL TOUR 360°</span>
     </div>
   </div>
@@ -493,7 +491,7 @@
 <!-- Info Popup -->
 <div class="vt-info" id="vtInfo">
   <h3 id="infoTitle">Depan Keseluruhan</h3>
-  <p id="infoDesc">Tampak depan keseluruhan Masjid Agung Sukabumi yang megah, landmark kebanggaan Kota Sukabumi.</p>
+  <p id="infoDesc">Tampak depan keseluruhan Masjid Agung Kota Sukabumi yang megah, landmark kebanggaan Kota Sukabumi.</p>
   <div class="vt-info-nav">
     <button onclick="prevScene()">← Sebelumnya</button>
     <button onclick="nextScene()">Berikutnya →</button>
@@ -593,19 +591,19 @@
 
   // ===== SCENE DESCRIPTIONS =====
   var sceneDescriptions = {
-    '0-depan-keseluruhan': 'Tampak depan keseluruhan Masjid Agung Sukabumi yang megah, landmark kebanggaan Kota Sukabumi.',
+    '0-depan-keseluruhan': 'Tampak depan keseluruhan Masjid Agung Kota Sukabumi yang megah, landmark kebanggaan Kota Sukabumi.',
     '6-tampak-jauh': 'Pandangan keseluruhan dari kejauhan, memperlihatkan kemegahan arsitektur masjid.',
     '9-jauh-depan': 'Area depan masjid dari kejauhan dengan halaman yang luas.',
     '11-halaman-ujung': 'Halaman dan taman masjid yang asri dengan area parkir yang luas.',
     '15-pintu-masjid': 'Pintu masuk masjid yang megah dengan ornamen khas arsitektur Islam.',
-    '19-depan-pintu-utama': 'Tepat di depan pintu utama Masjid Agung Sukabumi.',
+    '19-depan-pintu-utama': 'Tepat di depan pintu utama Masjid Agung Kota Sukabumi.',
     '23-dalam-masjid-kiri': 'Interior sisi kiri ruang shalat utama dengan dekorasi yang indah.',
     '24-dalam-masjid-kanan': 'Interior sisi kanan ruang shalat utama.',
     '25-utama': 'Ruang shalat utama yang luas, dapat menampung ribuan jamaah.',
     '27-mimbar': 'Mimbar dan mihrab yang megah sebagai pusat kegiatan ibadah.',
     '32-ruang-dkm': 'Ruang kantor DKM (Dewan Kemakmuran Masjid) dan pengurus masjid.',
     '38-bagian-atas-1': 'Bagian atas masjid dengan pemandangan menara dan kubah yang indah.',
-    '48-jalan-dekat-parkiran-1': 'Area jalan dan parkiran di sekitar Masjid Agung Sukabumi.',
+    '48-jalan-dekat-parkiran-1': 'Area jalan dan parkiran di sekitar Masjid Agung Kota Sukabumi.',
     '50-lapangan-merdeka-gor': 'Lapangan Merdeka dan area GOR di sekitar kawasan masjid.',
     '55-wc': 'Fasilitas toilet dan tempat wudhu yang tersedia untuk jamaah.',
     '58-halaman-luar-kanan': 'Halaman luar sisi kanan masjid.',
@@ -709,7 +707,7 @@
           found.scene.switchTo({ transitionDuration: 0 });
           document.getElementById('vt-scene-name').textContent = found.data.name;
           document.getElementById('infoTitle').textContent     = found.data.name;
-          document.getElementById('infoDesc').textContent      = sceneDescriptions[sceneId] || 'Area ' + found.data.name + ' Masjid Agung Sukabumi.';
+          document.getElementById('infoDesc').textContent      = sceneDescriptions[sceneId] || 'Area ' + found.data.name + ' Masjid Agung Kota Sukabumi.';
           document.getElementById('vtInfo').classList.remove('hidden');
           sidebarButtons.forEach(function(b) {
             b.classList.toggle('active', b.getAttribute('data-scene-id') === sceneId);

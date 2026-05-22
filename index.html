@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Masjid Agung Kota Sukabumi - Virtual Tour</title>
+  <link rel="icon" type="image/png" href="logo-MAKS-white.png" />
+  <link rel="shortcut icon" type="image/png" href="logo-MAKS-white.png" />
   <link rel="stylesheet" href="css/style.css" />
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
@@ -13,6 +15,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pannellum/2.5.6/pannellum.js"></script>
   <style>
+    /* ===== LOGO THEME SWITCH ===== */
+    .nav-logo img,
+    .footer-logo img,
+    #audioOverlay img {
+      transition: filter 0.3s;
+      filter: brightness(0) invert(0); /* default: warna asli (tema terang) */
+    }
+    body.dark .nav-logo img,
+    body.dark .footer-logo img,
+    body.dark #audioOverlay img {
+      filter: brightness(0) invert(1); /* tema gelap: jadi putih */
+    }
+
     /* ===== TENTANG MASJID ===== */
     .tentang-section {
       padding: 80px 0;
@@ -893,12 +908,7 @@
   <nav class="navbar" id="navbar">
     <div class="nav-brand">
       <div class="nav-logo">
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <circle cx="18" cy="18" r="17" stroke="#c9a84c" stroke-width="2" />
-          <path d="M18 6 C18 6, 10 14, 10 22 L26 22 C26 14, 18 6, 18 6Z" fill="#c9a84c" />
-          <rect x="15" y="22" width="6" height="8" fill="#c9a84c" />
-          <circle cx="18" cy="5" r="2" fill="#c9a84c" />
-        </svg>
+        <img src="logo-MAKS-transparent.png" alt="Logo Masjid Agung Kota Sukabumi" width="36" height="36" style="object-fit:contain;" />
       </div>
       <div>
         <div class="nav-title">Masjid Agung Kota Sukabumi</div>
@@ -1205,7 +1215,7 @@
 
       <!-- Brand -->
       <div class="footer-brand">
-        <div class="footer-logo">🕌</div>
+        <div class="footer-logo"><img src="logo-MAKS-transparent.png" alt="Logo Masjid Agung Kota Sukabumi" style="width:52px;height:52px;object-fit:contain;" /></div>
 
         <h3>Masjid Agung Kota Sukabumi</h3>
 
@@ -1284,7 +1294,7 @@
       border-radius:24px; padding:44px 48px; text-align:center;
       max-width:380px; width:90%; box-shadow:0 24px 64px rgba(0,0,0,0.6);
     ">
-      <div style="font-size:52px; margin-bottom:14px;">🕌</div>
+      <div style="margin-bottom:14px;"><img src="logo-MAKS-transparent.png" alt="Logo" style="width:64px;height:64px;object-fit:contain;filter:brightness(0) invert(1);" /></div>
       <div style="
         font-family:'Playfair Display',serif; font-size:22px;
         color:#c9a84c; margin-bottom:10px;
