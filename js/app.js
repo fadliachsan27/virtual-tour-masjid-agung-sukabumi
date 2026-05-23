@@ -51,6 +51,7 @@ function showPage(name, el) {
   if (name === 'info')     loadInfoForm();
   if (name === 'dashboard') updateDashboardStats();
   if (name === 'event')    loadEvents();
+  if (name === 'articles') loadArticles();
   return false;
 }
 window.showPage = showPage;
@@ -94,6 +95,39 @@ function formatIndonesianDate(dateStr) {
   }
 }
 
+function formatTimestamp(value) {
+  if (!value) return '';
+  let date;
+  if (value?.toDate) date = value.toDate();
+  else if (typeof value === 'object' && 'seconds' in value) date = new Date(value.seconds * 1000);
+  else date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function formatAdminTitle(value, charsPerLine = 20) {
+  const chars = Array.from(String(value || '-').trim());
+  if (!chars.length) return '-';
+  const lines = [];
+  for (let i = 0; i < chars.length; i += charsPerLine) {
+    lines.push(escapeHtml(chars.slice(i, i + charsPerLine).join('')));
+  }
+  return lines.join('<br>');
+}
+
 function renderEventTable() {
   const tbody = document.getElementById('eventAdminTableBody');
   if (!tbody) return;
@@ -118,7 +152,7 @@ function renderEventTable() {
     
     tr.innerHTML = `
       <td>${mediaHtml}</td>
-      <td style="font-weight:bold;color:#fff">${item.judul || '-'}</td>
+      <td class="admin-title-cell">${formatAdminTitle(item.judul)}</td>
       <td><span class="hari-badge">${formatIndonesianDate(item.tanggal) || '-'}</span></td>
       <td style="color:var(--muted);max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.deskripsi || '-'}</td>
       <td>
@@ -279,6 +313,266 @@ function closeEventModal() {
   document.getElementById('eventModal').classList.remove('open');
 }
 
+let articleItems = [];
+let editArticleId = null;
+let articlePendingImages = [];
+let draggedArticleImageIndex = null;
+
+async function loadArticles() {
+  try {
+    const snap = await getDocs(query(collection(db, 'articles'), orderBy('order', 'desc')));
+    articleItems = [];
+    snap.forEach(d => articleItems.push({ id: d.id, ...d.data() }));
+    renderArticleTable();
+  } catch (e) { showToast('⚠ Gagal memuat artikel: ' + e.message); }
+}
+
+function renderArticleTable() {
+  const tbody = document.getElementById('articleAdminTableBody');
+  if (!tbody) return;
+  if (articleItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data artikel.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = '';
+  articleItems.forEach(item => {
+    const tr = document.createElement('tr');
+    const imageHtml = item.images && item.images.length
+      ? `<img src="${item.images[0]}" style="width:100px;height:56px;object-fit:cover;border-radius:4px" alt="${item.judul}"/>`
+      : `<span style="font-size:24px">📰</span>`;
+    const summary = item.deskripsi ? item.deskripsi.replace(/\n/g, ' ').slice(0, 120) : '-';
+    const createdDate = item.createdAt ? formatTimestamp(item.createdAt) : '';
+    const created = createdDate
+      ? formatIndonesianDate(createdDate)
+      : item.order
+        ? formatIndonesianDate(formatTimestamp(item.order))
+        : '-';
+    tr.innerHTML = `
+      <td>${imageHtml}</td>
+      <td class="admin-title-cell">${formatAdminTitle(item.judul)}</td>
+      <td><span class="hari-badge">${created}</span></td>
+      <td style="color:var(--muted);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${summary}</td>
+      <td>
+        <button class="btn-sm" onclick="editArticle('${item.id}')">✏️ Edit</button>
+        <button class="btn-danger" style="margin-left:5px" onclick="deleteArticle('${item.id}')">🗑</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function openArticleModal(id) {
+  editArticleId = id || null;
+  articlePendingImages = [];
+  document.getElementById('articleModalTitle').textContent = id ? 'Edit Artikel' : 'Tambah Artikel';
+  document.getElementById('articleJudul').value = '';
+  document.getElementById('articleDeskripsi').value = '';
+  document.getElementById('articleImagesInput').value = '';
+  const previewEl = document.getElementById('articleImagePreview');
+  if (previewEl) previewEl.innerHTML = '<div class="article-thumbs" id="articleThumbGrid"></div>';
+
+  if (id) {
+    const item = articleItems.find(a => a.id === id);
+    if (item) {
+      document.getElementById('articleJudul').value = item.judul || '';
+      document.getElementById('articleDeskripsi').value = item.deskripsi || '';
+      articlePendingImages = Array.isArray(item.images) ? [...item.images] : [];
+    }
+  }
+
+  renderArticleImagePreview();
+  document.getElementById('articleModal').classList.add('open');
+}
+
+async function previewArticleImages(files) {
+  if (!files || !files.length) return;
+  const selected = Array.from(files);
+  showToast('Memproses gambar artikel...');
+  for (const file of selected) {
+    if (!file.type.startsWith('image/')) continue;
+    const base64 = await compressToBase64(file, 1200, 0.78);
+    if (!base64) continue;
+    articlePendingImages.push(base64);
+  }
+  window._targetThumbIndex = null;
+  if (!articlePendingImages.length) {
+    showToast('Pilih minimal 1 gambar valid untuk artikel');
+    return;
+  }
+  const input = document.getElementById('articleImagesInput');
+  if (input) input.value = '';
+  renderArticleImagePreview();
+  showToast('Gambar artikel siap. Klik Simpan.');
+}
+
+function renderArticleImagePreview() {
+  const preview = document.getElementById('articleImagePreview');
+  if (!preview) return;
+
+  let html = '<div class="article-thumbs">';
+  articlePendingImages.forEach((src, i) => {
+    html += `
+        <div class="thumb-item" draggable="true" data-idx="${i}" id="thumb-${i}">
+          <img class="thumb-img" src="${src}" alt="Preview ${i + 1}" />
+          <div class="thumb-controls">
+            <button class="thumb-btn thumb-edit" data-idx="${i}" title="Edit">Edit</button>
+            <button class="thumb-btn thumb-delete" data-idx="${i}" title="Hapus">X</button>
+          </div>
+          <div class="thumb-drag-handle">Drag</div>
+        </div>`;
+  });
+  html += `
+        <div class="thumb-item thumb-empty" data-idx="${articlePendingImages.length}" id="thumb-add">
+          <div class="thumb-plus">+</div>
+        </div>`;
+  html += '</div>';
+
+  const grid = preview.querySelector('#articleThumbGrid');
+  if (!grid) return;
+  grid.innerHTML = html;
+
+  for (let i = 0; i < articlePendingImages.length; i++) {
+    const filledEl = grid.querySelector(`#thumb-${i}`);
+    if (!filledEl) continue;
+
+    filledEl.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', i);
+      e.dataTransfer.effectAllowed = 'move';
+      draggedArticleImageIndex = i;
+      filledEl.classList.add('dragging');
+    });
+    filledEl.addEventListener('dragend', () => {
+      draggedArticleImageIndex = null;
+      filledEl.classList.remove('dragging');
+    });
+    filledEl.addEventListener('dragover', e => e.preventDefault());
+    filledEl.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const transferIdx = Number(e.dataTransfer.getData('text/plain'));
+      const srcIdx = Number.isFinite(transferIdx) ? transferIdx : draggedArticleImageIndex;
+      moveArticleImage(srcIdx, i);
+      renderArticleImagePreview();
+    });
+
+    const editBtn = filledEl.querySelector('.thumb-edit');
+    if (editBtn) editBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      window._replaceThumbIndex = i;
+      document.getElementById('articleReplaceInput').click();
+    });
+
+    const delBtn = filledEl.querySelector('.thumb-delete');
+    if (delBtn) delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      articlePendingImages.splice(i, 1);
+      renderArticleImagePreview();
+    });
+  }
+
+  const addEl = grid.querySelector('#thumb-add');
+  if (!addEl) return;
+
+  addEl.addEventListener('dragover', e => e.preventDefault());
+  addEl.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const transferIdx = Number(e.dataTransfer.getData('text/plain'));
+    const srcIdx = Number.isFinite(transferIdx) ? transferIdx : draggedArticleImageIndex;
+    moveArticleImage(srcIdx, articlePendingImages.length);
+    renderArticleImagePreview();
+  });
+  addEl.addEventListener('click', e => {
+    e.stopPropagation();
+    window._targetThumbIndex = articlePendingImages.length;
+    document.getElementById('articleImagesInput').click();
+  });
+}
+
+function moveArticleImage(sourceIndex, targetIndex) {
+  if (!Number.isInteger(sourceIndex) || !Number.isInteger(targetIndex)) return;
+  if (sourceIndex < 0 || sourceIndex >= articlePendingImages.length) return;
+
+  const [moved] = articlePendingImages.splice(sourceIndex, 1);
+  if (!moved) return;
+
+  let insertIndex = targetIndex;
+  if (sourceIndex < targetIndex) insertIndex -= 1;
+  insertIndex = Math.max(0, Math.min(insertIndex, articlePendingImages.length));
+  articlePendingImages.splice(insertIndex, 0, moved);
+}
+
+async function replaceArticleImage(file) {
+  if (!file) return;
+  const idx = window._replaceThumbIndex;
+  window._replaceThumbIndex = null;
+  if (!Number.isFinite(idx) || idx < 0 || idx >= articlePendingImages.length) return;
+  showToast('⏳ Memproses gambar pengganti...');
+  const base64 = await compressToBase64(file, 1200, 0.78);
+  if (!base64) { showToast('⚠ Gagal memproses gambar pengganti'); return; }
+  articlePendingImages[idx] = base64;
+  renderArticleImagePreview();
+  showToast('✅ Gambar diganti');
+}
+
+window.replaceArticleImage = replaceArticleImage;
+
+async function saveArticle() {
+  const judul = document.getElementById('articleJudul').value.trim();
+  const deskripsi = document.getElementById('articleDeskripsi').value.trim();
+  if (!judul) {
+    showToast('⚠ Judul artikel tidak boleh kosong!');
+    return;
+  }
+  if (!deskripsi) {
+    showToast('⚠ Deskripsi artikel tidak boleh kosong!');
+    return;
+  }
+  if (!articlePendingImages.length) {
+    showToast('⚠ Gambar artikel minimal 1 foto!');
+    return;
+  }
+  const data = {
+    judul,
+    deskripsi,
+    images: articlePendingImages,
+    order: editArticleId ? (articleItems.find(a => a.id === editArticleId)?.order || Date.now()) : Date.now(),
+    createdAt: editArticleId ? (articleItems.find(a => a.id === editArticleId)?.createdAt || serverTimestamp()) : serverTimestamp()
+  };
+  try {
+    if (editArticleId) {
+      await updateDoc(doc(db, 'articles', editArticleId), {
+        judul,
+        deskripsi,
+        images: articlePendingImages
+      });
+    } else {
+      await addDoc(collection(db, 'articles'), data);
+    }
+    closeArticleModal();
+    await loadArticles();
+    showToast('✅ Artikel berhasil disimpan!');
+  } catch (e) {
+    showToast('⚠ Gagal menyimpan artikel: ' + e.message);
+  }
+}
+
+async function deleteArticle(id) {
+  openConfirmModal('Hapus artikel ini?', async () => {
+    try {
+      await deleteDoc(doc(db, 'articles', id));
+      await loadArticles();
+      showToast('🗑 Artikel dihapus');
+    } catch (e) {
+      showToast('⚠ Gagal menghapus artikel: ' + e.message);
+    }
+  });
+}
+
+function closeArticleModal() {
+  document.getElementById('articleModal').classList.remove('open');
+}
+
 // Bind to window for global access
 window.loadEvents = loadEvents;
 window.openEventModal = openEventModal;
@@ -287,6 +581,13 @@ window.saveEvent = saveEvent;
 window.deleteEvent = deleteEvent;
 window.editEvent = openEventModal;
 window.previewEventMedia = previewEventMedia;
+window.loadArticles = loadArticles;
+window.openArticleModal = openArticleModal;
+window.closeArticleModal = closeArticleModal;
+window.saveArticle = saveArticle;
+window.deleteArticle = deleteArticle;
+window.editArticle = openArticleModal;
+window.previewArticleImages = previewArticleImages;
 window.closeConfirmModal = closeConfirmModal;
 
 // Drag & drop — event media preview
@@ -302,6 +603,23 @@ if (emp) {
     emp.classList.remove('drag-over');
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       previewEventMedia(e.dataTransfer.files[0]);
+    }
+  });
+}
+
+// Drag & drop — article image preview
+const aip = document.getElementById('articleImagePreview');
+if (aip) {
+  aip.addEventListener('dragover', e => {
+    e.preventDefault();
+    aip.classList.add('drag-over');
+  });
+  aip.addEventListener('dragleave', () => aip.classList.remove('drag-over'));
+  aip.addEventListener('drop', e => {
+    e.preventDefault();
+    aip.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) {
+      previewArticleImages(e.dataTransfer.files);
     }
   });
 }
