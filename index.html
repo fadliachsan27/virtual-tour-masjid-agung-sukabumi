@@ -1199,18 +1199,64 @@
       <div class="event-grid" id="eventList">
         <div class="event-empty">
           <div class="event-empty-icon">📅</div>
-          <div>Belum ada event. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
+          <div>Belum ada kegiatan. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
         </div>
       </div>
+      <div class="pagination-row" id="eventPagination"></div>
       <div class="event-detail-overlay" id="eventDetailOverlay" onclick="closeEventDetail()">
+        <button class="event-detail-close" onclick="closeEventDetail()">×</button>
         <div class="event-detail-card" onclick="event.stopPropagation()">
-          <button class="event-detail-close" onclick="closeEventDetail()">×</button>
-          <div class="event-detail-media" id="eventDetailMedia"></div>
-          <div class="event-detail-body">
-            <h3 id="eventDetailTitle">Judul Event</h3>
-            <p id="eventDetailDate"></p>
-            <p class="event-detail-countdown" id="eventDetailCountdown"></p>
-            <p id="eventDetailDescription"></p>
+          <div class="article-detail-grid event-detail-grid">
+            <div class="article-detail-left">
+              <div class="article-detail-media event-detail-media" id="eventDetailMedia"></div>
+            </div>
+            <div class="article-detail-right">
+              <div class="article-detail-title-box event-detail-title-box">
+                <h3 id="eventDetailTitle">Judul Kegiatan</h3>
+              </div>
+              <div class="article-detail-body event-detail-body">
+                <p id="eventDetailDate"></p>
+                <p class="event-detail-countdown" id="eventDetailCountdown"></p>
+                <p id="eventDetailDescription"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ARTICLE SECTION ===== -->
+  <section class="article-section" id="articles">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">BERITA & ARTIKEL</div>
+        <h2 class="section-title">Berita Terbaru</h2>
+        <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Baca informasi terbaru dan update kegiatan dari Masjid Agung Sukabumi.</p>
+      </div>
+      <div class="article-list" id="articleList">
+        <div class="article-empty">
+          <div class="article-empty-icon">📰</div>
+          <div>Belum ada artikel. <a href="admin/index.html" style="color:var(--gold)">Tambah di Admin Panel</a></div>
+        </div>
+      </div>
+      <div class="pagination-row" id="articlePagination"></div>
+      <div class="article-detail-overlay" id="articleDetailOverlay" onclick="closeArticleDetail()">
+        <button class="event-detail-close" onclick="closeArticleDetail()">×</button>
+        <div class="article-detail-card" onclick="event.stopPropagation()">
+          <div class="article-detail-grid">
+            <div class="article-detail-left">
+              <div class="article-detail-media" id="articleDetailMedia"></div>
+            </div>
+            <div class="article-detail-right">
+              <div class="article-detail-title-box">
+                <h3 id="articleDetailTitle">Judul Artikel</h3>
+              </div>
+              <div class="article-detail-body">
+                <p class="article-detail-timestamp" id="articleDetailTimestamp"></p>
+                <p class="article-detail-description" id="articleDetailDescription"></p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
