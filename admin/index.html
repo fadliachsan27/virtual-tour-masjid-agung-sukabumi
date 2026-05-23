@@ -5,6 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel - Masjid Agung Sukabumi</title>
+  <link rel="icon" type="image/png" href="logo-MAKS-white.png" />
+  <link rel="shortcut icon" type="image/png" href="logo-MAKS-white.png" />
   <link
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap"
     rel="stylesheet" />
@@ -32,7 +34,8 @@
       font-family: 'Lato', sans-serif;
       height: 100vh;
       display: flex;
-      overflow: hidden; /* prevent body scroll, allow main to scroll */
+      overflow: hidden;
+      /* prevent body scroll, allow main to scroll */
     }
 
     /* SIDEBAR */
@@ -114,10 +117,12 @@
     /* MAIN */
     .main {
       flex: 1;
-      margin-left: 230px; /* reserve space for fixed sidebar */
+      margin-left: 230px;
+      /* reserve space for fixed sidebar */
       padding: 36px 40px;
       height: 100vh;
-      overflow-y: auto; /* only main scrolls */
+      overflow-y: auto;
+      /* only main scrolls */
       -webkit-overflow-scrolling: touch;
     }
 
@@ -457,8 +462,18 @@
       font-weight: 300;
       line-height: 1;
     }
-    .thumb-item.dragging { opacity: 0.5; }
-    .thumb-img { width: 100%; height: 100%; object-fit: cover; display: block }
+
+    .thumb-item.dragging {
+      opacity: 0.5;
+    }
+
+    .thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block
+    }
+
     .thumb-controls {
       position: absolute;
       top: 6px;
@@ -466,14 +481,31 @@
       display: flex;
       gap: 6px;
     }
+
     .thumb-btn {
-      min-width: 28px; height: 28px; border-radius: 6px; border: none;
-      background: rgba(0,0,0,0.5); color: #fff; cursor: pointer; font-size: 11px;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: none;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      cursor: pointer;
+      font-size: 11px;
       padding: 0 7px;
-      display: inline-flex; align-items:center;justify-content:center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .thumb-drag-handle {
-      position: absolute; left:6px; bottom:6px; background: rgba(0,0,0,0.45); color:#fff; padding:4px 6px; border-radius:6px; font-size:12px
+      position: absolute;
+      left: 6px;
+      bottom: 6px;
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      padding: 4px 6px;
+      border-radius: 6px;
+      font-size: 12px
     }
 
     /* PREVIEW */
@@ -831,7 +863,8 @@
       max-width: 480px;
       box-sizing: border-box;
       max-height: calc(100vh - 40px);
-      overflow: auto; /* allow modal body to scroll on small viewports */
+      overflow: auto;
+      /* allow modal body to scroll on small viewports */
     }
 
     .modal.modal-large {
@@ -1503,13 +1536,16 @@
         <div class="form-group">
           <div class="article-upload-header">
             <strong>Upload Gambar</strong>
-            <span class="article-upload-sub">Gambar 1 menjadi gambar utama di dashboard. Klik kotak plus untuk menambah foto berikutnya tanpa batas jumlah.</span>
+            <span class="article-upload-sub">Gambar 1 menjadi gambar utama di dashboard. Klik kotak plus untuk menambah
+              foto berikutnya tanpa batas jumlah.</span>
           </div>
           <div id="articleImagePreview" class="article-upload-box">
             <div class="article-thumbs" id="articleThumbGrid"></div>
           </div>
-          <input type="file" id="articleImagesInput" accept="image/*" multiple onchange="previewArticleImages(this.files)" />
-          <input type="file" id="articleReplaceInput" accept="image/*" style="display:none" onchange="replaceArticleImage(this.files[0])" />
+          <input type="file" id="articleImagesInput" accept="image/*" multiple
+            onchange="previewArticleImages(this.files)" />
+          <input type="file" id="articleReplaceInput" accept="image/*" style="display:none"
+            onchange="replaceArticleImage(this.files[0])" />
         </div>
 
         <div class="form-group">
@@ -1519,7 +1555,8 @@
 
         <div class="form-group">
           <label>Deskripsi *</label>
-          <textarea id="articleDeskripsi" style="min-height:180px" placeholder="Tulis deskripsi atau isi artikel..."></textarea>
+          <textarea id="articleDeskripsi" style="min-height:180px"
+            placeholder="Tulis deskripsi atau isi artikel..."></textarea>
         </div>
       </div>
 
