@@ -15,5 +15,7 @@ jobs:
           server: 153.92.10.189
           username: u485208612.prmakotasukabumi.com
           password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
           local-dir: ./
           server-dir: /public_html/
