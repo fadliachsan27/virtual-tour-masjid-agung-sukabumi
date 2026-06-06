@@ -157,12 +157,33 @@ const quotes = [
   { text: "Sesungguhnya Allah tidak melihat rupa kalian, tetapi melihat hati dan amal kalian.", source: "HR. Muslim" }
 ];
 
-function loadQuoteOfTheDay() {
+function setQuoteHTML(el, text) {
+  if (!el) return;
+  const safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  el.innerHTML = safe.replace(/\n/g, '<br>');
+}
+
+async function loadQuoteOfTheDay() {
+  const hariKeys = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+  const todayHari = hariKeys[new Date().getDay()];
+  const quoteText   = document.getElementById('quoteText');
+  const quoteSource = document.getElementById('quoteSource');
+
+  try {
+    const snap = await getDoc(doc(db, 'quotes_of_day', 'quotes'));
+    if (snap.exists()) {
+      const q = snap.data()[todayHari];
+      if (q && q.text) {
+        setQuoteHTML(quoteText, `“${q.text}”`);
+        if (quoteSource) quoteSource.textContent = q.source ? `— ${q.source}` : '';
+        return;
+      }
+    }
+  } catch (e) { /* fallback ke quotes statis */ }
+
   const today = new Date().getDate();
   const quote = quotes[today % quotes.length];
-  const quoteText = document.getElementById("quoteText");
-  const quoteSource = document.getElementById("quoteSource");
-  if (quoteText) quoteText.textContent = `“${quote.text}”`;
+  setQuoteHTML(quoteText, `“${quote.text}”`);
   if (quoteSource) quoteSource.textContent = `— ${quote.source}`;
 }
 

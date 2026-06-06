@@ -315,7 +315,7 @@
     /* STATS */
     .stats-row {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 16px;
       margin-bottom: 24px
     }
@@ -911,7 +911,7 @@
 
     @media(max-width:768px) {
       .stats-row {
-        grid-template-columns: 1fr 1fr
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr))
       }
 
       .form-row,
@@ -1033,6 +1033,7 @@
       <a href="#info" onclick="showPage('info',this)">🕌 Informasi Masjid</a>
       <a href="#pengurus" onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
       <a href="#imam" onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
+      <a href="#quotes" onclick="showPage('quotes',this)">💬 Quotes of The Day</a>
       <a href="#galeri" onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
       <a href="#articles" onclick="showPage('articles',this)">📰 Kelola Artikel</a>
       <a href="#event" onclick="showPage('event',this)">📅 Kelola Kegiatan</a>
@@ -1071,6 +1072,10 @@
         <div class="stat-card">
           <div class="stat-num" id="statMuadzin">0</div>
           <div class="stat-label">Data Muadzin</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="statQuotes">0/7</div>
+          <div class="stat-label">Quotes Aktif</div>
         </div>
       </div>
       <div class="card">
@@ -1430,6 +1435,31 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- QUOTES OF THE DAY -->
+    <div id="page-quotes" style="display:none">
+      <div class="page-header">
+        <div class="page-title">💬 Quotes of The Day</div>
+        <div class="page-sub">Atur 7 quotes harian — tampil otomatis di beranda sesuai hari yang sedang berjalan</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Quotes Per Hari</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
+          Isi text quotes dan sumbernya untuk setiap hari dalam seminggu. Quotes akan berganti otomatis setiap hari tanpa perlu diubah lagi.
+        </p>
+        <div id="quotesDayList" style="display:flex;flex-direction:column;gap:14px;"></div>
+        <hr class="section-sep"/>
+        <button class="btn-save" onclick="saveQuotes()">💾 Simpan Semua Quotes</button>
+      </div>
+      <div class="card">
+        <div class="card-title">👁 Preview Quote Hari Ini</div>
+        <div style="background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:14px;padding:28px;text-align:center;">
+          <div style="font-size:40px;color:rgba(201,168,76,0.35);margin-bottom:14px;font-family:serif">❝</div>
+          <p id="quotesPreviewText" style="font-family:'Playfair Display',serif;font-size:19px;color:var(--text);margin-bottom:14px;font-style:italic;line-height:1.6">(Belum ada quote untuk hari ini)</p>
+          <div id="quotesPreviewSource" style="font-size:12px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase"></div>
+        </div>
       </div>
     </div>
 

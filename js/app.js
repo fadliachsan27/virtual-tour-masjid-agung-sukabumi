@@ -48,6 +48,7 @@ function showPage(name, el) {
   if (name === 'galeri')   loadGaleri();
   if (name === 'pengurus') loadPengurus();
   if (name === 'imam')     loadImamMuadzin();
+  if (name === 'quotes')   loadQuotes();
   if (name === 'info')     loadInfoForm();
   if (name === 'dashboard') updateDashboardStats();
   if (name === 'event')    loadEvents();
@@ -663,16 +664,21 @@ function compressToBase64(file, maxW, quality) {
 // ============================================================
 async function updateDashboardStats() {
   try {
-    const [galeriSnap, pengurusSnap, jadwalSnap] = await Promise.all([
+    const [galeriSnap, pengurusSnap, jadwalSnap, quotesSnap] = await Promise.all([
       getDocs(collection(db, 'galeri')),
       getDocs(collection(db, 'pengurus')),
-      getDoc(doc(db, 'imam_muadzin', 'jadwal'))
+      getDoc(doc(db, 'imam_muadzin', 'jadwal')),
+      getDoc(doc(db, 'quotes_of_day', 'quotes'))
     ]);
     document.getElementById('statGaleri').textContent   = galeriSnap.size;
     document.getElementById('statPengurus').textContent = pengurusSnap.size;
     const jadwal = jadwalSnap.exists() ? jadwalSnap.data() : {};
     document.getElementById('statImam').textContent    = (jadwal.imam    || []).length;
     document.getElementById('statMuadzin').textContent = (jadwal.muadzin || []).length;
+    const qData   = quotesSnap.exists() ? quotesSnap.data() : {};
+    const filledQ = Object.values(qData).filter(q => q && q.text).length;
+    const statQEl = document.getElementById('statQuotes');
+    if (statQEl) statQEl.textContent = filledQ + '/7';
   } catch (e) { console.error(e); }
 }
 
@@ -1376,6 +1382,123 @@ async function saveCredentials() {
   } catch (e) { showToast('⚠ Gagal simpan: ' + e.message); }
 }
 window.saveCredentials = saveCredentials;
+
+
+// ============================================================
+// QUOTES OF THE DAY
+// ============================================================
+const HARI_KEYS = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+let quotesData = {};
+
+async function loadQuotes() {
+  try {
+    const snap = await getDoc(doc(db, 'quotes_of_day', 'quotes'));
+    quotesData = snap.exists() ? snap.data() : {};
+    renderQuotesDayList();
+    updateQuotesPreview();
+  } catch (e) { showToast('⚠ Gagal memuat quotes: ' + e.message); }
+}
+
+function renderQuotesDayList() {
+  const container = document.getElementById('quotesDayList');
+  if (!container) return;
+  const todayHari = HARI_KEYS[new Date().getDay()];
+  container.innerHTML = '';
+
+  HARI_KEYS.forEach(hari => {
+    const q = quotesData[hari] || { text: '', source: '' };
+    const isToday = hari === todayHari;
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = `border:1px solid ${isToday ? 'rgba(201,168,76,0.45)' : 'var(--border)'};border-radius:12px;padding:16px 18px;background:${isToday ? 'rgba(201,168,76,0.05)' : 'rgba(255,255,255,0.02)'}`;
+
+    const headerRow = document.createElement('div');
+    headerRow.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:12px';
+    const dayBadge = document.createElement('span');
+    dayBadge.className = 'hari-badge';
+    dayBadge.textContent = hari;
+    headerRow.appendChild(dayBadge);
+    if (isToday) {
+      const todayTag = document.createElement('span');
+      todayTag.style.cssText = 'font-size:11px;color:var(--gold);background:rgba(201,168,76,0.15);padding:3px 10px;border-radius:10px';
+      todayTag.textContent = '📅 Hari Ini';
+      headerRow.appendChild(todayTag);
+    }
+    wrapper.appendChild(headerRow);
+
+    const textGroup = document.createElement('div');
+    textGroup.className = 'form-group';
+    textGroup.style.marginBottom = '10px';
+    const textLabel = document.createElement('label');
+    textLabel.textContent = 'Text Quotes *';
+    const textarea = document.createElement('textarea');
+    textarea.id = 'quoteText_' + hari;
+    textarea.rows = 3;
+    textarea.placeholder = 'Tulis quotes islami untuk hari ' + hari + '...';
+    textarea.style.minHeight = '80px';
+    textarea.value = q.text || '';
+    textGroup.appendChild(textLabel);
+    textGroup.appendChild(textarea);
+    wrapper.appendChild(textGroup);
+
+    const srcGroup = document.createElement('div');
+    srcGroup.className = 'form-group';
+    srcGroup.style.margin = '0';
+    const srcLabel = document.createElement('label');
+    srcLabel.textContent = 'Sumber (Ayat / Hadits)';
+    const srcInput = document.createElement('input');
+    srcInput.type = 'text';
+    srcInput.id = 'quoteSource_' + hari;
+    srcInput.value = q.source || '';
+    srcInput.placeholder = 'mis. QS. Al-Insyirah: 6 / HR. Bukhari';
+    srcGroup.appendChild(srcLabel);
+    srcGroup.appendChild(srcInput);
+    wrapper.appendChild(srcGroup);
+
+    container.appendChild(wrapper);
+  });
+}
+
+function setQuotePreviewHTML(el, text) {
+  if (!el) return;
+  const safe = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  el.innerHTML = safe.replace(/\n/g, '<br>');
+}
+
+function updateQuotesPreview() {
+  const todayHari = HARI_KEYS[new Date().getDay()];
+  const q = quotesData[todayHari] || { text: '', source: '' };
+  const previewText = document.getElementById('quotesPreviewText');
+  const previewSrc  = document.getElementById('quotesPreviewSource');
+  if (q.text) {
+    setQuotePreviewHTML(previewText, `"${q.text}"`);
+  } else if (previewText) {
+    previewText.textContent = '(Belum ada quote untuk hari ini)';
+  }
+  if (previewSrc) previewSrc.textContent = q.source ? `— ${q.source}` : '';
+}
+
+async function saveQuotes() {
+  const data = {};
+  let filledCount = 0;
+  for (const hari of HARI_KEYS) {
+    const textEl   = document.getElementById('quoteText_'   + hari);
+    const sourceEl = document.getElementById('quoteSource_' + hari);
+    const text   = textEl   ? textEl.value.trim()   : '';
+    const source = sourceEl ? sourceEl.value.trim() : '';
+    data[hari] = { text, source };
+    if (text) filledCount++;
+  }
+  try {
+    await setDoc(doc(db, 'quotes_of_day', 'quotes'), data);
+    quotesData = data;
+    updateQuotesPreview();
+    updateDashboardStats();
+    showToast(`✅ ${filledCount}/7 quotes berhasil disimpan!`);
+  } catch (e) { showToast('⚠ Gagal simpan: ' + e.message); }
+}
+
+window.saveQuotes = saveQuotes;
 
 
 // ============================================================
