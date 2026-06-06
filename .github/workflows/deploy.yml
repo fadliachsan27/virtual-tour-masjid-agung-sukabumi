@@ -19,3 +19,8 @@ jobs:
           port: 21
           local-dir: ./
           server-dir: /public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tiles/**
