@@ -1009,6 +1009,11 @@ let galeriItems = [], galeriReplaceId = null;
 let activeGaleriUploadKategori = 'luar';
 window.activeGaleriUploadKategori = 'luar';
 
+// ---- PRMA (Dokumentasi Kegiatan) ----
+let editPrmaId = null;
+let prmaPendingImages = [];
+let draggedPrmaImageIndex = null;
+
 function kategoriLabelGaleri(kategori) {
   return kategori === 'dalam' ? 'Foto bagian dalam' : 'Foto bagian luar';
 }
@@ -1051,13 +1056,19 @@ async function loadGaleri() {
 function renderGaleriGrid() {
   const gridLuar = document.getElementById('galeriAdminGridLuar');
   const gridDalam = document.getElementById('galeriAdminGridDalam');
+  const gridPrma = document.getElementById('galeriAdminGridPrma');
   gridLuar.innerHTML = '';
   gridDalam.innerHTML = '';
+  if (gridPrma) gridPrma.innerHTML = '';
 
   const itemsLuar = galeriItems.filter(item => (item.kategori || 'luar') === 'luar');
   const itemsDalam = galeriItems.filter(item => item.kategori === 'dalam');
+  const itemsPrma = galeriItems.filter(item => item.kategori === 'prma');
   document.getElementById('galeriCountLuar').textContent = itemsLuar.length + ' foto';
   document.getElementById('galeriCountDalam').textContent = itemsDalam.length + ' foto';
+  if (document.getElementById('galeriCountPrma')) {
+    document.getElementById('galeriCountPrma').textContent = itemsPrma.length + ' foto';
+  }
 
   function renderItems(items, grid, offset) {
     if (items.length === 0) {
@@ -1080,8 +1091,40 @@ function renderGaleriGrid() {
     });
   }
 
+  function renderPrmaItems(items, grid) {
+    if (!grid) return;
+    if (items.length === 0) {
+      grid.innerHTML = '<div style="color:var(--muted);text-align:center;padding:24px;grid-column:1/-1">Belum ada foto kegiatan.</div>';
+      return;
+    }
+    items.forEach((item) => {
+      const imgs = Array.isArray(item.images) && item.images.length ? item.images : (item.base64 ? [item.base64] : []);
+      const cover = imgs[0] || '';
+      const countBadge = imgs.length > 1
+        ? `<div class="galeri-item-num" style="left:auto;right:8px">📷 ${imgs.length}</div>`
+        : '';
+      const div = document.createElement('div');
+      div.className = 'galeri-admin-item';
+      div.innerHTML = `
+        <img src="${cover}" alt="${item.judul || 'Kegiatan PRMA'}" loading="lazy"/>
+        ${countBadge}
+        <div class="galeri-item-overlay" style="opacity:1;background:linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 70%, transparent 100%)">
+          <div style="margin-bottom:8px">
+            <div style="color:#fff;font-size:12px;font-weight:700;line-height:1.3;margin-bottom:3px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.judul || '(Tanpa judul)'}</div>
+            <div style="color:var(--gold);font-size:10px">${formatIndonesianDate(item.tanggal) || '-'}</div>
+          </div>
+          <div class="galeri-item-actions">
+            <button class="btn-item-replace" onclick="openPrmaModal('${item.id}')">✏️ Edit</button>
+            <button class="btn-item-delete"  onclick="deletePrmaItem('${item.id}')">🗑</button>
+          </div>
+        </div>`;
+      grid.appendChild(div);
+    });
+  }
+
   renderItems(itemsLuar, gridLuar, 0);
   renderItems(itemsDalam, gridDalam, itemsLuar.length);
+  renderPrmaItems(itemsPrma, gridPrma);
 }
 
 async function addGaleriFiles(files, kategori) {
@@ -1168,6 +1211,234 @@ dz.addEventListener('drop', e => {
   e.preventDefault(); dz.classList.remove('drag-over');
   addGaleriFiles(e.dataTransfer.files, activeGaleriUploadKategori);
 });
+
+// ============================================================
+// PRMA — Dokumentasi Kegiatan (foto banyak + judul + tanggal + deskripsi)
+// ============================================================
+function openPrmaModal(id) {
+  editPrmaId = id || null;
+  prmaPendingImages = [];
+
+  document.getElementById('prmaModalTitle').textContent = id ? 'Edit Foto Kegiatan PRMA' : 'Tambah Foto Kegiatan PRMA';
+  document.getElementById('prmaJudul').value = '';
+  document.getElementById('prmaTanggal').value = '';
+  document.getElementById('prmaDeskripsi').value = '';
+  document.getElementById('prmaImagesInput').value = '';
+  const previewEl = document.getElementById('prmaImagePreview');
+  if (previewEl) previewEl.innerHTML = '<div class="article-thumbs" id="prmaThumbGrid"></div>';
+
+  if (id) {
+    const item = galeriItems.find(g => g.id === id);
+    if (item) {
+      document.getElementById('prmaJudul').value = item.judul || '';
+      let dateVal = '';
+      if (item.tanggal && /^\d{4}-\d{2}-\d{2}$/.test(item.tanggal)) dateVal = item.tanggal;
+      document.getElementById('prmaTanggal').value = dateVal;
+      document.getElementById('prmaDeskripsi').value = item.deskripsi || '';
+      // Kompatibel dengan data lama yang masih pakai field tunggal "base64"
+      prmaPendingImages = Array.isArray(item.images) && item.images.length
+        ? [...item.images]
+        : (item.base64 ? [item.base64] : []);
+    }
+  }
+
+  renderPrmaImagePreview();
+  document.getElementById('prmaModal').classList.add('open');
+}
+
+function closePrmaModal() {
+  document.getElementById('prmaModal').classList.remove('open');
+}
+
+async function previewPrmaImages(files) {
+  if (!files || !files.length) return;
+  const selected = Array.from(files);
+  showToast('⏳ Memproses foto kegiatan...');
+  for (const file of selected) {
+    if (!file.type.startsWith('image/')) continue;
+    const base64 = await compressToBase64(file, 1200, 0.8);
+    if (!base64) continue;
+    prmaPendingImages.push(base64);
+  }
+  if (!prmaPendingImages.length) {
+    showToast('⚠ Pilih minimal 1 foto yang valid');
+    return;
+  }
+  const input = document.getElementById('prmaImagesInput');
+  if (input) input.value = '';
+  renderPrmaImagePreview();
+  showToast('📸 Foto siap — klik Simpan');
+}
+
+function renderPrmaImagePreview() {
+  const preview = document.getElementById('prmaImagePreview');
+  if (!preview) return;
+
+  let html = '<div class="article-thumbs">';
+  prmaPendingImages.forEach((src, i) => {
+    html += `
+        <div class="thumb-item" draggable="true" data-idx="${i}" id="prma-thumb-${i}">
+          <img class="thumb-img" src="${src}" alt="Preview ${i + 1}" />
+          <div class="thumb-controls">
+            <button class="thumb-btn prma-thumb-edit" data-idx="${i}" title="Ganti">Edit</button>
+            <button class="thumb-btn prma-thumb-delete" data-idx="${i}" title="Hapus">X</button>
+          </div>
+          <div class="thumb-drag-handle">Drag</div>
+        </div>`;
+  });
+  html += `
+        <div class="thumb-item thumb-empty" data-idx="${prmaPendingImages.length}" id="prma-thumb-add">
+          <div class="thumb-plus">+</div>
+        </div>`;
+  html += '</div>';
+
+  const grid = preview.querySelector('#prmaThumbGrid');
+  if (!grid) return;
+  grid.innerHTML = html;
+
+  for (let i = 0; i < prmaPendingImages.length; i++) {
+    const filledEl = grid.querySelector(`#prma-thumb-${i}`);
+    if (!filledEl) continue;
+
+    filledEl.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', i);
+      e.dataTransfer.effectAllowed = 'move';
+      draggedPrmaImageIndex = i;
+      filledEl.classList.add('dragging');
+    });
+    filledEl.addEventListener('dragend', () => {
+      draggedPrmaImageIndex = null;
+      filledEl.classList.remove('dragging');
+    });
+    filledEl.addEventListener('dragover', e => e.preventDefault());
+    filledEl.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      const transferIdx = Number(e.dataTransfer.getData('text/plain'));
+      const srcIdx = Number.isFinite(transferIdx) ? transferIdx : draggedPrmaImageIndex;
+      movePrmaImage(srcIdx, i);
+      renderPrmaImagePreview();
+    });
+
+    const editBtn = filledEl.querySelector('.prma-thumb-edit');
+    if (editBtn) editBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      window._replacePrmaThumbIndex = i;
+      document.getElementById('prmaReplaceInput').click();
+    });
+
+    const delBtn = filledEl.querySelector('.prma-thumb-delete');
+    if (delBtn) delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      prmaPendingImages.splice(i, 1);
+      renderPrmaImagePreview();
+    });
+  }
+
+  const addEl = grid.querySelector('#prma-thumb-add');
+  if (!addEl) return;
+
+  addEl.addEventListener('dragover', e => e.preventDefault());
+  addEl.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const transferIdx = Number(e.dataTransfer.getData('text/plain'));
+    const srcIdx = Number.isFinite(transferIdx) ? transferIdx : draggedPrmaImageIndex;
+    movePrmaImage(srcIdx, prmaPendingImages.length);
+    renderPrmaImagePreview();
+  });
+  addEl.addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('prmaImagesInput').click();
+  });
+}
+
+function movePrmaImage(sourceIndex, targetIndex) {
+  if (!Number.isInteger(sourceIndex) || !Number.isInteger(targetIndex)) return;
+  if (sourceIndex < 0 || sourceIndex >= prmaPendingImages.length) return;
+
+  const [moved] = prmaPendingImages.splice(sourceIndex, 1);
+  if (!moved) return;
+
+  let insertIndex = targetIndex;
+  if (sourceIndex < targetIndex) insertIndex -= 1;
+  insertIndex = Math.max(0, Math.min(insertIndex, prmaPendingImages.length));
+  prmaPendingImages.splice(insertIndex, 0, moved);
+}
+
+async function replacePrmaImage(file) {
+  if (!file) return;
+  const idx = window._replacePrmaThumbIndex;
+  window._replacePrmaThumbIndex = null;
+  if (!Number.isFinite(idx) || idx < 0 || idx >= prmaPendingImages.length) return;
+  showToast('⏳ Memproses foto pengganti...');
+  const base64 = await compressToBase64(file, 1200, 0.8);
+  if (!base64) { showToast('⚠ Gagal memproses foto pengganti'); return; }
+  prmaPendingImages[idx] = base64;
+  renderPrmaImagePreview();
+  showToast('✅ Foto diganti');
+}
+
+async function savePrma() {
+  const judul = document.getElementById('prmaJudul').value.trim();
+  const tanggal = document.getElementById('prmaTanggal').value.trim();
+  const deskripsi = document.getElementById('prmaDeskripsi').value.trim();
+
+  if (!judul) { showToast('⚠ Judul kegiatan tidak boleh kosong!'); return; }
+  if (!tanggal) { showToast('⚠ Tanggal kegiatan tidak boleh kosong!'); return; }
+  if (!deskripsi) { showToast('⚠ Deskripsi kegiatan tidak boleh kosong!'); return; }
+  if (!prmaPendingImages.length) { showToast('⚠ Foto kegiatan minimal 1 foto!'); return; }
+
+  try {
+    if (editPrmaId) {
+      await updateDoc(doc(db, 'galeri', editPrmaId), {
+        judul, tanggal, deskripsi,
+        images: prmaPendingImages,
+        base64: prmaPendingImages[0],
+        kategori: 'prma'
+      });
+    } else {
+      await addDoc(collection(db, 'galeri'), {
+        judul, tanggal, deskripsi,
+        images: prmaPendingImages,
+        base64: prmaPendingImages[0],
+        kategori: 'prma',
+        order: Date.now(),
+        createdAt: serverTimestamp()
+      });
+    }
+    closePrmaModal();
+    await loadGaleri();
+    showToast('✅ Foto kegiatan PRMA berhasil disimpan!');
+  } catch (e) {
+    showToast('⚠ Gagal menyimpan: ' + e.message);
+  }
+}
+
+async function deletePrmaItem(id) {
+  openConfirmModal('Hapus foto kegiatan ini?', async () => {
+    await deleteDoc(doc(db, 'galeri', id));
+    await loadGaleri();
+    showToast('🗑 Foto kegiatan dihapus');
+  });
+}
+
+window.openPrmaModal    = openPrmaModal;
+window.closePrmaModal   = closePrmaModal;
+window.previewPrmaImages = previewPrmaImages;
+window.replacePrmaImage = replacePrmaImage;
+window.savePrma         = savePrma;
+window.deletePrmaItem   = deletePrmaItem;
+
+const prmaDz = document.getElementById('prmaImagePreview');
+if (prmaDz) {
+  prmaDz.addEventListener('dragover', e => { e.preventDefault(); prmaDz.classList.add('drag-over'); });
+  prmaDz.addEventListener('dragleave', () => prmaDz.classList.remove('drag-over'));
+  prmaDz.addEventListener('drop', e => {
+    e.preventDefault(); prmaDz.classList.remove('drag-over');
+    if (e.dataTransfer.files && e.dataTransfer.files.length) previewPrmaImages(e.dataTransfer.files);
+  });
+}
 
 
 // ============================================================

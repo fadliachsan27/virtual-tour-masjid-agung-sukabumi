@@ -124,6 +124,62 @@
       overflow-y: auto;
       /* only main scrolls */
       -webkit-overflow-scrolling: touch;
+      width: 100%;
+      min-width: 0;
+    }
+
+    /* MOBILE TOPBAR (hidden on desktop) */
+    .mobile-topbar {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: rgba(10, 10, 10, 0.95);
+      border-bottom: 1px solid var(--border);
+      padding: 0 14px;
+      z-index: 1100;
+      backdrop-filter: blur(6px);
+    }
+
+    .hamburger-btn {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--gold);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .mobile-topbar-title {
+      font-family: 'Playfair Display', serif;
+      color: var(--gold);
+      font-size: 15px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* SIDEBAR OVERLAY (mobile only) */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.open {
+      display: block;
     }
 
     .page-header {
@@ -927,6 +983,140 @@
       .status-grid {
         grid-template-columns: 1fr
       }
+
+      /* Sidebar jadi off-canvas, muncul saat tombol hamburger ditekan */
+      .mobile-topbar {
+        display: flex
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        width: 250px;
+        max-width: 80vw;
+        z-index: 1200;
+      }
+
+      .sidebar.open {
+        transform: translateX(0)
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 20px 16px 32px;
+        padding-top: 72px;
+        /* beri ruang untuk topbar mobile */
+        height: 100vh;
+      }
+
+      .page-title {
+        font-size: 21px
+      }
+
+      .card {
+        padding: 18px 16px;
+        border-radius: 12px
+      }
+
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px
+      }
+
+      .stat-card {
+        padding: 14px 14px
+      }
+
+      .stat-num {
+        font-size: 22px
+      }
+
+      /* Tabel bisa di-scroll horizontal supaya tidak gepeng */
+      .admin-table,
+      .jadwal-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 8px;
+      }
+
+      .admin-table thead,
+      .jadwal-table thead,
+      .admin-table tbody,
+      .jadwal-table tbody,
+      .admin-table tr,
+      .jadwal-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      .admin-title-cell {
+        min-width: 180px;
+        max-width: none;
+        white-space: normal
+      }
+
+      /* Modal lebih nyaman dilihat di hp */
+      .modal {
+        width: 94vw;
+        padding: 18px;
+        max-height: calc(100vh - 24px)
+      }
+
+      .modal-title {
+        font-size: 17px
+      }
+
+      .modal-footer {
+        flex-direction: column-reverse;
+        gap: 8px
+      }
+
+      .modal-footer button {
+        width: 100%;
+        margin: 0 !important
+      }
+
+      .galeri-admin-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px
+      }
+
+      .pengurus-admin-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px
+      }
+
+      .loc-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 4px
+      }
+
+      .loc-tab {
+        flex-shrink: 0
+      }
+
+      div[style*="display:flex;align-items:center;justify-content:space-between"] {
+        flex-wrap: wrap
+      }
+    }
+
+    @media(max-width:480px) {
+      .stats-row {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .add-row-form {
+        grid-template-columns: 1fr
+      }
+
+      .thumb-item {
+        width: 92px;
+        height: 76px
+      }
     }
 
     .admin-table {
@@ -1098,24 +1288,33 @@
 
 <body>
 
+  <!-- ===== MOBILE TOPBAR (hanya tampil di hp) ===== -->
+  <div class="mobile-topbar">
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Buka menu">☰</button>
+    <div class="mobile-topbar-title">Admin Panel</div>
+  </div>
+
+  <!-- ===== OVERLAY (klik untuk tutup sidebar di hp) ===== -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
   <!-- ===== SIDEBAR ===== -->
-  <nav class="sidebar">
+  <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <div class="sidebar-brand-title">Admin Panel</div>
       <div class="sidebar-brand-sub">MASJID AGUNG SUKABUMI</div>
     </div>
     <div class="sidebar-nav">
-      <a href="#dashboard" class="active" onclick="showPage('dashboard',this)">📊 Dashboard</a>
-      <a href="#info" onclick="showPage('info',this)">🕌 Informasi Masjid</a>
-      <a href="#pengurus" onclick="showPage('pengurus',this)">👥 Profil Pengurus</a>
-      <a href="#imam" onclick="showPage('imam',this)">🎙️ Imam & Muadzin</a>
-      <a href="#quotes" onclick="showPage('quotes',this)">💬 Quotes of The Day</a>
-      <a href="#galeri" onclick="showPage('galeri',this)">🖼️ Kelola Galeri</a>
-      <a href="#articles" onclick="showPage('articles',this)">📰 Kelola Artikel</a>
-      <a href="#event" onclick="showPage('event',this)">📅 Kelola Kegiatan</a>
-      <a href="#hero" onclick="showPage('hero',this)">🌄 Background Hero</a>
+      <a href="#dashboard" class="active" onclick="showPage('dashboard',this);closeSidebar()">📊 Dashboard</a>
+      <a href="#info" onclick="showPage('info',this);closeSidebar()">🕌 Informasi Masjid</a>
+      <a href="#pengurus" onclick="showPage('pengurus',this);closeSidebar()">👥 Profil Pengurus</a>
+      <a href="#imam" onclick="showPage('imam',this);closeSidebar()">🎙️ Imam & Muadzin</a>
+      <a href="#quotes" onclick="showPage('quotes',this);closeSidebar()">💬 Quotes of The Day</a>
+      <a href="#galeri" onclick="showPage('galeri',this);closeSidebar()">🖼️ Kelola Galeri</a>
+      <a href="#articles" onclick="showPage('articles',this);closeSidebar()">📰 Kelola Artikel</a>
+      <a href="#event" onclick="showPage('event',this);closeSidebar()">📅 Kelola Kegiatan</a>
+      <a href="#hero" onclick="showPage('hero',this);closeSidebar()">🌄 Background Hero</a>
       <!-- <a href="#panorama"  onclick="showPage('panorama',this)">🔄 Foto Panorama</a> -->
-      <a href="#settings" onclick="showPage('settings',this)">⚙ Pengaturan</a>
+      <a href="#settings" onclick="showPage('settings',this);closeSidebar()">⚙ Pengaturan</a>
     </div>
     <div class="sidebar-bottom">
       <a href="../index.html">← Lihat Website</a>
@@ -1415,6 +1614,65 @@
           <div class="galeri-admin-grid" id="galeriAdminGridDalam"></div>
         </div>
       </div>
+
+      <div class="card">
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="card-title" style="margin-bottom:0">Dokumentasi Kegiatan PRMA</div>
+            <div class="galeri-count" id="galeriCountPrma">0 foto</div>
+          </div>
+          <button class="btn-save" style="margin-top:0;padding:9px 18px" onclick="openPrmaModal()">+ Tambah Foto
+            Kegiatan PRMA</button>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+          Setiap foto kegiatan PRMA memiliki judul, tanggal, dan deskripsi sendiri. Foto ini akan tampil paling atas
+          di halaman Galeri publik, dan saat diklik akan menampilkan detail kegiatannya.
+        </p>
+        <div class="galeri-admin-grid" id="galeriAdminGridPrma"></div>
+      </div>
+    </div>
+
+    <!-- ===== MODAL TAMBAH/EDIT FOTO KEGIATAN PRMA ===== -->
+    <div class="modal-overlay" id="prmaModal">
+      <div class="modal modal-large">
+        <div class="modal-title" id="prmaModalTitle">Tambah Foto Kegiatan PRMA</div>
+
+        <div class="form-group">
+          <div class="article-upload-header">
+            <strong>Upload Foto Kegiatan</strong>
+            <span class="article-upload-sub">Foto 1 menjadi foto utama/cover kegiatan. Klik kotak plus untuk menambah
+              foto berikutnya tanpa batas jumlah.</span>
+          </div>
+          <div id="prmaImagePreview" class="article-upload-box">
+            <div class="article-thumbs" id="prmaThumbGrid"></div>
+          </div>
+          <input type="file" id="prmaImagesInput" accept="image/*" multiple onchange="previewPrmaImages(this.files)"
+            style="display:none" />
+          <input type="file" id="prmaReplaceInput" accept="image/*" style="display:none"
+            onchange="replacePrmaImage(this.files[0])" />
+        </div>
+
+        <div class="form-group">
+          <label>Judul Kegiatan *</label>
+          <input type="text" id="prmaJudul" placeholder="Kajian Akbar Menyambut Ramadhan" />
+        </div>
+
+        <div class="form-group">
+          <label>Tanggal Kegiatan / Pelaksanaan *</label>
+          <input type="date" id="prmaTanggal" class="event-date-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Deskripsi & Informasi Kegiatan *</label>
+          <textarea id="prmaDeskripsi" style="min-height:100px" placeholder="Tuliskan info lengkap kegiatan..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-reset" style="margin:0" onclick="closePrmaModal()">Batal</button>
+          <button class="btn-save" style="margin:0" onclick="savePrma()">💾 Simpan</button>
+        </div>
+      </div>
     </div>
 
     <!-- HERO -->
@@ -1705,6 +1963,16 @@
   <!-- ===== SCRIPTS ===== -->
   <script type="module" src="../js/app.js"></script>
   <script>
+    // Toggle sidebar mobile (hamburger menu)
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('open');
+    }
+
     // Jam admin: jalan terus tiap detik
     function updateAdminClock() {
       const now = new Date().toLocaleString('id-ID', {
