@@ -926,12 +926,16 @@ document.getElementById('pengurusFotoInput')
 // IMAM & MUADZIN
 // ============================================================
 let imamData = [], muadzinData = [];
+let imamMuadzinSectionTampil = true;
 
 async function loadImamMuadzin() {
   try {
     const snap  = await getDoc(doc(db, 'imam_muadzin', 'jadwal'));
     imamData    = snap.exists() ? (snap.data().imam    || []) : [];
     muadzinData = snap.exists() ? (snap.data().muadzin || []) : [];
+    imamMuadzinSectionTampil = snap.exists() ? (snap.data().sectionTampil !== false) : true;
+    const toggleEl = document.getElementById('imamMuadzinSectionToggle');
+    if (toggleEl) toggleEl.checked = imamMuadzinSectionTampil;
     renderImamMuadzinTables();
   } catch (e) { showToast('⚠ ' + e.message); }
 }
@@ -941,39 +945,27 @@ function renderImamMuadzinTables() { renderImamTable(); renderMuadzinTable(); }
 function renderImamTable() {
   const tbody = document.getElementById('imamTableBody');
   tbody.innerHTML = imamData.length === 0
-    ? `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data imam</td></tr>`
-    : imamData.map((item, i) => {
-        const tampil = item.tampil !== false; // default tampil jika field belum ada
-        return `
-        <tr style="${tampil ? '' : 'opacity:0.5'}">
+    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Belum ada data imam</td></tr>`
+    : imamData.map((item, i) => `
+        <tr>
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
-          <td>
-            <button class="btn-sm" style="${tampil ? '' : 'background:rgba(255,255,255,0.06);color:var(--muted);border-color:var(--border)'}" onclick="toggleImamRow(${i})" title="${tampil ? 'Klik untuk sembunyikan dari beranda' : 'Klik untuk tampilkan di beranda'}">${tampil ? '👁 Tampil' : '🚫 Sembunyi'}</button>
-          </td>
           <td><button class="btn-danger" onclick="confirmDeleteImamRow(${i})">🗑</button></td>
-        </tr>`;
-      }).join('');
+        </tr>`).join('');
 }
 
 function renderMuadzinTable() {
   const tbody = document.getElementById('muadzinTableBody');
   tbody.innerHTML = muadzinData.length === 0
-    ? `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data muadzin</td></tr>`
-    : muadzinData.map((item, i) => {
-        const tampil = item.tampil !== false;
-        return `
-        <tr style="${tampil ? '' : 'opacity:0.5'}">
+    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Belum ada data muadzin</td></tr>`
+    : muadzinData.map((item, i) => `
+        <tr>
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
-          <td>
-            <button class="btn-sm" style="${tampil ? '' : 'background:rgba(255,255,255,0.06);color:var(--muted);border-color:var(--border)'}" onclick="toggleMuadzinRow(${i})" title="${tampil ? 'Klik untuk sembunyikan dari beranda' : 'Klik untuk tampilkan di beranda'}">${tampil ? '👁 Tampil' : '🚫 Sembunyi'}</button>
-          </td>
           <td><button class="btn-danger" onclick="confirmDeleteMuadzinRow(${i})">🗑</button></td>
-        </tr>`;
-      }).join('');
+        </tr>`).join('');
 }
 
 function addImamRow() {
@@ -981,7 +973,7 @@ function addImamRow() {
   const nama = document.getElementById('addImamNama').value.trim();
   const ket  = document.getElementById('addImamKet').value.trim();
   if (!nama) { showToast('⚠ Nama imam wajib diisi!'); return; }
-  imamData.push({ hari, nama, keterangan: ket, tampil: true });
+  imamData.push({ hari, nama, keterangan: ket });
   document.getElementById('addImamNama').value = '';
   document.getElementById('addImamKet').value  = '';
   renderImamTable();
@@ -992,7 +984,7 @@ function addMuadzinRow() {
   const nama = document.getElementById('addMuadzinNama').value.trim();
   const ket  = document.getElementById('addMuadzinKet').value.trim();
   if (!nama) { showToast('⚠ Nama muadzin wajib diisi!'); return; }
-  muadzinData.push({ hari, nama, keterangan: ket, tampil: true });
+  muadzinData.push({ hari, nama, keterangan: ket });
   document.getElementById('addMuadzinNama').value = '';
   document.getElementById('addMuadzinKet').value  = '';
   renderMuadzinTable();
@@ -1009,30 +1001,26 @@ function confirmDeleteMuadzinRow(i) {
   openConfirmModal('Hapus jadwal muadzin ini?', () => { deleteMuadzinRow(i); });
 }
 
-// Toggle tampil/sembunyi — langsung tersimpan ke Firestore tanpa perlu klik "Simpan Jadwal"
-async function toggleImamRow(i) {
-  if (!imamData[i]) return;
-  imamData[i].tampil = imamData[i].tampil === false ? true : false;
-  renderImamTable();
+// Toggle master — sembunyikan/tampilkan SELURUH bagian Imam & Muadzin di beranda, langsung tersimpan
+async function toggleImamMuadzinSection() {
+  const toggleEl = document.getElementById('imamMuadzinSectionToggle');
+  imamMuadzinSectionTampil = toggleEl ? toggleEl.checked : !imamMuadzinSectionTampil;
   try {
-    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
-    showToast(imamData[i].tampil ? '👁 Ditampilkan di beranda' : '🚫 Disembunyikan dari beranda');
-  } catch (e) { showToast('⚠ Gagal menyimpan: ' + e.message); }
-}
-
-async function toggleMuadzinRow(i) {
-  if (!muadzinData[i]) return;
-  muadzinData[i].tampil = muadzinData[i].tampil === false ? true : false;
-  renderMuadzinTable();
-  try {
-    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
-    showToast(muadzinData[i].tampil ? '👁 Ditampilkan di beranda' : '🚫 Disembunyikan dari beranda');
-  } catch (e) { showToast('⚠ Gagal menyimpan: ' + e.message); }
+    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), {
+      imam: imamData, muadzin: muadzinData, sectionTampil: imamMuadzinSectionTampil
+    });
+    showToast(imamMuadzinSectionTampil ? 'Bagian Imam & Muadzin ditampilkan di beranda' : 'Bagian Imam & Muadzin disembunyikan dari beranda');
+  } catch (e) {
+    showToast('⚠ Gagal menyimpan: ' + e.message);
+    if (toggleEl) toggleEl.checked = !imamMuadzinSectionTampil; // revert kalau gagal
+  }
 }
 
 async function saveImamMuadzin() {
   try {
-    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
+    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), {
+      imam: imamData, muadzin: muadzinData, sectionTampil: imamMuadzinSectionTampil
+    });
     showToast('✅ Jadwal imam & muadzin berhasil disimpan!');
     updateDashboardStats();
   } catch (e) { showToast('⚠ Gagal simpan: ' + e.message); }
@@ -1044,8 +1032,7 @@ window.deleteImamRow   = deleteImamRow;
 window.deleteMuadzinRow = deleteMuadzinRow;
 window.confirmDeleteImamRow = confirmDeleteImamRow;
 window.confirmDeleteMuadzinRow = confirmDeleteMuadzinRow;
-window.toggleImamRow = toggleImamRow;
-window.toggleMuadzinRow = toggleMuadzinRow;
+window.toggleImamMuadzinSection = toggleImamMuadzinSection;
 window.saveImamMuadzin = saveImamMuadzin;
 
 

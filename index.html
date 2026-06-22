@@ -1174,7 +1174,7 @@
     <div class="container">
       <div class="section-header">
         <div class="section-badge">KEPENGURUSAN</div>
-        <h2 class="section-title">Profil Pengurus Remaja Masjid Agung (PRMA)</h2>
+        <h2 class="section-title">Profil Pengurus Masjid</h2>
         <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Remaja Masjid Agung
           Kota
           Sukabumi (PRMA) Kota Sukabumi</p>
@@ -1422,6 +1422,19 @@
       } catch (e) {
         const isiEl = document.getElementById('prmaDescIsi');
         if (isiEl) isiEl.innerHTML = '<p>Gagal memuat deskripsi PRMA.</p>';
+        console.error(e);
+      }
+    })();
+
+    // ===== Sembunyikan seluruh section Imam & Muadzin kalau toggle "Tampil di Beranda" dimatikan di admin =====
+    (async () => {
+      try {
+        const snap = await getDoc(doc(prmaDescDb, 'imam_muadzin', 'jadwal'));
+        const sectionEl = document.getElementById('imam-muadzin');
+        if (!sectionEl) return;
+        const sectionTampil = snap.exists() ? (snap.data().sectionTampil !== false) : true;
+        if (!sectionTampil) sectionEl.style.display = 'none';
+      } catch (e) {
         console.error(e);
       }
     })();
