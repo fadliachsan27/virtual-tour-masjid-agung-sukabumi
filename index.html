@@ -131,6 +131,39 @@
       line-height: 1.7;
     }
 
+    /* ===== DESKRIPSI PRMA ===== */
+    .prma-desc-section {
+      padding: 80px 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    body.dark .prma-desc-section {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .prma-desc-card {
+      max-width: 860px;
+      margin: 28px auto 0;
+    }
+
+    .prma-desc-text {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.9;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+
+    .prma-desc-text p {
+      margin-bottom: 14px;
+    }
+
+    .prma-desc-text p:last-child {
+      margin-bottom: 0;
+    }
+
     /* ===== PROFIL PENGURUS SLIDER ===== */
     .pengurus-section {
       padding: 80px 0;
@@ -1121,12 +1154,27 @@
     </div>
   </section>
 
+  <!-- ===== DESKRIPSI PRMA ===== -->
+  <section class="prma-desc-section" id="prma-desc">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-badge">TENTANG PRMA</div>
+        <h2 class="section-title" id="prmaDescJudul">Remaja Masjid Agung Kota Sukabumi (PRMA)</h2>
+      </div>
+      <div class="prma-desc-card">
+        <div class="prma-desc-text" id="prmaDescIsi">
+          <p>Memuat informasi PRMA...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== PROFIL PENGURUS ===== -->
   <section class="pengurus-section" id="pengurus">
     <div class="container">
       <div class="section-header">
         <div class="section-badge">KEPENGURUSAN</div>
-        <h2 class="section-title">Profil Pengurus Masjid</h2>
+        <h2 class="section-title">Profil Pengurus Remaja Masjid Agung (PRMA)</h2>
         <p style="color:var(--text-muted);font-size:14px;margin-top:6px;">Remaja Masjid Agung
           Kota
           Sukabumi (PRMA) Kota Sukabumi</p>
@@ -1329,6 +1377,55 @@
   </footer>
 
   <script type="module" src="js/index.js"></script>
+
+  <!-- ===== DESKRIPSI PRMA — script mandiri (terpisah dari js/index.js) ===== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6b5hiSH7BWAXOWu3_-cwXtMl6J3sTGxA",
+      authDomain: "vt-masjid-agung-sukabumi.firebaseapp.com",
+      projectId: "vt-masjid-agung-sukabumi",
+      storageBucket: "vt-masjid-agung-sukabumi.firebasestorage.app",
+      messagingSenderId: "633933684627",
+      appId: "1:633933684627:web:fdcaa9d3ff99475e665266",
+      measurementId: "G-GG88GW221Z"
+    };
+
+    const prmaDescApp = initializeApp(firebaseConfig, "prmaDescApp");
+    const prmaDescDb  = getFirestore(prmaDescApp);
+
+    function renderPrmaDescParagraphs(container, text) {
+      const paragraphs = (text || '').split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+      if (!paragraphs.length) {
+        container.innerHTML = '<p>Belum ada deskripsi PRMA. Silakan isi melalui <a href="admin/login.html" style="color:var(--gold)">Admin Panel</a>.</p>';
+        return;
+      }
+      container.innerHTML = paragraphs.map(p => `<p>${p.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')}</p>`).join('');
+    }
+
+    (async () => {
+      try {
+        const snap = await getDoc(doc(prmaDescDb, 'masjid_info', 'prma_desc'));
+        const judulEl = document.getElementById('prmaDescJudul');
+        const isiEl   = document.getElementById('prmaDescIsi');
+        if (!judulEl || !isiEl) return;
+
+        if (snap.exists()) {
+          const d = snap.data();
+          if (d.judul) judulEl.textContent = d.judul;
+          renderPrmaDescParagraphs(isiEl, d.deskripsi);
+        } else {
+          renderPrmaDescParagraphs(isiEl, '');
+        }
+      } catch (e) {
+        const isiEl = document.getElementById('prmaDescIsi');
+        if (isiEl) isiEl.innerHTML = '<p>Gagal memuat deskripsi PRMA.</p>';
+        console.error(e);
+      }
+    })();
+  </script>
 
   <!-- ===== AUDIO MASJID ===== -->
   <audio id="bgAudio" loop preload="auto">

@@ -690,9 +690,10 @@ let fiturRows = [];
 
 async function loadInfoForm() {
   try {
-    const [infoSnap, fiturSnap] = await Promise.all([
+    const [infoSnap, fiturSnap, prmaDescSnap] = await Promise.all([
       getDoc(doc(db, 'masjid_info', 'info')),
-      getDoc(doc(db, 'masjid_info', 'fitur'))
+      getDoc(doc(db, 'masjid_info', 'fitur')),
+      getDoc(doc(db, 'masjid_info', 'prma_desc'))
     ]);
     if (infoSnap.exists()) {
       const d = infoSnap.data();
@@ -702,6 +703,11 @@ async function loadInfoForm() {
       document.getElementById('infoBerdiri').value   = d.berdiri   || '';
       document.getElementById('infoLuas').value      = d.luas      || '';
       document.getElementById('infoMenara').value    = d.menara    || '';
+    }
+    if (prmaDescSnap.exists()) {
+      const pd = prmaDescSnap.data();
+      document.getElementById('prmaInfoJudul').value     = pd.judul     || '';
+      document.getElementById('prmaInfoDeskripsi').value = pd.deskripsi || '';
     }
     fiturRows = fiturSnap.exists() ? (fiturSnap.data().items || []) : [
       { icon: '🕌', judul: 'Ruang Utama Shalat',      deskripsi: 'Pusat ibadah dengan mihrab megah dan kubah utama yang menakjubkan.' },
@@ -764,10 +770,16 @@ async function saveInfoMasjid() {
     menara:    document.getElementById('infoMenara').value,
   };
 
+  const prmaDesc = {
+    judul:     document.getElementById('prmaInfoJudul').value,
+    deskripsi: document.getElementById('prmaInfoDeskripsi').value,
+  };
+
   try {
     await Promise.all([
       setDoc(doc(db, 'masjid_info', 'info'),  info),
-      setDoc(doc(db, 'masjid_info', 'fitur'), { items: fiturRows })
+      setDoc(doc(db, 'masjid_info', 'fitur'), { items: fiturRows }),
+      setDoc(doc(db, 'masjid_info', 'prma_desc'), prmaDesc)
     ]);
     showToast('✅ Informasi masjid berhasil disimpan!');
   } catch (e) { showToast('⚠ Gagal simpan: ' + e.message); }
@@ -929,27 +941,39 @@ function renderImamMuadzinTables() { renderImamTable(); renderMuadzinTable(); }
 function renderImamTable() {
   const tbody = document.getElementById('imamTableBody');
   tbody.innerHTML = imamData.length === 0
-    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Belum ada data imam</td></tr>`
-    : imamData.map((item, i) => `
-        <tr>
+    ? `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data imam</td></tr>`
+    : imamData.map((item, i) => {
+        const tampil = item.tampil !== false; // default tampil jika field belum ada
+        return `
+        <tr style="${tampil ? '' : 'opacity:0.5'}">
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
+          <td>
+            <button class="btn-sm" style="${tampil ? '' : 'background:rgba(255,255,255,0.06);color:var(--muted);border-color:var(--border)'}" onclick="toggleImamRow(${i})" title="${tampil ? 'Klik untuk sembunyikan dari beranda' : 'Klik untuk tampilkan di beranda'}">${tampil ? '👁 Tampil' : '🚫 Sembunyi'}</button>
+          </td>
           <td><button class="btn-danger" onclick="confirmDeleteImamRow(${i})">🗑</button></td>
-        </tr>`).join('');
+        </tr>`;
+      }).join('');
 }
 
 function renderMuadzinTable() {
   const tbody = document.getElementById('muadzinTableBody');
   tbody.innerHTML = muadzinData.length === 0
-    ? `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:16px">Belum ada data muadzin</td></tr>`
-    : muadzinData.map((item, i) => `
-        <tr>
+    ? `<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:16px">Belum ada data muadzin</td></tr>`
+    : muadzinData.map((item, i) => {
+        const tampil = item.tampil !== false;
+        return `
+        <tr style="${tampil ? '' : 'opacity:0.5'}">
           <td><span class="hari-badge">${item.hari}</span></td>
           <td>${item.nama}</td>
           <td style="color:var(--muted)">${item.keterangan || '-'}</td>
+          <td>
+            <button class="btn-sm" style="${tampil ? '' : 'background:rgba(255,255,255,0.06);color:var(--muted);border-color:var(--border)'}" onclick="toggleMuadzinRow(${i})" title="${tampil ? 'Klik untuk sembunyikan dari beranda' : 'Klik untuk tampilkan di beranda'}">${tampil ? '👁 Tampil' : '🚫 Sembunyi'}</button>
+          </td>
           <td><button class="btn-danger" onclick="confirmDeleteMuadzinRow(${i})">🗑</button></td>
-        </tr>`).join('');
+        </tr>`;
+      }).join('');
 }
 
 function addImamRow() {
@@ -957,7 +981,7 @@ function addImamRow() {
   const nama = document.getElementById('addImamNama').value.trim();
   const ket  = document.getElementById('addImamKet').value.trim();
   if (!nama) { showToast('⚠ Nama imam wajib diisi!'); return; }
-  imamData.push({ hari, nama, keterangan: ket });
+  imamData.push({ hari, nama, keterangan: ket, tampil: true });
   document.getElementById('addImamNama').value = '';
   document.getElementById('addImamKet').value  = '';
   renderImamTable();
@@ -968,7 +992,7 @@ function addMuadzinRow() {
   const nama = document.getElementById('addMuadzinNama').value.trim();
   const ket  = document.getElementById('addMuadzinKet').value.trim();
   if (!nama) { showToast('⚠ Nama muadzin wajib diisi!'); return; }
-  muadzinData.push({ hari, nama, keterangan: ket });
+  muadzinData.push({ hari, nama, keterangan: ket, tampil: true });
   document.getElementById('addMuadzinNama').value = '';
   document.getElementById('addMuadzinKet').value  = '';
   renderMuadzinTable();
@@ -985,6 +1009,27 @@ function confirmDeleteMuadzinRow(i) {
   openConfirmModal('Hapus jadwal muadzin ini?', () => { deleteMuadzinRow(i); });
 }
 
+// Toggle tampil/sembunyi — langsung tersimpan ke Firestore tanpa perlu klik "Simpan Jadwal"
+async function toggleImamRow(i) {
+  if (!imamData[i]) return;
+  imamData[i].tampil = imamData[i].tampil === false ? true : false;
+  renderImamTable();
+  try {
+    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
+    showToast(imamData[i].tampil ? '👁 Ditampilkan di beranda' : '🚫 Disembunyikan dari beranda');
+  } catch (e) { showToast('⚠ Gagal menyimpan: ' + e.message); }
+}
+
+async function toggleMuadzinRow(i) {
+  if (!muadzinData[i]) return;
+  muadzinData[i].tampil = muadzinData[i].tampil === false ? true : false;
+  renderMuadzinTable();
+  try {
+    await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
+    showToast(muadzinData[i].tampil ? '👁 Ditampilkan di beranda' : '🚫 Disembunyikan dari beranda');
+  } catch (e) { showToast('⚠ Gagal menyimpan: ' + e.message); }
+}
+
 async function saveImamMuadzin() {
   try {
     await setDoc(doc(db, 'imam_muadzin', 'jadwal'), { imam: imamData, muadzin: muadzinData });
@@ -999,6 +1044,8 @@ window.deleteImamRow   = deleteImamRow;
 window.deleteMuadzinRow = deleteMuadzinRow;
 window.confirmDeleteImamRow = confirmDeleteImamRow;
 window.confirmDeleteMuadzinRow = confirmDeleteMuadzinRow;
+window.toggleImamRow = toggleImamRow;
+window.toggleMuadzinRow = toggleMuadzinRow;
 window.saveImamMuadzin = saveImamMuadzin;
 
 
@@ -1280,16 +1327,16 @@ function renderPrmaImagePreview() {
         <div class="thumb-item" draggable="true" data-idx="${i}" id="prma-thumb-${i}">
           <img class="thumb-img" src="${src}" alt="Preview ${i + 1}" />
           <div class="thumb-controls">
-            <button class="thumb-btn prma-thumb-edit" data-idx="${i}" title="Ganti">Edit</button>
-            <button class="thumb-btn prma-thumb-delete" data-idx="${i}" title="Hapus">X</button>
+            <button type="button" class="thumb-btn prma-thumb-edit" onclick="event.stopPropagation(); prmaThumbEditClick(${i})" title="Ganti">Edit</button>
+            <button type="button" class="thumb-btn prma-thumb-delete" onclick="event.stopPropagation(); prmaThumbDeleteClick(${i})" title="Hapus">X</button>
           </div>
           <div class="thumb-drag-handle">Drag</div>
         </div>`;
   });
   html += `
-        <div class="thumb-item thumb-empty" data-idx="${prmaPendingImages.length}" id="prma-thumb-add">
+        <button type="button" class="thumb-item thumb-empty" data-idx="${prmaPendingImages.length}" id="prma-thumb-add" onclick="prmaThumbAddClick()">
           <div class="thumb-plus">+</div>
-        </div>`;
+        </button>`;
   html += '</div>';
 
   const grid = preview.querySelector('#prmaThumbGrid');
@@ -1319,20 +1366,6 @@ function renderPrmaImagePreview() {
       movePrmaImage(srcIdx, i);
       renderPrmaImagePreview();
     });
-
-    const editBtn = filledEl.querySelector('.prma-thumb-edit');
-    if (editBtn) editBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      window._replacePrmaThumbIndex = i;
-      document.getElementById('prmaReplaceInput').click();
-    });
-
-    const delBtn = filledEl.querySelector('.prma-thumb-delete');
-    if (delBtn) delBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      prmaPendingImages.splice(i, 1);
-      renderPrmaImagePreview();
-    });
   }
 
   const addEl = grid.querySelector('#prma-thumb-add');
@@ -1347,11 +1380,21 @@ function renderPrmaImagePreview() {
     movePrmaImage(srcIdx, prmaPendingImages.length);
     renderPrmaImagePreview();
   });
-  addEl.addEventListener('click', e => {
-    e.stopPropagation();
-    document.getElementById('prmaImagesInput').click();
-  });
 }
+
+// Helper window-level functions — dipanggil langsung dari onclick="" di HTML
+// supaya kompatibel di semua browser HP (sama seperti tombol upload galeri biasa yang sudah terbukti jalan).
+window.prmaThumbAddClick = function () {
+  document.getElementById('prmaImagesInput').click();
+};
+window.prmaThumbEditClick = function (i) {
+  window._replacePrmaThumbIndex = i;
+  document.getElementById('prmaReplaceInput').click();
+};
+window.prmaThumbDeleteClick = function (i) {
+  prmaPendingImages.splice(i, 1);
+  renderPrmaImagePreview();
+};
 
 function movePrmaImage(sourceIndex, targetIndex) {
   if (!Number.isInteger(sourceIndex) || !Number.isInteger(targetIndex)) return;
