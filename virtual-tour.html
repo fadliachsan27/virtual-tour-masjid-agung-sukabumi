@@ -356,7 +356,7 @@
 </div>
 
 <!-- Sidebar -->
-<div class="vt-sidebar" id="vtSidebar">
+<div class="vt-sidebar collapsed" id="vtSidebar">
   <button class="vt-sidebar-toggle" id="sidebarToggle" title="Buka/Tutup Panel"><span class="toggle-icon">◀</span></button>
   <div class="vt-sidebar-inner">
   <div class="vt-sidebar-label">PILIH LOKASI</div>
@@ -536,6 +536,16 @@
   var Marzipano = window.Marzipano;
   var data = window.APP_DATA;
 
+  // Guard: pastikan Marzipano dan data tersedia
+  if (!Marzipano) {
+    console.error('Marzipano belum tersedia. Pastikan vendor/marzipano.js ter-load dengan benar.');
+    return;
+  }
+  if (!data || !data.scenes) {
+    console.error('APP_DATA belum tersedia. Pastikan data.js ter-load dengan benar.');
+    return;
+  }
+
   // Detect mobile
   if (window.matchMedia) {
     var mql = matchMedia("(max-width: 500px), (max-height: 500px)");
@@ -712,7 +722,9 @@
           document.getElementById('vt-scene-name').textContent = found.data.name;
           document.getElementById('infoTitle').textContent     = found.data.name;
           document.getElementById('infoDesc').textContent      = sceneDescriptions[sceneId] || 'Area ' + found.data.name + ' Masjid Agung Kota Sukabumi.';
-          document.getElementById('vtInfo').classList.remove('hidden');
+          // Sembunyikan info dan sidebar saat pindah scene
+          document.getElementById('vtInfo').classList.add('hidden');
+          document.getElementById('vtSidebar').classList.add('collapsed');
           sidebarButtons.forEach(function(b) {
             b.classList.toggle('active', b.getAttribute('data-scene-id') === sceneId);
           });
@@ -754,7 +766,7 @@
           canvas.style.opacity    = '0';
           vignette.classList.remove('active');
           overlay.classList.remove('active');
-          if (autoRotating) {
+          if (autoRotating && viewer && autorotate) {
             viewer.startMovement(autorotate);
             viewer.setIdleMovement(3000, autorotate);
           }
@@ -790,6 +802,7 @@
   };
 
   window.toggleAutoRotate = function() {
+    if (!viewer || !autorotate) return;
     autoRotating = !autoRotating;
     document.getElementById('autoRotateBtn').style.color = autoRotating ? '#c9a84c' : '#fff';
     if (autoRotating) {
@@ -892,8 +905,15 @@
 
   // INIT — start with first scene
   switchToScene('0-depan-keseluruhan');
-  viewer.startMovement(autorotate);
-  viewer.setIdleMovement(3000, autorotate);
+  // Tampilkan info dan sidebar di scene pertama saja
+  setTimeout(function() {
+    document.getElementById('vtInfo').classList.remove('hidden');
+    document.getElementById('vtSidebar').classList.remove('collapsed');
+  }, 900);
+  if (viewer && autorotate) {
+    viewer.startMovement(autorotate);
+    viewer.setIdleMovement(3000, autorotate);
+  }
   document.getElementById('autoRotateBtn').style.color = '#c9a84c';
 
   // Loading screen
