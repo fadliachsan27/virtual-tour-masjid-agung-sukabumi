@@ -703,11 +703,17 @@ async function loadInfoForm() {
       document.getElementById('infoBerdiri').value   = d.berdiri   || '';
       document.getElementById('infoLuas').value      = d.luas      || '';
       document.getElementById('infoMenara').value    = d.menara    || '';
+      document.getElementById('footerInstagram').value = d.footerInstagram || '';
+      document.getElementById('footerYoutube').value    = d.footerYoutube  || '';
+      document.getElementById('footerLokasi').value     = d.footerLokasi   || '';
     }
     if (prmaDescSnap.exists()) {
       const pd = prmaDescSnap.data();
       document.getElementById('prmaInfoJudul').value     = pd.judul     || '';
       document.getElementById('prmaInfoDeskripsi').value = pd.deskripsi || '';
+      document.getElementById('prmaInfoInstagram').value = pd.instagram || '';
+      document.getElementById('prmaInfoTiktok').value    = pd.tiktok    || '';
+      document.getElementById('prmaInfoYoutube').value   = pd.youtube   || '';
     }
     fiturRows = fiturSnap.exists() ? (fiturSnap.data().items || []) : [
       { icon: '🕌', judul: 'Ruang Utama Shalat',      deskripsi: 'Pusat ibadah dengan mihrab megah dan kubah utama yang menakjubkan.' },
@@ -768,11 +774,17 @@ async function saveInfoMasjid() {
     berdiri:   document.getElementById('infoBerdiri').value,
     luas:      document.getElementById('infoLuas').value,
     menara:    document.getElementById('infoMenara').value,
+    footerInstagram: document.getElementById('footerInstagram').value.trim(),
+    footerYoutube:   document.getElementById('footerYoutube').value.trim(),
+    footerLokasi:    document.getElementById('footerLokasi').value.trim(),
   };
 
   const prmaDesc = {
     judul:     document.getElementById('prmaInfoJudul').value,
     deskripsi: document.getElementById('prmaInfoDeskripsi').value,
+    instagram: document.getElementById('prmaInfoInstagram').value.trim(),
+    tiktok:    document.getElementById('prmaInfoTiktok').value.trim(),
+    youtube:   document.getElementById('prmaInfoYoutube').value.trim(),
   };
 
   try {
