@@ -1606,12 +1606,12 @@ var APP_DATA = {
           "rotation": 0,
           "target": "34-belakang-2"
         },
-        {
-          "yaw": -1.8436818827627501,
-          "pitch": 0.14429828027541092,
-          "rotation": 0,
-          "target": "36-tangga-awal"
-        }
+        // {
+        //   "yaw": -1.8436818827627501,
+        //   "pitch": 0.14429828027541092,
+        //   "rotation": 0,
+        //   "target": "36-tangga-awal"
+        // }
       ],
       "infoHotspots": []
     },
@@ -2040,12 +2040,12 @@ var APP_DATA = {
         "fov": 1.5707963267948966
       },
       "linkHotspots": [
-        {
-          "yaw": 1.4540213650288223,
-          "pitch": 0.32301626725198673,
-          "rotation": 0,
-          "target": "42-bagian-atas-5"
-        },
+        // {
+        //   "yaw": 1.4540213650288223,
+        //   "pitch": 0.32301626725198673,
+        //   "rotation": 0,
+        //   "target": "42-bagian-atas-5"
+        // },
         {
           "yaw": -0.05999418274935309,
           "pitch": 0.2792169927598369,
@@ -2723,7 +2723,7 @@ var APP_DATA = {
     },
     {
       "id": "59-atas-dekat-tangga",
-      "name": "area dekat tangga",
+      "name": "area dekat tangga 2",
       "levels": [
         {
           "tileSize": 256,
@@ -3151,12 +3151,12 @@ var APP_DATA = {
           "rotation": 0,
           "target": "69-bagian-atas-15"
         },
-        {
-          "yaw": -3.0649525418062744,
-          "pitch": 0.1528503287872045,
-          "rotation": 0,
-          "target": "38-bagian-atas-1"
-        }
+        // {
+        //   "yaw": -3.0649525418062744,
+        //   "pitch": 0.1528503287872045,
+        //   "rotation": 0,
+        //   "target": "38-bagian-atas-1"
+        // }
       ],
       "infoHotspots": []
     },
