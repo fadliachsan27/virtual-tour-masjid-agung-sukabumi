@@ -1523,7 +1523,7 @@ var APP_DATA = {
     },
     {
       "id": "32-ruang-dkm",
-      "name": "ruang DKM",
+      "name": "ruang Imam",
       "levels": [
         {
           "tileSize": 256,
@@ -2723,7 +2723,7 @@ var APP_DATA = {
     },
     {
       "id": "59-atas-dekat-tangga",
-      "name": "atas dekat tangga",
+      "name": "area dekat tangga",
       "levels": [
         {
           "tileSize": 256,
